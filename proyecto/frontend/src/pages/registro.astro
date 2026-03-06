@@ -1,77 +1,105 @@
 ---
-import Layout from "../layouts/Layout.astro"
+import Layout from "../layouts/Layout.astro";
 const error = Astro.url.searchParams.get("error");
-
-
 ---
 
 <Layout title="Registro">
-  <div class="flex min-h-screen items-center justify-center bg-gray-100">
-    <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
-      
-      <h1 class="text-2xl font-bold text-center mb-6">
-        Crear cuenta
-      </h1>
 
-  
-      <form method="POST" action="/api/registro" class="space-y-5">
+<div class="relative min-h-screen flex items-center justify-center">
 
-        <div>
-          <label for="name" class="block text-sm font-medium text-gray-700">
-            Nombre
-          </label>
-          <input 
-            type="text"
-            id="name"
-            name="name"
-            required
-            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-700">
-            Correo electrónico
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            autocomplete="email"
-            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700">
-            Contraseña
-          </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            minlength="8"
-            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <button 
-          type="submit"
-          class="w-full bg-sky-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200"
-        >
-          Registrarme
-        </button>
-      </form>
-
-      <p class="text-center text-sm text-gray-600 mt-6">
-        ¿Ya tienes cuenta?
-        <a href="/login" class="text-blue-600 hover:underline font-medium">
-          Inicia sesión
-        </a>
-      </p>
-
-    </div>
+  <!-- Fondo -->
+  <div class="absolute inset-0">
+    <img 
+      src="https://images.unsplash.com/photo-1557683316-973673baf926"
+      class="w-full h-full object-cover"
+      alt="background"
+    />
+    <div class="absolute inset-0 bg-white/70"></div>
   </div>
+
+  <!-- Card -->
+  <div class="relative w-[350px] bg-gray-200 rounded-2xl shadow-xl p-8">
+
+    <!-- Header -->
+    <div class="flex justify-center mb-6">
+      <div class="bg-gray-400 text-white px-6 py-2 rounded-full font-bold shadow-md tracking-wide flex items-center gap-2">
+        📘 CREAR CUENTA
+      </div>
+    </div>
+
+    {error && (
+      <div class="mb-4 text-center text-sm text-red-600 font-medium">
+        {error}
+      </div>
+    )}
+
+    <form method="POST" action="/api/registro" class="space-y-4">
+
+      <!-- Usuario -->
+      <div class="bg-gray-300 rounded-full px-4 py-2 flex items-center gap-3 shadow-inner">
+        <span class="text-gray-600">👤</span>
+        <input 
+          type="text" 
+          name="username"
+          placeholder="Nombre"
+          required
+          class="bg-transparent w-full outline-none text-sm"
+        />
+      </div>
+
+      <!-- Email -->
+      <div class="bg-gray-300 rounded-full px-4 py-2 flex items-center gap-3 shadow-inner">
+        <span class="text-gray-600">✉</span>
+        <input 
+          type="email" 
+          name="email"
+          placeholder="Correo"
+          required
+          class="bg-transparent w-full outline-none text-sm"
+        />
+      </div>
+
+      <!-- Password -->
+      <div class="bg-gray-300 rounded-full px-4 py-2 flex items-center gap-3 shadow-inner">
+        <span class="text-gray-600">🔒</span>
+        <input 
+          type="password" 
+          name="password"
+          placeholder="Contraseña"
+          required
+          minlength="8"
+          class="bg-transparent w-full outline-none text-sm"
+        />
+      </div>
+
+      <!-- Teléfono -->
+      <div class="bg-gray-300 rounded-full px-4 py-2 flex items-center gap-3 shadow-inner">
+        <span class="text-gray-600">📞</span>
+        <input 
+          type="text" 
+          name="telefono"
+          placeholder="Teléfono"
+          class="bg-transparent w-full outline-none text-sm"
+        />
+      </div>
+
+      <!-- Términos -->
+      <div class="flex items-center gap-2 text-xs text-gray-600 mt-2">
+        <input type="checkbox" required />
+        <span>Términos y condiciones</span>
+      </div>
+
+      <!-- Botón -->
+      <button 
+        type="submit"
+        class="w-full mt-4 bg-black text-white py-2 rounded-full font-semibold hover:scale-105 transition duration-200"
+      >
+        REGISTRAR
+      </button>
+
+    </form>
+
+  </div>
+</div>
+
 </Layout>

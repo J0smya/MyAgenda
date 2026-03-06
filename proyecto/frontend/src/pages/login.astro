@@ -2,74 +2,133 @@
 import Layout from "../layouts/Layout.astro";
 ---
 
-
 <Layout title="Iniciar sesión">
-  <div class="flex min-h-screen items-center justify-center bg-gray-100">
-    
-    <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
-      
-      <h1 class="text-2xl font-bold text-center mb-6">
-        Iniciar sesión
-      </h1>
 
-      <form method="POST" action="/api/login" class="space-y-5">
+  <div class="relative min-h-screen flex items-center justify-center">
+
+    <!-- Fondo -->
+    <div class="absolute inset-0">
+      <img 
+        src=""
+        class="w-full h-full object-cover"
+        alt="background"
+      />
+      <div class="absolute inset-0 bg-white/70"></div>
+    </div>
+
+    <!-- Card -->
+    <div class="relative w-[330px] bg-gray-200 rounded-2xl shadow-xl p-8">
+
+      <!-- Header -->
+      <div class="flex justify-center mb-6">
+        <div class="bg-gray-400 text-white px-6 py-2 rounded-full font-bold shadow-md tracking-wide flex items-center gap-2">
+          📅 INICIAR SESIÓN
+        </div>
+      </div>
+
+      <!-- Contenedor del mensaje de error -->
+      <div id="error-message" 
+           class="mb-4 text-center text-sm text-red-600 font-medium hidden bg-red-50 p-3 rounded-xl border border-red-200">
+        <!-- Aquí aparecerán los mensajes -->
+      </div>
+
+      <form id="login-form" class="space-y-4">
 
         <!-- Email -->
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-700">
-            Correo electrónico
-          </label>
-          <input
-            type="email"
-            id="email"
+        <div class="bg-gray-300 rounded-full px-4 py-2 flex items-center gap-3 shadow-inner">
+          <span class="text-gray-600">✉</span>
+          <input 
+            type="email" 
             name="email"
+            placeholder="Correo"
             required
-            autocomplete="email"
-
-            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="bg-transparent w-full outline-none text-sm"
           />
         </div>
 
         <!-- Password -->
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700">
-            Contraseña
-          </label>
-          <input
-            type="password"
-            id="password"
+        <div class="bg-gray-300 rounded-full px-4 py-2 flex items-center gap-3 shadow-inner">
+          <span class="text-gray-600">🔒</span>
+          <input 
+            type="password" 
             name="password"
+            placeholder="Contraseña"
             required
             minlength="8"
-            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="bg-transparent w-full outline-none text-sm"
           />
         </div>
 
-        <!-- Remember me -->
-        <div class="flex items-center justify-between text-sm">
-          <a href="/forgot-password" class="text-blue-600 hover:underline">
-            ¿Olvidaste tu contraseña?
+        <!-- Olvidé contraseña -->
+        <div class="text-xs text-center text-gray-600">
+          <a href="/forgot-password" class="hover:underline">
+            ¿Olvidó su contraseña?
           </a>
         </div>
 
-        <!-- Button -->
-        <button
+        <!-- Botón -->
+        <button 
           type="submit"
-          class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200"
+          class="w-full mt-3 bg-black text-white py-2 rounded-full font-semibold hover:scale-105 transition duration-200"
         >
-          Iniciar sesión
+          INICIAR SESIÓN
         </button>
 
       </form>
 
-      <!-- Register link -->
-      <p class="text-center text-sm text-gray-600 mt-6">
+      <p class="text-center text-xs text-gray-600 mt-5">
         ¿No tienes cuenta?
-        <a href="/register" class="text-blue-600 hover:underline font-medium">
+        <a href="/registro" class="font-semibold hover:underline">
           Crear cuenta
         </a>
       </p>
 
     </div>
   </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    
+    const formElement = document.getElementById('login-form');
+    const errorDiv = document.getElementById('error-message');
+
+    if (!formElement || !errorDiv) {
+      console.warn('No se encontró el formulario o el div de error');
+      return;
+    }
+
+    const form = formElement as HTMLFormElement;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      errorDiv.classList.add('hidden');
+      errorDiv.textContent = '';
+
+      
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          window.location.href = '/dashboard'; // ruta al calendario
+        } else {
+          errorDiv.textContent = data.message || 'Error al iniciar sesión';
+          errorDiv.classList.remove('hidden');
+        }
+      } catch (err) {
+        errorDiv.textContent = 'Error de conexión. Intenta más tarde.';
+        errorDiv.classList.remove('hidden');
+        console.error(err);
+      }
+    });
+  });
+</script>
+
 </Layout>

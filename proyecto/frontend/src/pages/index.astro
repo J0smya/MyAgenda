@@ -1,9 +1,110 @@
 ---
-
-import Layout from '../layouts/Layout.astro';
-
+import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout title="MyAgenda">
-	
+<Layout title="Inicio">
+
+<!-- HEADER -->
+<header class="w-full px-10 py-5 flex items-center justify-between">
+  <div class="flex items-center gap-2 font-bold text-lg">
+    📅 <span>MyAgenda</span>
+  </div>
+
+  <div class="flex gap-3">
+    <a href="/login" class="px-4 py-1 border rounded-full text-sm hover:bg-gray-100">
+      Iniciar sesión
+    </a>
+    <a href="/registro" class="px-4 py-1 border rounded-full text-sm hover:bg-gray-100">
+      Crear cuenta
+    </a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="min-h-[80vh] grid grid-cols-1 lg:grid-cols-2 gap-10 px-10 items-center">
+
+  <!-- IZQUIERDA -->
+  <div>
+    <h1 class="text-4xl font-extrabold leading-tight mb-4">
+      Organiza tus días,<br />
+      en un solo lugar
+    </h1>
+
+    <p class="text-gray-600 mb-6">
+      Organiza tu día, conquista tu meta.
+    </p>
+
+    <a
+      href="/registro"
+      class="inline-block bg-blue-600 text-white px-6 py-3 rounded-full font-semibold mb-6 hover:bg-blue-700 transition"
+    >
+      Comenzar ahora
+    </a>
+
+    <!-- ICONOS -->
+    <div class="flex gap-6">
+      <div class="flex flex-col items-center text-sm">
+        <span class="text-xl">✅</span>
+        <span>Tareas</span>
+      </div>
+      <div class="flex flex-col items-center text-sm">
+        <span class="text-xl">📅</span>
+        <span>Agenda</span>
+      </div>
+      <div class="flex flex-col items-center text-sm">
+        <span class="text-xl">📝</span>
+        <span>Notas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PREVIEW -->
+  <div class="relative flex justify-center">
+
+    <!-- ICONOS VERTICALES -->
+    <div class="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-300 rounded-xl px-3 py-4 space-y-4 shadow">
+      <div>📄</div>
+      <div>📋</div>
+      <div>⚙</div>
+    </div>
+
+    <!-- CARD -->
+    <div class="bg-gray-100 w-80 rounded-2xl shadow-xl p-6">
+      <h3 class="font-bold mb-4">HOY</h3>
+
+      <ul class="space-y-3 text-sm">
+        <li class="flex items-start gap-2">
+          ✔️ 
+          <span>
+            <b>Revisión proyecto</b><br>
+            <span class="text-xs text-gray-500">10:00 PM</span>
+          </span>
+        </li>
+        <li class="flex items-start gap-2">
+          ⭕ <span>Comprar materiales</span>
+        </li>
+        <li class="flex items-start gap-2">
+          ⭕ 
+          <span>
+            Llamar cliente<br>
+            <span class="text-xs text-gray-500">03:00 PM</span>
+          </span>
+        </li>
+      </ul>
+
+      <hr class="my-4">
+
+      <p class="text-xs text-gray-500 mb-2">Próximos eventos</p>
+
+      <ul class="text-sm space-y-2">
+        <li>Reunión de equipo — 08:00 AM</li>
+        <li>Almuerzo con Marta — 01:00 PM</li>
+        <li>Pasear a Lola — 08:00 PM</li>
+      </ul>
+    </div>
+
+  </div>
+
+</section>
+
 </Layout>

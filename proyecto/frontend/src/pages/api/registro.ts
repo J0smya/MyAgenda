@@ -11,8 +11,9 @@ export const POST: APIRoute = async ({ request }) => {
     const name = formData.get("name")?.toString().trim();
     const email = formData.get("email")?.toString().trim();
     const password = formData.get("password")?.toString();
+    const telefono = formData.get("telefono")?.toString();
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !telefono) {
       return new Response("Campos vacíos", { status: 400 });
     }
 
@@ -28,8 +29,8 @@ export const POST: APIRoute = async ({ request }) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await pool.query(
-      "INSERT INTO usuario (nombre, email, contrasena) VALUES ($1, $2, $3)",
-      [name, email, hashedPassword]
+      "INSERT INTO usuario (nombre, email, contrasena, telefono) VALUES ($1, $2, $3, $4)",
+      [name, email, hashedPassword, telefono]
     );
 
     return Response.redirect(new URL("/login", request.url));
