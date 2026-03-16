@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { pool } from "../../lib/dashboard";
+import { pool } from "../../lib/db";
 
 export const POST: APIRoute = async ({ request }) => {
   try {
