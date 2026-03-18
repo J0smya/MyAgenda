@@ -1,289 +1,183 @@
 ---
+import '../styles/global.css'
+import '../styles/landing.css'
 import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout title="MyAgenda Pro 2026">
-  <div class="flex h-screen bg-slate-50 overflow-hidden font-sans text-slate-900">
-    
-    <aside class="w-64 bg-[#0f172a] text-white p-6 flex flex-col gap-8 shadow-2xl z-20">
-      <div class="text-2xl font-black text-blue-400 flex items-center gap-2 italic tracking-tighter">
-        <span>📅</span> MYAGENDA
-      </div>
-      <div class="space-y-6">
-        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">FILTROS ACTIVOS</h3>
-        <div class="space-y-4 text-sm font-bold">
-            <label class="flex items-center gap-3 cursor-pointer group">
-              <input type="checkbox" id="f-trabajo" checked class="w-5 h-5 accent-blue-500 filter-input"> 
-              <span>TRABAJO</span>
-            </label>
-            <label class="flex items-center gap-3 cursor-pointer group">
-              <input type="checkbox" id="f-personal" checked class="w-5 h-5 accent-green-500 filter-input"> 
-              <span>PERSONAL</span>
-            </label>
-        </div>
-      </div>
-    </aside>
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Agenda</title>
+  </head>
 
-    <main class="flex-1 flex flex-col bg-white">
-      <header class="p-6 border-b flex justify-between items-center shadow-sm">
-        <div>
-            <h2 id="header-title" class="text-2xl font-black text-slate-800 uppercase italic tracking-tighter">...</h2>
-            <p id="live-clock" class="text-[10px] font-bold text-blue-500 tracking-widest uppercase"></p>
-        </div>
-        <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl">
-            <button data-v="dia" class="nav-btn px-6 py-2 rounded-xl font-black text-[10px]">HOY</button>
-            <button data-v="semana" class="nav-btn px-6 py-2 rounded-xl font-black text-[10px]">SEMANA</button>
-            <button data-v="mes" class="nav-btn px-6 py-2 rounded-xl font-black text-[10px]">MES</button>
-            <button id="btn-add" class="ml-4 bg-blue-600 text-white px-6 py-2 rounded-xl font-black text-[10px] shadow-lg hover:bg-blue-700 transition-all">+ AGENDAR</button>
-        </div>
-      </header>
-      <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50" id="view-container"></div>
-    </main>
-  </div>
+  <body>
+    <!-- ── NAV ── -->
+    <nav class="nav">
+      <a href="/" class="nav__brand">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        My Agenda
+      </a>
+      <div class="nav__actions">
+        <button class="btn-outline" onclick="window.location.href='/login'">Iniciar sesión</button>
+        <button class="btn-outline" onclick="window.location.href='/registro'">Crear cuenta</button>
+      </div>
+    </nav>
 
-  <div id="modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden items-center justify-center z-[100] p-4">
-    <div class="bg-white w-full max-w-md rounded-[3rem] shadow-2xl border-t-[12px] border-blue-600">
-      <form id="task-form" class="p-8 space-y-6">
-        <div class="text-center">
-            <h3 class="text-2xl font-black italic uppercase text-slate-800">Agendar Cita</h3>
-            <p id="modal-desc" class="text-[10px] font-bold text-blue-500 tracking-widest uppercase mt-1"></p>
-        </div>
-        <div class="space-y-1">
-            <label class="text-[10px] font-black text-slate-400 uppercase ml-2">¿Qué tienes pendiente?</label>
-            <input type="text" id="t-name" required placeholder="TITULO DE LA TAREA" class="w-full bg-slate-100 p-4 rounded-2xl font-bold uppercase outline-none focus:ring-2 ring-blue-500">
-        </div>
-        <div id="dynamic-date-container" class="space-y-3"></div>
-        <div id="hour-section" class="space-y-4">
-            <div id="toggle-hour-container" class="hidden flex items-center justify-between bg-slate-50 p-4 rounded-2xl border">
-                <span class="text-[10px] font-black text-slate-500 uppercase">¿Hora específica?</span>
-                <input type="checkbox" id="use-hour" checked class="w-5 h-5 accent-blue-600">
+    <!-- ── HERO ── -->
+    <section class="hero">
+
+      <!-- Columna izquierda -->
+      <div class="hero__left">
+        <h1 class="hero__title">Organiza tus dias,<br />en un solo lugar</h1>
+        <p class="hero__subtitle">Organiza tu día, conquista tu meta.</p>
+        <a href="#" class="btn-primary">Comenzar ahora</a>
+
+        <div class="features">
+          <div class="feature-item">
+            <div class="feature-item__icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 11 12 14 22 4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div id="hour-input-wrapper"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Hora</label><input type="time" id="t-time" class="w-full bg-slate-100 p-4 rounded-2xl font-bold outline-none disabled:opacity-20"></div>
-                <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Categoría</label><select id="t-cat" class="w-full bg-slate-100 p-4 rounded-2xl font-bold outline-none"><option value="trabajo">TRABAJO</option><option value="personal">PERSONAL</option></select></div>
+            Tareas
+          </div>
+          <div class="feature-item">
+            <div class="feature-item__icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
             </div>
+            Agenda
+          </div>
+          <div class="feature-item">
+            <div class="feature-item__icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </div>
+            Notas
+          </div>
         </div>
-        <input type="hidden" id="t-date-final">
-        <div class="flex gap-4 pt-4 font-black">
-            <button type="button" id="close-modal" class="flex-1 text-slate-400 uppercase text-xs">CANCELAR</button>
-            <button type="submit" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl shadow-lg uppercase text-xs">CONFIRMAR</button>
+      </div>
+
+      <!-- Columna derecha – Mockup -->
+      <div class="hero__right">
+        <div class="mockup">
+          <!-- Sidebar -->
+          <div class="mockup__sidebar">
+            <div class="mockup__sidebar-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+            </div>
+            <div class="mockup__sidebar-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+            </div>
+            <div class="mockup__sidebar-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"></path>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Tarjeta -->
+          <div class="mockup__card">
+            <h2 class="mockup__card-title">HOY</h2>
+
+            <ul class="task-list">
+              <li class="task-item">
+                <div class="task-item__check--done">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <span class="task-item__name" style="text-decoration:line-through;color:#9ca3af;">Revisión proyecto</span>
+                  <small class="task-item__time">10:00 AM</small>
+                </div>
+              </li>
+              <li class="task-item">
+                <div class="task-item__check--pending"></div>
+                <div>
+                  <span class="task-item__name">Comprar materiales</span>
+                </div>
+              </li>
+              <li class="task-item">
+                <div class="task-item__check--pending"></div>
+                <div>
+                  <span class="task-item__name">Llamar cliente</span>
+                  <small class="task-item__time">03:00 PM</small>
+                </div>
+              </li>
+            </ul>
+
+            <div class="events">
+              <h3 class="events__title">Próximos eventos</h3>
+              <ul class="event-list">
+                <li>
+                  <p class="event-item__name">Reunión de equipo</p>
+                  <small class="event-item__time">09:00 AM</small>
+                </li>
+                <li>
+                  <p class="event-item__name">Almuerzo con Marta</p>
+                  <small class="event-item__time">01:00 PM</small>
+                </li>
+                <li>
+                  <p class="event-item__name">Pasear a Lola</p>
+                  <small class="event-item__time">10:00 PM</small>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-      </form>
+      </div>
+    </section>
+
+    <!-- ── PLATAFORMAS ── -->
+    <div class="platforms">
+      <p class="platforms__label">Disponible en todas tus plataformas favoritas</p>
+      <div class="platforms__badges">
+        <a href="#" class="badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#3b9edd"><path d="M3 20.5v-17l17.5 8.5L3 20.5z"></path></svg>
+          Google Play
+        </a>
+        <a href="#" class="badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#555">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"></path>
+          </svg>
+          App Store
+        </a>
+        <a href="#" class="badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          Descarga Pc
+        </a>
+      </div>
     </div>
-  </div>
-</Layout>
 
-<script>
-  interface Tarea { nombre: string; categoria: string; hora: string; fecha: string; }
-  let allTasks: Tarea[] = [];
-  let currentView: 'dia' | 'semana' | 'mes' = 'dia';
-  let today = new Date();
-
-  const container = document.getElementById('view-container');
-  const hTitle = document.getElementById('header-title');
-  const liveClock = document.getElementById('live-clock');
-
-  // Reloj
-  setInterval(() => {
-    const now = new Date();
-    if (liveClock) liveClock.innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    if (now.getDate() !== today.getDate()) { today = now; render(); }
-  }, 1000);
-
-  async function loadTasks() {
-    try {
-      const res = await fetch('/api/tareas');
-      if (res.ok) {
-        allTasks = await res.json();
-        render();
-      }
-    } catch (e) { render(); }
-  }
-
-  function render() {
-    if (!container || !hTitle) return;
-    const isT = (document.getElementById('f-trabajo') as HTMLInputElement).checked;
-    const isP = (document.getElementById('f-personal') as HTMLInputElement).checked;
-
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      const b = btn as HTMLElement;
-      b.className = `nav-btn px-6 py-2 rounded-xl font-black text-[10px] ${b.dataset.v === currentView ? 'bg-white shadow-md text-blue-600 border border-blue-100 scale-105' : 'text-slate-400'}`;
-    });
-
-    if (!isT && !isP) {
-        hTitle.innerText = "SISTEMA PAUSADO";
-        container.innerHTML = `<div class="h-full flex flex-col items-center justify-center opacity-50"><span class="text-4xl mb-4">🔦</span><h3 class="font-black text-slate-400 uppercase">Sin filtros activos</h3></div>`;
-        return;
-    }
-
-    const filtered = allTasks.filter(t => (t.categoria === 'trabajo' && isT) || (t.categoria === 'personal' && isP));
-    
-    if (currentView === 'dia') renderDia(filtered, isT, isP);
-    else if (currentView === 'semana') renderSemana(filtered);
-    else renderMes(filtered);
-  }
-
-  // --- VISTAS ---
-  function renderDia(tasks: Tarea[], showT: boolean, showP: boolean) {
-    const dStr = today.toISOString().split('T')[0];
-    hTitle!.innerText = today.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-    let grid = `grid-cols-[80px${showT?'_1fr':''}${showP?'_1fr':''}]`;
-    let html = `<div class="grid ${grid} bg-white rounded-[2rem] shadow-sm border overflow-hidden">`;
-    html += `<div class="h-12 bg-slate-50 border-b"></div>`;
-    if(showT) html += `<div class="h-12 border-b border-r flex items-center justify-center font-black text-blue-600 bg-blue-50/20 text-[9px]">TRABAJO</div>`;
-    if(showP) html += `<div class="h-12 border-b flex items-center justify-center font-black text-green-600 bg-green-50/20 text-[9px]">PERSONAL</div>`;
-    for(let i=0; i<24; i++) {
-        const h = i.toString().padStart(2,'0');
-        html += `<div class="h-16 border-b flex items-center justify-center text-[10px] font-black text-slate-300">${h}:00</div>`;
-        if(showT) html += `<div class="border-b border-r p-1">${tasks.filter(t=>t.fecha===dStr && t.categoria==='trabajo' && t.hora.startsWith(h)).map(t=>`<div class="bg-blue-600 text-white p-2 rounded-xl text-[8px] font-black uppercase mb-1">${t.nombre}</div>`).join('')}</div>`;
-        if(showP) html += `<div class="border-b p-1">${tasks.filter(t=>t.fecha===dStr && t.categoria==='personal' && t.hora.startsWith(h)).map(t=>`<div class="bg-green-500 text-white p-2 rounded-xl text-[8px] font-black uppercase mb-1">${t.nombre}</div>`).join('')}</div>`;
-    }
-    container!.innerHTML = html + `</div>`;
-  }
-
-  function renderSemana(tasks: Tarea[]) {
-    hTitle!.innerText = "PLAN SEMANAL";
-    let html = `<div class="grid grid-cols-7 gap-4 h-full">`;
-    const start = new Date(today); start.setDate(today.getDate() - (today.getDay() === 0 ? 6 : today.getDay() - 1));
-    for(let i=0; i<7; i++) {
-        const d = new Date(start); d.setDate(start.getDate()+i);
-        const dStr = d.toISOString().split('T')[0];
-        const isT = dStr === today.toISOString().split('T')[0];
-        html += `<div class="bg-white border-2 ${isT?'border-blue-500 shadow-lg':'border-slate-100'} rounded-[2rem] p-4 min-h-[400px]">
-            <div class="text-center mb-4"><div class="text-[9px] font-black text-slate-400 uppercase">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div><div class="text-xl font-black">${d.getDate()}</div></div>
-            <div class="space-y-2">${tasks.filter(t=>t.fecha===dStr).map(t=>`<div class="${t.categoria==='trabajo'?'bg-blue-600':'bg-green-500'} text-white p-2 rounded-xl text-[8px] font-black uppercase">${t.nombre} ${t.hora && t.hora!=='00:00' ? `• ${t.hora}`:''}</div>`).join('')}</div>
-        </div>`;
-    }
-    container!.innerHTML = html + `</div>`;
-  }
-
-  function renderMes(tasks: Tarea[]) {
-    const y = today.getFullYear(), m = today.getMonth();
-    hTitle!.innerText = today.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
-    const first = new Date(y, m, 1).getDay();
-    const days = new Date(y, m + 1, 0).getDate();
-    const offset = first === 0 ? 6 : first - 1;
-    let html = `<div class="grid grid-cols-7 gap-2">`;
-    ["LUN","MAR","MIÉ","JUE","VIE","SÁB","DOM"].forEach(d => html += `<div class="text-center text-[10px] font-black text-slate-400 py-2">${d}</div>`);
-    for(let i=0; i<offset; i++) html += `<div></div>`;
-    for(let d=1; d<=days; d++) {
-        const dStr = new Date(y,m,d).toISOString().split('T')[0];
-        const isT = dStr === today.toISOString().split('T')[0];
-        html += `<div class="bg-white border-2 ${isT?'border-blue-500 shadow-md':'border-slate-100'} rounded-2xl p-2 min-h-[90px]">
-            <div class="text-[10px] font-black ${isT?'text-blue-600':'text-slate-300'} mb-1">${d}</div>
-            <div class="flex flex-wrap gap-1">${tasks.filter(t=>t.fecha===dStr).slice(0,4).map(t=>`<div class="h-1.5 w-1.5 rounded-full ${t.categoria==='trabajo'?'bg-blue-500':'bg-green-500'}"></div>`).join('')}</div>
-        </div>`;
-    }
-    container!.innerHTML = html + `</div>`;
-  }
-
-  // --- FORMULARIO Y MODAL ---
-  const modal = document.getElementById('modal');
-  const dateContainer = document.getElementById('dynamic-date-container');
-  const hourInputWrapper = document.getElementById('hour-input-wrapper');
-  const toggleHourContainer = document.getElementById('toggle-hour-container');
-  const useHourCheckbox = document.getElementById('use-hour') as HTMLInputElement;
-  const timeInput = document.getElementById('t-time') as HTMLInputElement;
-  const dateFinal = document.getElementById('t-date-final') as HTMLInputElement;
-
-  useHourCheckbox?.addEventListener('change', () => {
-    timeInput.disabled = !useHourCheckbox.checked;
-    timeInput.required = useHourCheckbox.checked;
-  });
-
-  document.getElementById('btn-add')?.addEventListener('click', () => {
-    modal?.classList.remove('hidden');
-    buildDynamicForm();
-  });
-
-  function buildDynamicForm() {
-    if (!dateContainer || !hourInputWrapper || !toggleHourContainer) return;
-    dateContainer.innerHTML = '';
-    const desc = document.getElementById('modal-desc');
-    toggleHourContainer.classList.add('hidden');
-    hourInputWrapper.classList.remove('hidden');
-    timeInput.disabled = false;
-    timeInput.required = true;
-
-    if (currentView === 'dia') {
-        desc!.innerText = "Para hoy";
-        dateFinal.value = today.toISOString().split('T')[0];
-        dateContainer.innerHTML = `<div class="bg-blue-50 p-4 rounded-2xl border-2 border-dashed border-blue-200 text-center text-blue-600 font-black text-[10px]">FECHA: HOY</div>`;
-    } else if (currentView === 'semana') {
-        desc!.innerText = "Elegir día de la semana";
-        toggleHourContainer.classList.remove('hidden');
-        let html = `<div class="grid grid-cols-7 gap-1">`;
-        const start = new Date(today); start.setDate(today.getDate() - (today.getDay() === 0 ? 6 : today.getDay() - 1));
-        for(let i=0; i<7; i++) {
-            const d = new Date(start); d.setDate(start.getDate()+i);
-            const dStr = d.toISOString().split('T')[0];
-            html += `<button type="button" data-date="${dStr}" class="week-btn p-2 rounded-xl border-2 border-slate-100 flex flex-col items-center hover:border-blue-500 transition-all">
-                <span class="text-[8px] font-black text-slate-400 uppercase">${d.toLocaleDateString('es-ES',{weekday:'short'})}</span>
-                <span class="text-xs font-black">${d.getDate()}</span>
-            </button>`;
-        }
-        dateContainer.innerHTML = html + `</div>`;
-        document.querySelectorAll('.week-btn').forEach(btn => btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('bg-blue-600', 'text-white', 'border-blue-600'));
-            (e.currentTarget as HTMLElement).classList.add('bg-blue-600', 'text-white', 'border-blue-600');
-            dateFinal.value = (e.currentTarget as HTMLElement).dataset.date!;
-        }));
-    } else {
-        desc!.innerText = "Programación mensual";
-        dateContainer.innerHTML = `<input type="date" id="date-picker-mes" class="w-full bg-slate-100 p-4 rounded-2xl font-bold outline-none focus:ring-2 ring-blue-500">`;
-        const picker = document.getElementById('date-picker-mes') as HTMLInputElement;
-        picker.value = today.toISOString().split('T')[0];
-        dateFinal.value = picker.value;
-        picker.addEventListener('change', () => dateFinal.value = picker.value);
-        hourInputWrapper.classList.add('hidden');
-        timeInput.required = false;
-        timeInput.value = "00:00";
-    }
-  }
-
-  // --- LÓGICA DE GUARDADO OPTIMISTA ---
-  const form = document.getElementById('task-form') as HTMLFormElement;
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!dateFinal.value) return alert("Selecciona un día");
-    
-    // 1. Crear el objeto de la tarea
-    const nuevaTarea: Tarea = {
-        nombre: (document.getElementById('t-name') as HTMLInputElement).value,
-        fecha: dateFinal.value,
-        hora: (currentView === 'semana' && !useHourCheckbox.checked) ? "00:00" : timeInput.value,
-        categoria: (document.getElementById('t-cat') as HTMLSelectElement).value
-    };
-
-    // 2. GUARDAR EN EL SITIO (Local) PRIMERO
-    allTasks.push(nuevaTarea);
-    render(); // Actualiza la UI instantáneamente
-    form.reset();
-    document.getElementById('modal')?.classList.add('hidden');
-
-    // 3. GUARDAR EN LA BASE DE DATOS (Background)
-    try {
-        const res = await fetch('/api/tareas', { 
-          method:'POST', 
-          headers:{'Content-Type':'application/json'}, 
-          body:JSON.stringify(nuevaTarea)
-        });
-        
-        if (!res.ok) {
-            // Si la base de datos falla, podrías revertir el cambio o avisar
-            console.error("Error al guardar en BD, pero se mantiene en sesión local.");
-        }
-    } catch (err) {
-        console.error("Fallo de red al intentar guardar en BD.");
-    }
-  });
-
-  document.getElementById('close-modal')?.addEventListener('click', () => modal?.classList.add('hidden'));
-  document.querySelectorAll('.filter-input').forEach(i => i.addEventListener('change', render));
-  document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', (e) => {
-    currentView = (e.currentTarget as HTMLElement).dataset.v as any;
-    render();
-  }));
-
-  loadTasks();
-</script>
+  </body>
+</html>

@@ -8,24 +8,31 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const formData = await request.formData();
 
-    const name = formData.get("name")?.toString().trim();
-    const email = formData.get("email")?.toString().trim();
+    const name     = formData.get("name")?.toString().trim();
+    const email    = formData.get("email")?.toString().trim();
     const password = formData.get("password")?.toString();
-    const telefono = formData.get("telefono")?.toString();
+    const telefono = formData.get("telefono")?.toString().trim();
 
+    // ── Validación ──
     if (!name || !email || !password || !telefono) {
-      return new Response("Campos vacíos", { status: 400 });
+      return new Response("Por favor completa todos los campos.", { status: 400 });
     }
 
+    if (password.length < 8) {
+      return new Response("La contraseña debe tener al menos 8 caracteres.", { status: 400 });
+    }
+
+    // ── Correo duplicado ──
     const userExist = await pool.query(
       "SELECT id_usuario FROM usuario WHERE email = $1",
       [email]
     );
 
     if (userExist.rows.length > 0) {
-      return new Response("Correo ya registrado", { status: 400 });
+      return new Response("Este correo ya está registrado.", { status: 409 });
     }
 
+    // ── Insertar ──
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await pool.query(
@@ -33,15 +40,10 @@ export const POST: APIRoute = async ({ request }) => {
       [name, email, hashedPassword, telefono]
     );
 
-    return Response.redirect(new URL("/login", request.url));
+    return new Response("ok", { status: 200 });
 
   } catch (error: any) {
-    console.error("🔥 ERROR COMPLETO:");
-    console.error(error);
-    console.error("Mensaje:", error.message);
-    console.error("Detalle:", error.detail);
-    console.error("Código:", error.code);
-
-    return new Response("Error interno", { status: 500 });
+    console.error("🔥 ERROR:", error.message, error.detail);
+    return new Response("Error interno del servidor. Intenta de nuevo.", { status: 500 });
   }
 };
