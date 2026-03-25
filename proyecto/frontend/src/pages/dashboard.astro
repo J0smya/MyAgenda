@@ -1,9 +1,7 @@
 ---
-// --- SECCIÓN FRONTMATTER (Astro) ---
-// Aquí se importa el componente base que envuelve toda la página.
 import Layout from "../layouts/Layout.astro";
 ---
-
+ 
 <Layout title="MyAgenda Pro 2026">
   <div class="flex h-screen bg-[#f1f5f9] overflow-hidden font-sans text-slate-900 relative">
     
@@ -26,7 +24,7 @@ import Layout from "../layouts/Layout.astro";
         </div>
       </div>
     </aside>
-
+ 
     <main class="flex-1 flex flex-col bg-white">
       <header class="p-8 border-b flex justify-between items-center bg-white/90 backdrop-blur-md sticky top-0 z-10">
         <div class="flex items-center gap-8">
@@ -50,14 +48,14 @@ import Layout from "../layouts/Layout.astro";
             <button id="btn-add" class="ml-4 bg-[#1e60ff] text-white px-8 py-2.5 rounded-[1.5rem] font-black text-[11px] shadow-lg hover:bg-blue-700 transition-all uppercase">+ NUEVA TAREA</button>
         </div>
       </header>
-
+ 
       <div class="flex-1 overflow-y-auto p-8 bg-[#f8fafc]" id="view-container"></div>
     </main>
-
+ 
     <button id="btn-ai-toggle" class="fixed bottom-8 right-8 w-16 h-16 bg-[#0f172a] text-blue-400 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all z-[150] border-4 border-white">
         <span class="text-2xl">🤖</span>
     </button>
-
+ 
     <div id="ai-window" class="fixed bottom-28 right-8 w-80 h-[500px] bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 hidden flex-col overflow-hidden z-[150] animate-in fade-in slide-in-from-bottom-5">
         <div class="p-6 bg-[#0f172a] text-white flex justify-between items-center font-black italic uppercase text-xs">Asistente IA</div>
         <div class="flex-1 p-6 overflow-y-auto text-[10px] font-black uppercase italic text-slate-400">¿En qué puedo ayudarte?</div>
@@ -65,7 +63,7 @@ import Layout from "../layouts/Layout.astro";
             <input type="text" class="w-full bg-white border-none p-4 rounded-full font-black text-[10px] outline-none shadow-sm uppercase" placeholder="ESCRIBE...">
         </div>
     </div>
-
+ 
     <div id="modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden items-center justify-center z-[200] p-4">
       <div class="bg-white w-full max-w-xl rounded-[2.5rem] p-8 shadow-2xl overflow-y-auto max-h-[95vh]">
         <form id="task-form" class="space-y-5">
@@ -84,7 +82,7 @@ import Layout from "../layouts/Layout.astro";
                   <option value="personal">🏠 PERSONAL</option>
               </select>
           </div>
-
+ 
           <div class="flex flex-col items-center gap-3">
               <label class="flex items-center gap-3 cursor-pointer group bg-slate-50 px-6 py-3 rounded-full border border-slate-100">
                   <input type="checkbox" id="t-usa-hora" class="w-5 h-5 accent-blue-600">
@@ -94,7 +92,7 @@ import Layout from "../layouts/Layout.astro";
                   <input type="time" id="t-hora-inicio" class="w-full bg-blue-50 border-none p-4 rounded-[1.5rem] font-black text-center outline-none text-blue-600">
               </div>
           </div>
-
+ 
           <div class="pt-4 space-y-3">
               <button type="submit" class="w-full bg-[#1e60ff] text-white py-5 rounded-full font-black uppercase text-xs shadow-lg hover:bg-blue-700 transition-all">GUARDAR TAREA</button>
               <button type="button" id="close-modal" class="w-full py-2 font-black text-[10px] text-slate-400 uppercase tracking-widest hover:text-red-500">CANCELAR</button>
@@ -102,7 +100,7 @@ import Layout from "../layouts/Layout.astro";
         </form>
       </div>
     </div>
-
+ 
     <div id="modal-view" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden items-center justify-center z-[210] p-4">
       <div class="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl relative border-t-8 border-blue-500">
         <div id="view-content" class="space-y-6"></div>
@@ -112,231 +110,321 @@ import Layout from "../layouts/Layout.astro";
         </div>
       </div>
     </div>
-
+ 
+    <!-- BOTÓN ETIQUETAS -->
+    <button id="btn-etiquetas" class="fixed bottom-28 right-8 w-16 h-16 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all z-[150] border-4 border-white" title="Gestionar etiquetas">
+      <span class="text-xl">🏷️</span>
+    </button>
+ 
+    <!-- MODAL ETIQUETAS -->
+    <div id="modal-etiquetas" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden items-center justify-center z-[220] p-4">
+      <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="font-black italic uppercase text-2xl tracking-tighter">🏷️ Etiquetas</h3>
+          <button id="close-etiquetas" class="bg-slate-100 hover:bg-red-500 hover:text-white w-10 h-10 rounded-full font-black text-slate-500 transition-all">✕</button>
+        </div>
+        <div id="etiquetas-list" class="space-y-3 mb-6"></div>
+        <div id="etiquetas-form" class="hidden border-t pt-6 space-y-4">
+          <h4 class="font-black uppercase text-sm text-slate-500">✏️ Editar Etiqueta</h4>
+          <input type="hidden" id="e-id" />
+          <input type="text" id="e-nombre" placeholder="NOMBRE" maxlength="100" class="w-full bg-slate-50 border-2 border-slate-200 p-4 rounded-2xl font-bold uppercase outline-none focus:border-blue-400" />
+          <div class="flex items-center gap-4">
+            <input type="color" id="e-color" value="#3b82f6" class="w-14 h-14 rounded-full border-none cursor-pointer" />
+            <span class="font-black text-sm text-slate-500">Elige un color</span>
+          </div>
+          <div class="flex gap-3">
+            <button id="e-guardar" class="flex-1 bg-blue-600 text-white py-4 rounded-full font-black uppercase text-xs hover:bg-blue-700 transition-all">GUARDAR</button>
+            <button id="e-cancelar" class="bg-slate-100 text-slate-500 px-6 py-4 rounded-full font-black uppercase text-xs hover:bg-slate-200 transition-all">CANCELAR</button>
+          </div>
+        </div>
+        <div id="etiquetas-toast" class="hidden text-center py-3 px-6 rounded-full text-xs font-black uppercase mt-4"></div>
+      </div>
+    </div>
+ 
   </div>
 </Layout>
-
+ 
 <script>
-  // --- LÓGICA DE JAVASCRIPT (CLIENTE) ---
-
-  // Interfaz para definir la estructura de datos de una Tarea
-  interface Tarea { id: any; titulo: string; descripcion: string; fecha: string; hora: string | null; prioridad: string; categoria: string; }
-  
-  // Estado de la aplicación
-  let allTasks: Tarea[] = []; // Almacena todas las tareas traídas de la DB
-  let currentView: 'dia' | 'semana' | 'mes' = 'dia'; // Vista actual
-  let viewDate = new Date(); // Fecha de referencia para navegar
-  let selectedTaskId: any = null; // Tarea seleccionada para ver detalles o borrar
-
-  // Elementos del DOM vinculados a variables
-  const container = document.getElementById('view-container') as HTMLDivElement;
-  const hTitle = document.getElementById('header-title') as HTMLElement;
-  const modalCreate = document.getElementById('modal');
-  const modalView = document.getElementById('modal-view');
-  const viewContent = document.getElementById('view-content');
-  const taskForm = document.getElementById('task-form') as HTMLFormElement;
-
-  // Evento para alternar la visibilidad de la ventana de IA
-  document.getElementById('btn-ai-toggle')?.addEventListener('click', () => {
-    document.getElementById('ai-window')?.classList.toggle('hidden');
-  });
-
-  // FUNCIÓN LOAD: Obtiene las tareas desde el endpoint de la API
-  async function load() {
-    try {
-        const response = await fetch('/api/dashboard');
-        const data = await response.json();
-        if (data.success) {
-            // Transforma los nombres de columnas de SQL a propiedades de JS
-            allTasks = data.tareas.map((t: any) => ({
-                id: t.id_tarea,
-                titulo: t.titulo,
-                descripcion: t.descripcion,
-                fecha: t.fecha_inicio ? new Date(t.fecha_inicio).toISOString().split('T')[0] : '',
-                hora: t.hora_inicio,
-                prioridad: t.prioridad,
-                categoria: t.categoria || 'personal'
-            }));
-            render(); // Ejecuta el dibujo de la interfaz
-        }
-    } catch (err) { console.error("Error al cargar:", err); }
-  }
-
-  // FUNCIÓN RENDER: Determina qué vista dibujar y aplica filtros de categoría
-  function render() {
-    if (!container) return;
-    // Lee el estado de los filtros del sidebar
-    const sT = (document.getElementById('f-trabajo') as HTMLInputElement).checked;
-    const sP = (document.getElementById('f-personal') as HTMLInputElement).checked;
-    
-    // Filtra el array de tareas según lo seleccionado
-    const filtered = allTasks.filter(t => (t.categoria === 'trabajo' && sT) || (t.categoria === 'personal' && sP));
-
-    // Actualiza el estilo visual de los botones de navegación (Día/Semana/Mes)
-    document.querySelectorAll('.nav-btn').forEach(b => {
-        const btn = b as HTMLElement;
-        btn.className = `nav-btn px-8 py-2.5 rounded-[1.5rem] font-black text-[11px] transition-all ${btn.dataset.v === currentView ? 'bg-[#0f172a] text-white shadow-xl scale-105' : 'text-slate-400 hover:text-slate-600'}`;
-    });
-
-    // Llama a la función específica de dibujo según la vista
-    if (currentView === 'dia') renderDia(filtered);
-    else if (currentView === 'semana') renderSemana(filtered);
-    else renderMes(filtered);
-  }
-
-  // DIBUJAR DÍA: Crea una lista vertical de 24 bloques de hora
-  function renderDia(filtered: Tarea[]) {
-    const dStr = viewDate.toISOString().split('T')[0];
-    hTitle.innerText = viewDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-    let html = `<div class="grid grid-cols-[100px_1fr] bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-2xl">`;
-    for (let i = 0; i < 24; i++) {
-        const h = i.toString().padStart(2, '0');
-        const tasksH = filtered.filter(t => t.fecha === dStr && t.hora?.startsWith(h + ':'));
-        html += `<div class="min-h-[100px] border-b border-r flex items-center justify-center text-[11px] font-black text-slate-300 bg-slate-50/30">${h}:00</div>`;
-        html += `<div class="border-b p-5 space-y-2">${tasksH.map(t => crearCard(t)).join('')}</div>`;
-    }
-    container.innerHTML = html + `</div>`;
-  }
-
-  // DIBUJAR SEMANA: Crea 7 columnas (Lunes a Domingo)
-  function renderSemana(filtered: Tarea[]) {
-    hTitle.innerText = "VISTA SEMANAL";
-    let html = `<div class="grid grid-cols-7 gap-4">`;
-    const start = new Date(viewDate);
-    // Calcula el inicio de la semana (Lunes)
-    start.setDate(start.getDate() - (start.getDay() === 0 ? 6 : start.getDay() - 1));
-    for (let i = 0; i < 7; i++) {
-        const d = new Date(start); d.setDate(start.getDate() + i);
-        const ds = d.toISOString().split('T')[0];
-        html += `<div class="bg-white p-4 rounded-[2rem] border border-slate-100 min-h-[400px]">
-            <div class="text-center mb-4">
-                <div class="text-[9px] font-black text-slate-300 uppercase">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div>
-                <div class="text-xl font-black">${d.getDate()}</div>
-            </div>
-            <div class="space-y-2">${filtered.filter(t => t.fecha === ds).map(t => crearCard(t)).join('')}</div>
-        </div>`;
-    }
-    container.innerHTML = html + `</div>`;
-  }
-
-  // DIBUJAR MES: Genera la cuadrícula clásica de calendario
-  function renderMes(filtered: Tarea[]) {
-    hTitle.innerText = viewDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
-    const year = viewDate.getFullYear();
-    const month = viewDate.getMonth();
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const offset = firstDay === 0 ? 6 : firstDay - 1; // Ajuste para que empiece en Lunes
-
-    let html = `<div class="grid grid-cols-7 gap-2 bg-slate-100 p-2 rounded-[2rem] shadow-inner">`;
-    ['Lun','Mar','Mie','Jue','Vie','Sab','Dom'].forEach(d => {
-        html += `<div class="text-center p-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">${d}</div>`;
-    });
-    // Celdas vacías para el desfase del inicio de mes
-    for (let i = 0; i < offset; i++) html += `<div></div>`;
-    // Generación de cada día del mes
-    for (let d = 1; d <= daysInMonth; d++) {
-        const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        const dayTasks = filtered.filter(t => t.fecha === ds);
-        html += `<div class="bg-white min-h-[120px] rounded-[1.5rem] p-3 border border-slate-50 shadow-sm">
-            <span class="text-[10px] font-black text-slate-800">${d}</span>
-                        <div class="mt-2 space-y-1">${dayTasks.map(t => `<div onclick="window.verDetalle('${t.id}')" class="h-2 rounded-full cursor-pointer ${t.prioridad === 'alta' ? 'bg-red-500' : 'bg-blue-500'}"></div>`).join('')}</div>
-        </div>`;
-    }
-    container.innerHTML = html + `</div>`;
-  }
-
-  // CREAR CARD: Genera el componente visual pequeño de una tarea
-  function crearCard(t: Tarea) {
-    const colors: any = { 'alta': 'bg-red-600', 'media': 'bg-yellow-500', 'baja': 'bg-blue-500' };
-    return `<div onclick="window.verDetalle('${t.id}')" class="${colors[t.prioridad]} p-4 rounded-[1.5rem] mb-2 cursor-pointer transition-all hover:brightness-110 text-white shadow-sm active:scale-95">
-        <span class="text-[7px] font-black block opacity-80 uppercase">${t.hora || 'TODO EL DÍA'}</span>
-        <h4 class="font-black text-[11px] uppercase truncate">${t.titulo}</h4>
-    </div>`;
-  }
-
-  // FUNCIÓN VER DETALLE: Se inyecta al objeto window para ser llamada desde el HTML dinámico
-  (window as any).verDetalle = (id: string) => {
-      selectedTaskId = id;
-      const t = allTasks.find(task => String(task.id) === String(id));
-      if (!t || !viewContent) return;
-      
-      // Llena el modal con la información de la tarea seleccionada
-      viewContent.innerHTML = `
-          <div class="flex justify-between items-start">
-            <span class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">${t.categoria}</span>
-            <span class="text-slate-300 font-black text-[10px] uppercase">${t.fecha} | ${t.hora || 'S.H'}</span>
-          </div>
-          <h3 class="text-3xl font-black italic uppercase tracking-tighter text-slate-800 leading-none">${t.titulo}</h3>
-          <p class="font-bold text-slate-500 uppercase text-[11px] leading-relaxed border-l-4 border-slate-100 pl-4">${t.descripcion || 'Sin descripción adicional.'}</p>
-          <div class="pt-4 flex items-center gap-2">
-            <div class="w-3 h-3 rounded-full ${t.prioridad === 'alta' ? 'bg-red-500' : (t.prioridad === 'media' ? 'bg-yellow-500' : 'bg-blue-500')}"></div>
-            <span class="font-black text-[9px] uppercase text-slate-400">Prioridad ${t.prioridad}</span>
-          </div>
-      `;
-      modalView?.classList.remove('hidden');
-  };
-
-  // --- GESTIÓN DE EVENTOS ---
-
-  // Abrir modal de creación
-  document.getElementById('btn-add')?.addEventListener('click', () => {
-    modalCreate?.classList.remove('hidden');
-  });
-
-  // Cerrar modales
-  document.getElementById('close-modal')?.addEventListener('click', () => modalCreate?.classList.add('hidden'));
-  document.getElementById('close-view')?.addEventListener('click', () => modalView?.classList.add('hidden'));
-
-  // EVENTO SUBMIT: Envía la nueva tarea a la base de datos
-  taskForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    // Recolección de datos del formulario
-    const payload = { 
-        titulo: (document.getElementById('t-titulo') as HTMLInputElement).value, 
-        descripcion: (document.getElementById('t-desc') as HTMLTextAreaElement).value,
-        fecha: viewDate.toISOString().split('T')[0], 
-        hora: (document.getElementById('t-usa-hora') as HTMLInputElement).checked ? (document.getElementById('t-hora-inicio') as HTMLInputElement).value : null, 
-        prioridad: (document.getElementById('t-prioridad') as HTMLSelectElement).value,
-        categoria: (document.getElementById('t-cat') as HTMLSelectElement).value 
-    };
-
-    // Petición POST a la API
-    const res = await fetch('/api/dashboard', { method: 'POST', body: JSON.stringify(payload) });
-    if ((await res.json()).success) {
-        modalCreate?.classList.add('hidden'); // Cierra modal
-        taskForm.reset(); // Limpia campos
-        await load(); // Refresca los datos y la vista
-    }
-  });
-
-  // Listeners para filtros laterales
-  document.getElementById('f-trabajo')?.addEventListener('change', render);
-  document.getElementById('f-personal')?.addEventListener('change', render);
-
-  // Mostrar/Ocultar el input de hora según el checkbox
-  document.getElementById('t-usa-hora')?.addEventListener('change', (e) => {
-    document.getElementById('wrapper-hora')?.classList.toggle('hidden', !(e.target as HTMLInputElement).checked);
-  });
-
-  // Listeners para cambiar entre Día, Semana y Mes
-  document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', (e) => { 
-    currentView = (e.target as HTMLElement).dataset.v as any; 
-    render(); 
-  }));
-
-  // Navegación temporal (Botones de flechas)
-  document.getElementById('prev-date')?.addEventListener('click', () => { 
-    if(currentView === 'mes') viewDate.setMonth(viewDate.getMonth() - 1);
-    else viewDate.setDate(viewDate.getDate() - (currentView === 'semana' ? 7 : 1));
-    render(); 
-  });
-  document.getElementById('next-date')?.addEventListener('click', () => { 
-    if(currentView === 'mes') viewDate.setMonth(viewDate.getMonth() + 1);
-    else viewDate.setDate(viewDate.getDate() + (currentView === 'semana' ? 7 : 1));
-    render(); 
-  });
-
-  // Disparo inicial al cargar la página
-  load();
+  interface Tarea { id: any; titulo: string; descripcion: string; fecha: string; hora: string | null; prioridad: string; categoria: string; }
+  
+  let allTasks: Tarea[] = [];
+  let currentView: 'dia' | 'semana' | 'mes' = 'dia';
+  let viewDate = new Date();
+  let selectedTaskId: any = null;
+ 
+  const container = document.getElementById('view-container') as HTMLDivElement;
+  const hTitle = document.getElementById('header-title') as HTMLElement;
+  const modalCreate = document.getElementById('modal');
+  const modalView = document.getElementById('modal-view');
+  const viewContent = document.getElementById('view-content');
+  const taskForm = document.getElementById('task-form') as HTMLFormElement;
+ 
+  document.getElementById('btn-ai-toggle')?.addEventListener('click', () => {
+    document.getElementById('ai-window')?.classList.toggle('hidden');
+  });
+ 
+  async function load() {
+    try {
+        const response = await fetch('/api/dashboard');
+        const data = await response.json();
+        if (data.success) {
+            allTasks = data.tareas.map((t: any) => ({
+                id: t.id_tarea,
+                titulo: t.titulo,
+                descripcion: t.descripcion,
+                fecha: t.fecha_inicio ? new Date(t.fecha_inicio).toISOString().split('T')[0] : '',
+                hora: t.hora_inicio,
+                prioridad: t.prioridad,
+                categoria: t.categoria || 'personal'
+            }));
+            render();
+        }
+    } catch (err) { console.error("Error al cargar:", err); }
+  }
+ 
+  function render() {
+    if (!container) return;
+    const sT = (document.getElementById('f-trabajo') as HTMLInputElement).checked;
+    const sP = (document.getElementById('f-personal') as HTMLInputElement).checked;
+    const filtered = allTasks.filter(t => (t.categoria === 'trabajo' && sT) || (t.categoria === 'personal' && sP));
+    document.querySelectorAll('.nav-btn').forEach(b => {
+        const btn = b as HTMLElement;
+        btn.className = `nav-btn px-8 py-2.5 rounded-[1.5rem] font-black text-[11px] transition-all ${btn.dataset.v === currentView ? 'bg-[#0f172a] text-white shadow-xl scale-105' : 'text-slate-400 hover:text-slate-600'}`;
+    });
+    if (currentView === 'dia') renderDia(filtered);
+    else if (currentView === 'semana') renderSemana(filtered);
+    else renderMes(filtered);
+  }
+ 
+  function renderDia(filtered: Tarea[]) {
+    const dStr = viewDate.toISOString().split('T')[0];
+    hTitle.innerText = viewDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+    let html = `<div class="grid grid-cols-[100px_1fr] bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-2xl">`;
+    for (let i = 0; i < 24; i++) {
+        const h = i.toString().padStart(2, '0');
+        const tasksH = filtered.filter(t => t.fecha === dStr && t.hora?.startsWith(h + ':'));
+        html += `<div class="min-h-[100px] border-b border-r flex items-center justify-center text-[11px] font-black text-slate-300 bg-slate-50/30">${h}:00</div>`;
+        html += `<div class="border-b p-5 space-y-2">${tasksH.map(t => crearCard(t)).join('')}</div>`;
+    }
+    container.innerHTML = html + `</div>`;
+  }
+ 
+  function renderSemana(filtered: Tarea[]) {
+    hTitle.innerText = "VISTA SEMANAL";
+    let html = `<div class="grid grid-cols-7 gap-4">`;
+    const start = new Date(viewDate);
+    start.setDate(start.getDate() - (start.getDay() === 0 ? 6 : start.getDay() - 1));
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(start); d.setDate(start.getDate() + i);
+        const ds = d.toISOString().split('T')[0];
+        html += `<div class="bg-white p-4 rounded-[2rem] border border-slate-100 min-h-[400px]">
+            <div class="text-center mb-4">
+                <div class="text-[9px] font-black text-slate-300 uppercase">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div>
+                <div class="text-xl font-black">${d.getDate()}</div>
+            </div>
+            <div class="space-y-2">${filtered.filter(t => t.fecha === ds).map(t => crearCard(t)).join('')}</div>
+        </div>`;
+    }
+    container.innerHTML = html + `</div>`;
+  }
+ 
+  function renderMes(filtered: Tarea[]) {
+    hTitle.innerText = viewDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const offset = firstDay === 0 ? 6 : firstDay - 1;
+    let html = `<div class="grid grid-cols-7 gap-2 bg-slate-100 p-2 rounded-[2rem] shadow-inner">`;
+    ['Lun','Mar','Mie','Jue','Vie','Sab','Dom'].forEach(d => {
+        html += `<div class="text-center p-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">${d}</div>`;
+    });
+    for (let i = 0; i < offset; i++) html += `<div></div>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+        const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const dayTasks = filtered.filter(t => t.fecha === ds);
+        html += `<div class="bg-white min-h-[120px] rounded-[1.5rem] p-3 border border-slate-50 shadow-sm">
+            <span class="text-[10px] font-black text-slate-800">${d}</span>
+            <div class="mt-2 space-y-1">${dayTasks.map(t => `<div onclick="window.verDetalle('${t.id}')" class="h-2 rounded-full cursor-pointer ${t.prioridad === 'alta' ? 'bg-red-500' : 'bg-blue-500'}"></div>`).join('')}</div>
+        </div>`;
+    }
+    container.innerHTML = html + `</div>`;
+  }
+ 
+  function crearCard(t: Tarea) {
+    const colors: any = { 'alta': 'bg-red-600', 'media': 'bg-yellow-500', 'baja': 'bg-blue-500' };
+    return `<div onclick="window.verDetalle('${t.id}')" class="${colors[t.prioridad]} p-4 rounded-[1.5rem] mb-2 cursor-pointer transition-all hover:brightness-110 text-white shadow-sm active:scale-95">
+        <span class="text-[7px] font-black block opacity-80 uppercase">${t.hora || 'TODO EL DÍA'}</span>
+        <h4 class="font-black text-[11px] uppercase truncate">${t.titulo}</h4>
+    </div>`;
+  }
+ 
+  (window as any).verDetalle = (id: string) => {
+      selectedTaskId = id;
+      const t = allTasks.find(task => String(task.id) === String(id));
+      if (!t || !viewContent) return;
+      viewContent.innerHTML = `
+          <div class="flex justify-between items-start">
+            <span class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">${t.categoria}</span>
+            <span class="text-slate-300 font-black text-[10px] uppercase">${t.fecha} | ${t.hora || 'S.H'}</span>
+          </div>
+          <h3 class="text-3xl font-black italic uppercase tracking-tighter text-slate-800 leading-none">${t.titulo}</h3>
+          <p class="font-bold text-slate-500 uppercase text-[11px] leading-relaxed border-l-4 border-slate-100 pl-4">${t.descripcion || 'Sin descripción adicional.'}</p>
+          <div class="pt-4 flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full ${t.prioridad === 'alta' ? 'bg-red-500' : (t.prioridad === 'media' ? 'bg-yellow-500' : 'bg-blue-500')}"></div>
+            <span class="font-black text-[9px] uppercase text-slate-400">Prioridad ${t.prioridad}</span>
+          </div>
+      `;
+      modalView?.classList.remove('hidden');
+  };
+ 
+  document.getElementById('btn-add')?.addEventListener('click', () => { modalCreate?.classList.remove('hidden'); });
+  document.getElementById('close-modal')?.addEventListener('click', () => modalCreate?.classList.add('hidden'));
+  document.getElementById('close-view')?.addEventListener('click', () => modalView?.classList.add('hidden'));
+ 
+  taskForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = { 
+        titulo: (document.getElementById('t-titulo') as HTMLInputElement).value, 
+        descripcion: (document.getElementById('t-desc') as HTMLTextAreaElement).value,
+        fecha: viewDate.toISOString().split('T')[0], 
+        hora: (document.getElementById('t-usa-hora') as HTMLInputElement).checked ? (document.getElementById('t-hora-inicio') as HTMLInputElement).value : null, 
+        prioridad: (document.getElementById('t-prioridad') as HTMLSelectElement).value,
+        categoria: (document.getElementById('t-cat') as HTMLSelectElement).value 
+    };
+    const res = await fetch('/api/dashboard', { method: 'POST', body: JSON.stringify(payload) });
+    if ((await res.json()).success) {
+        modalCreate?.classList.add('hidden');
+        taskForm.reset();
+        await load();
+    }
+  });
+ 
+  document.getElementById('f-trabajo')?.addEventListener('change', render);
+  document.getElementById('f-personal')?.addEventListener('change', render);
+  document.getElementById('t-usa-hora')?.addEventListener('change', (e) => {
+    document.getElementById('wrapper-hora')?.classList.toggle('hidden', !(e.target as HTMLInputElement).checked);
+  });
+  document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', (e) => { 
+    currentView = (e.target as HTMLElement).dataset.v as any; 
+    render(); 
+  }));
+  document.getElementById('prev-date')?.addEventListener('click', () => { 
+    if(currentView === 'mes') viewDate.setMonth(viewDate.getMonth() - 1);
+    else viewDate.setDate(viewDate.getDate() - (currentView === 'semana' ? 7 : 1));
+    render(); 
+  });
+  document.getElementById('next-date')?.addEventListener('click', () => { 
+    if(currentView === 'mes') viewDate.setMonth(viewDate.getMonth() + 1);
+    else viewDate.setDate(viewDate.getDate() + (currentView === 'semana' ? 7 : 1));
+    render(); 
+  });
+ 
+  // ── GESTOR DE ETIQUETAS ──
+  const modalEtiquetas = document.getElementById('modal-etiquetas')!;
+  const etiquetasList  = document.getElementById('etiquetas-list')!;
+  const etiquetasForm  = document.getElementById('etiquetas-form')!;
+  const etiquetasToast = document.getElementById('etiquetas-toast')!;
+  const eId     = document.getElementById('e-id') as HTMLInputElement;
+  const eNombre = document.getElementById('e-nombre') as HTMLInputElement;
+  const eColor  = document.getElementById('e-color') as HTMLInputElement;
+ 
+  function mostrarToast(msg: string, ok: boolean) {
+    etiquetasToast.textContent = msg;
+    etiquetasToast.className = `text-center py-3 px-6 rounded-full text-xs font-black uppercase mt-4 ${ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`;
+    setTimeout(() => { etiquetasToast.className = 'hidden'; }, 3000);
+  }
+ 
+  async function cargarEtiquetas() {
+    etiquetasList.innerHTML = '<p class="text-center text-slate-400 text-xs font-black uppercase py-4">Cargando...</p>';
+    try {
+      const res = await fetch('/api/etiquetas');
+      const data = await res.json();
+      if (!data.success) throw new Error();
+      if (data.etiquetas.length === 0) {
+        etiquetasList.innerHTML = '<p class="text-center text-slate-400 text-xs font-black uppercase py-4">No hay etiquetas.</p>';
+        return;
+      }
+      etiquetasList.innerHTML = data.etiquetas.map((e: any) => `
+        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full" style="background:${e.color}"></div>
+            <span class="font-black uppercase text-sm text-slate-700">${e.nombre}</span>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn-editar-etiqueta bg-slate-800 text-white px-4 py-2 rounded-full text-[9px] font-black uppercase hover:bg-blue-600 transition-all"
+              data-id="${e.id_etiqueta}" data-nombre="${e.nombre}" data-color="${e.color}">Editar</button>
+            <button class="btn-eliminar-etiqueta bg-red-100 text-red-500 px-4 py-2 rounded-full text-[9px] font-black uppercase hover:bg-red-500 hover:text-white transition-all"
+              data-id="${e.id_etiqueta}" data-nombre="${e.nombre}">Eliminar</button>
+          </div>
+        </div>
+      `).join('');
+ 
+      document.querySelectorAll('.btn-editar-etiqueta').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const d = (btn as HTMLElement).dataset;
+          eId.value = d.id!;
+          eNombre.value = d.nombre!;
+          eColor.value = d.color!;
+          etiquetasForm.classList.remove('hidden');
+          etiquetasForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+      });
+ 
+      document.querySelectorAll('.btn-eliminar-etiqueta').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const d = (btn as HTMLElement).dataset;
+          if (!confirm(`¿Eliminar la etiqueta "${d.nombre}"?`)) return;
+          const r = await fetch('/api/etiquetas', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_etiqueta: d.id })
+          });
+          const rd = await r.json();
+          if (rd.success) { mostrarToast(`"${d.nombre}" eliminada`, true); await cargarEtiquetas(); }
+          else mostrarToast('Error al eliminar', false);
+        });
+      });
+    } catch {
+      etiquetasList.innerHTML = '<p class="text-center text-red-400 text-xs font-black uppercase py-4">Error al cargar etiquetas.</p>';
+    }
+  }
+ 
+  document.getElementById('e-guardar')?.addEventListener('click', async () => {
+    const payload = {
+      id_etiqueta: eId.value,
+      nombre: eNombre.value.trim(),
+      color: eColor.value
+    };
+    if (!payload.nombre) return;
+    const r = await fetch('/api/etiquetas', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const rd = await r.json();
+    if (rd.success) {
+      mostrarToast(`"${payload.nombre}" actualizada`, true);
+      etiquetasForm.classList.add('hidden');
+      await cargarEtiquetas();
+    } else mostrarToast('Error al guardar', false);
+  });
+ 
+  document.getElementById('e-cancelar')?.addEventListener('click', () => {
+    etiquetasForm.classList.add('hidden');
+  });
+ 
+  document.getElementById('btn-etiquetas')?.addEventListener('click', async () => {
+    modalEtiquetas.classList.remove('hidden');
+    modalEtiquetas.style.display = 'flex';
+    etiquetasForm.classList.add('hidden');
+    await cargarEtiquetas();
+  });
+ 
+  document.getElementById('close-etiquetas')?.addEventListener('click', () => {
+    modalEtiquetas.classList.add('hidden');
+    modalEtiquetas.style.display = 'none';
+  });
+ 
+  load();
 </script>
