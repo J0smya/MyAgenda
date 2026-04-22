@@ -1,0 +1,497 @@
+---
+import Layout from "../layouts/Layout.astro";
+import '../styles/tablero.css';
+---
+
+<Layout title="MyAgenda Pro 2026">
+  <div>
+    
+    <aside>
+      <div>
+        <span>📅</span> MY AGENDA
+      </div>
+      
+      <div>
+        <h3>FILTROS</h3>
+        <div>
+            <label>
+              <input type="checkbox" id="f-trabajo" checked> 
+              <span>Trabajo</span>
+            </label>
+            
+            <label>
+              <input type="checkbox" id="f-personal" checked> 
+              <span>Personal</span>
+            </label>
+        </div>
+      </div>
+
+      <button id="btn-perfil" title="Mi Perfil">
+          <img src="https://ui-avatars.com/api/?name=Usuario&background=1e60ff&color=fff&bold=true" alt="Perfil">
+          <div>
+            <div>Usuario</div>
+            <div>usuario@myagenda.pro</div>
+          </div>
+      </button>
+    </aside>
+
+    <main>
+      <header>
+        <div>
+            <div>
+                <button id="prev-date">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <button id="next-date">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M9 5l7 7-7 7" /></svg>
+                </button>
+            </div>
+            <div>
+                <h2 id="header-title">Cargando...</h2>
+            </div>
+        </div>
+        
+        <div>
+            <button data-v="dia" class="nav-btn active">DÍA</button>
+            <button data-v="semana" class="nav-btn">SEMANA</button>
+            <button data-v="mes" class="nav-btn">MES</button>
+            <button id="btn-add">+ NUEVA TAREA</button>
+        </div>
+      </header>
+
+      <div id="view-container"></div>
+    </main>
+
+    <button id="btn-ai-toggle">
+        <span>🤖</span>
+    </button>
+
+    <div id="ai-window" class="hidden">
+        <div>
+          <span>Asistente IA</span>
+        </div>
+        <div>¿En qué puedo ayudarte?</div>
+        <div>
+            <input type="text" placeholder="ESCRIBE...">
+        </div>
+    </div>
+
+    <div id="modal" class="hidden">
+      <div>
+        <form id="task-form">
+          <h3>AGENDAR TAREA</h3>
+          <input type="text" id="t-titulo" required placeholder="TÍTULO DE LA TAREA">
+          <textarea id="t-desc" placeholder="DESCRIPCIÓN O NOTAS"></textarea>
+          
+          <div>
+              <select id="t-prioridad">
+                  <option value="alta">🔴 ALTA</option>
+                  <option value="media" selected>🟡 MEDIA</option>
+                  <option value="baja">🔵 BAJA</option>
+              </select>
+              <select id="t-cat">
+                  <option value="trabajo">💼 TRABAJO</option>
+                  <option value="personal">🏠 PERSONAL</option>
+              </select>
+          </div>
+
+          <div>
+              <label>
+                  <input type="checkbox" id="t-usa-hora">
+                  <span>¿Asignar hora?</span>
+              </label>
+              <div id="wrapper-hora" class="hidden">
+                  <input type="time" id="t-hora-inicio">
+              </div>
+          </div>
+
+          <div>
+              <button type="submit">GUARDAR TAREA</button>
+              <button type="button" id="close-modal">CANCELAR</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="modal-view" class="hidden">
+      <div>
+        <div id="view-content"></div>
+        <div>
+            <button id="close-view">ENTENDIDO</button>
+            <button id="btn-delete-task">ELIMINAR TAREA</button>
+        </div>
+      </div>
+    </div>
+
+    <button id="btn-etiquetas" title="Gestionar etiquetas">
+      <span>🏷️</span>
+    </button>
+
+    <div id="modal-etiquetas" class="hidden">
+      <div>
+        <div>
+          <h3>🏷️ Etiquetas</h3>
+          <button id="close-etiquetas">✕</button>
+        </div>
+        <div id="etiquetas-list"></div>
+        <div id="etiquetas-form" class="hidden">
+          <h4>✏️ Editar Etiqueta</h4>
+          <input type="hidden" id="e-id" />
+          <input type="text" id="e-nombre" placeholder="NOMBRE" maxlength="100" />
+          <div>
+            <input type="color" id="e-color" value="#3b82f6" />
+            <span>Elige un color</span>
+          </div>
+          <div>
+            <button id="e-guardar">GUARDAR</button>
+            <button id="e-cancelar">CANCELAR</button>
+          </div>
+        </div>
+        <div id="etiquetas-toast" class="hidden"></div>
+      </div>
+    </div>
+
+    <div id="modal-perfil" class="hidden">
+      <div>
+        <div>
+          <button id="close-perfil">✕</button>
+        </div>
+        <div>
+            <img src="https://ui-avatars.com/api/?name=Usuario&background=0f172a&color=fff&bold=true&size=128" alt="Perfil Grande">
+        </div>
+        <h3>Mi Cuenta</h3>
+        <p>usuario@myagenda.pro</p>
+        
+        <div>
+            <button>Ajustes de cuenta</button>
+            <button>Cerrar Sesión</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</Layout>
+
+<script>
+  interface Tarea { id: any; titulo: string; descripcion: string; fecha: string; hora: string | null; prioridad: string; categoria: string; }
+  
+  let allTasks: Tarea[] = [];
+  let currentView: 'dia' | 'semana' | 'mes' = 'dia';
+  let viewDate = new Date();
+  let selectedTaskId: any = null;
+
+  const container = document.getElementById('view-container') as HTMLDivElement;
+  const hTitle = document.getElementById('header-title') as HTMLElement;
+  const modalCreate = document.getElementById('modal');
+  const modalView = document.getElementById('modal-view');
+  const viewContent = document.getElementById('view-content');
+  const taskForm = document.getElementById('task-form') as HTMLFormElement;
+
+  document.getElementById('btn-ai-toggle')?.addEventListener('click', () => {
+    document.getElementById('ai-window')?.classList.toggle('hidden');
+  });
+
+  async function load() {
+    try {
+        const response = await fetch('/api/dashboard');
+        const data = await response.json();
+        if (data.success) {
+            allTasks = data.tareas.map((t: any) => ({
+                id: t.id_tarea,
+                titulo: t.titulo,
+                descripcion: t.descripcion,
+                fecha: t.fecha_inicio ? new Date(t.fecha_inicio).toISOString().split('T')[0] : '',
+                hora: t.hora_inicio,
+                prioridad: t.prioridad,
+                categoria: t.categoria || 'personal'
+            }));
+            render();
+        }
+    } catch (err) { console.error("Error al cargar:", err); }
+  }
+
+  function render() {
+    if (!container) return;
+    const sT = (document.getElementById('f-trabajo') as HTMLInputElement).checked;
+    const sP = (document.getElementById('f-personal') as HTMLInputElement).checked;
+    const filtered = allTasks.filter(t => (t.categoria === 'trabajo' && sT) || (t.categoria === 'personal' && sP));
+    
+    // Asigna la clase 'active' al botón seleccionado
+    document.querySelectorAll('.nav-btn').forEach(b => {
+        const btn = b as HTMLElement;
+        if(btn.dataset.v === currentView) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    if (currentView === 'dia') renderDia(filtered);
+    else if (currentView === 'semana') renderSemana(filtered);
+    else renderMes(filtered);
+  }
+
+  function renderDia(filtered: Tarea[]) {
+    const dStr = viewDate.toISOString().split('T')[0];
+    hTitle.innerText = viewDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+    
+    // Se inserta la clase .vista-dia para conectar con el CSS
+    let html = `<div class="vista-dia">`;
+    for (let i = 0; i < 24; i++) {
+        const h = i.toString().padStart(2, '0');
+        const tasksH = filtered.filter(t => t.fecha === dStr && t.hora?.startsWith(h + ':'));
+        html += `<div class="hora-label">${h}:00</div>`;
+        html += `<div class="hora-tasks">${tasksH.map(t => crearCard(t)).join('')}</div>`;
+    }
+    container.innerHTML = html + `</div>`;
+  }
+
+  function renderSemana(filtered: Tarea[]) {
+    hTitle.innerText = "VISTA SEMANAL";
+    // Se inserta la clase .vista-semana
+    let html = `<div class="vista-semana">`;
+    const start = new Date(viewDate);
+    start.setDate(start.getDate() - (start.getDay() === 0 ? 6 : start.getDay() - 1));
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(start); d.setDate(start.getDate() + i);
+        const ds = d.toISOString().split('T')[0];
+        html += `<div class="semana-columna">
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <div style="font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase;">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div>
+                <div style="font-size: 1.5rem; font-weight: 900; color: #1e293b;">${d.getDate()}</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">${filtered.filter(t => t.fecha === ds).map(t => crearCard(t)).join('')}</div>
+        </div>`;
+    }
+    container.innerHTML = html + `</div>`;
+  }
+
+  function renderMes(filtered: Tarea[]) {
+    hTitle.innerText = viewDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const offset = firstDay === 0 ? 6 : firstDay - 1;
+    
+    // Se insertan las clases de la vista de Mes
+    let html = `<div class="vista-mes-header">`;
+    ['Lun','Mar','Mie','Jue','Vie','Sab','Dom'].forEach(d => {
+        html += `<div class="mes-dia-header">${d}</div>`;
+    });
+    html += `</div><div class="vista-mes-grid">`;
+    
+    for (let i = 0; i < offset; i++) html += `<div></div>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+        const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const dayTasks = filtered.filter(t => t.fecha === ds);
+        html += `<div class="mes-dia-celda">
+            <span class="mes-dia-numero">${d}</span>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              ${dayTasks.map(t => `<div onclick="window.verDetalle('${t.id}')" style="height: 6px; border-radius: 4px; cursor: pointer;" class="${t.prioridad === 'alta' ? 'prioridad-alta' : (t.prioridad === 'media' ? 'prioridad-media' : 'prioridad-baja')}"></div>`).join('')}
+            </div>
+        </div>`;
+    }
+    container.innerHTML = html + `</div>`;
+  }
+
+  function crearCard(t: Tarea) {
+    const prioridades: any = { 'alta': 'prioridad-alta', 'media': 'prioridad-media', 'baja': 'prioridad-baja' };
+    return `<div onclick="window.verDetalle('${t.id}')" class="tarjeta-tarea ${prioridades[t.prioridad]}">
+        <span>${t.hora || 'TODO EL DÍA'}</span>
+        <h4>${t.titulo}</h4>
+    </div>`;
+  }
+
+  (window as any).verDetalle = (id: string) => {
+      selectedTaskId = id;
+      const t = allTasks.find(task => String(task.id) === String(id));
+      if (!t || !viewContent) return;
+      viewContent.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+            <span style="background-color: #dbeafe; color: #2563eb; padding: 0.25rem 1rem; border-radius: 9999px; font-size: 9px; font-weight: 900; text-transform: uppercase;">${t.categoria}</span>
+            <span style="color: #94a3b8; font-weight: 900; font-size: 10px; text-transform: uppercase;">${t.fecha} | ${t.hora || 'S.H'}</span>
+          </div>
+          <h3 style="font-size: 1.875rem; font-weight: 900; font-style: italic; text-transform: uppercase; color: #1e293b; margin: 0 0 1rem 0;">${t.titulo}</h3>
+          <p style="font-weight: bold; color: #64748b; text-transform: uppercase; font-size: 11px; border-left: 4px solid #f1f5f9; padding-left: 1rem; margin-bottom: 1rem;">${t.descripcion || 'Sin descripción adicional.'}</p>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div style="width: 12px; height: 12px; border-radius: 50%;" class="${t.prioridad === 'alta' ? 'prioridad-alta' : (t.prioridad === 'media' ? 'prioridad-media' : 'prioridad-baja')}"></div>
+            <span style="font-weight: 900; font-size: 9px; text-transform: uppercase; color: #94a3b8;">Prioridad ${t.prioridad}</span>
+          </div>
+      `;
+      modalView?.classList.remove('hidden');
+  };
+
+  document.getElementById('btn-add')?.addEventListener('click', () => { modalCreate?.classList.remove('hidden'); });
+  document.getElementById('close-modal')?.addEventListener('click', () => modalCreate?.classList.add('hidden'));
+  document.getElementById('close-view')?.addEventListener('click', () => modalView?.classList.add('hidden'));
+
+  taskForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = { 
+        titulo: (document.getElementById('t-titulo') as HTMLInputElement).value, 
+        descripcion: (document.getElementById('t-desc') as HTMLTextAreaElement).value,
+        fecha: viewDate.toISOString().split('T')[0], 
+        hora: (document.getElementById('t-usa-hora') as HTMLInputElement).checked ? (document.getElementById('t-hora-inicio') as HTMLInputElement).value : null, 
+        prioridad: (document.getElementById('t-prioridad') as HTMLSelectElement).value,
+        categoria: (document.getElementById('t-cat') as HTMLSelectElement).value 
+    };
+    
+    const res = await fetch('/api/dashboard', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload) 
+    });
+    
+    if ((await res.json()).success) {
+        modalCreate?.classList.add('hidden');
+        taskForm.reset();
+        await load();
+    }
+  });
+
+  document.getElementById('f-trabajo')?.addEventListener('change', render);
+  document.getElementById('f-personal')?.addEventListener('change', render);
+  document.getElementById('t-usa-hora')?.addEventListener('change', (e) => {
+    document.getElementById('wrapper-hora')?.classList.toggle('hidden', !(e.target as HTMLInputElement).checked);
+  });
+  
+  // LOGICA PARA VOLVER A LA FECHA ACTUAL AL CAMBIAR DE PESTAÑA
+  document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', (e) => { 
+    currentView = (e.target as HTMLElement).dataset.v as any; 
+    viewDate = new Date(); // Resetea a la fecha de hoy
+    render(); 
+  }));
+  
+  document.getElementById('prev-date')?.addEventListener('click', () => { 
+    if(currentView === 'mes') viewDate.setMonth(viewDate.getMonth() - 1);
+    else viewDate.setDate(viewDate.getDate() - (currentView === 'semana' ? 7 : 1));
+    render(); 
+  });
+  document.getElementById('next-date')?.addEventListener('click', () => { 
+    if(currentView === 'mes') viewDate.setMonth(viewDate.getMonth() + 1);
+    else viewDate.setDate(viewDate.getDate() + (currentView === 'semana' ? 7 : 1));
+    render(); 
+  });
+
+  // ── GESTOR DE ETIQUETAS ──
+  const modalEtiquetas = document.getElementById('modal-etiquetas')!;
+  const etiquetasList  = document.getElementById('etiquetas-list')!;
+  const etiquetasForm  = document.getElementById('etiquetas-form')!;
+  const etiquetasToast = document.getElementById('etiquetas-toast')!;
+  const eId     = document.getElementById('e-id') as HTMLInputElement;
+  const eNombre = document.getElementById('e-nombre') as HTMLInputElement;
+  const eColor  = document.getElementById('e-color') as HTMLInputElement;
+
+  function mostrarToast(msg: string, ok: boolean) {
+    etiquetasToast.textContent = msg;
+    etiquetasToast.classList.remove('hidden');
+    etiquetasToast.style.backgroundColor = ok ? '#dcfce7' : '#fee2e2';
+    etiquetasToast.style.color = ok ? '#15803d' : '#b91c1c';
+    setTimeout(() => { etiquetasToast.classList.add('hidden'); }, 3000);
+  }
+
+  async function cargarEtiquetas() {
+    etiquetasList.innerHTML = '<p style="text-align:center; color:#94a3b8; font-weight:900; text-transform:uppercase; font-size:10px;">Cargando...</p>';
+    try {
+      const res = await fetch('/api/etiquetas');
+      const data = await res.json();
+      if (!data.success) throw new Error();
+      if (data.etiquetas.length === 0) {
+        etiquetasList.innerHTML = '<p style="text-align:center; color:#94a3b8; font-weight:900; text-transform:uppercase; font-size:10px;">No hay etiquetas.</p>';
+        return;
+      }
+      etiquetasList.innerHTML = data.etiquetas.map((e: any) => `
+        <div style="display:flex; align-items:center; justify-content:space-between; background-color:#f8fafc; padding:1rem; border-radius:1rem; margin-bottom:0.5rem;">
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <div style="width:2rem; height:2rem; border-radius:50%; background:${e.color}"></div>
+            <span style="font-weight:900; text-transform:uppercase; font-size:0.875rem;">${e.nombre}</span>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn-editar-etiqueta" data-id="${e.id_etiqueta}" data-nombre="${e.nombre}" data-color="${e.color}">Editar</button>
+            <button class="btn-eliminar-etiqueta" data-id="${e.id_etiqueta}" data-nombre="${e.nombre}">Eliminar</button>
+          </div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.btn-editar-etiqueta').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const d = (btn as HTMLElement).dataset;
+          eId.value = d.id!;
+          eNombre.value = d.nombre!;
+          eColor.value = d.color!;
+          etiquetasForm.classList.remove('hidden');
+          etiquetasForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+      });
+
+      document.querySelectorAll('.btn-eliminar-etiqueta').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const d = (btn as HTMLElement).dataset;
+          if (!confirm(`¿Eliminar la etiqueta "${d.nombre}"?`)) return;
+          const r = await fetch('/api/etiquetas', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_etiqueta: d.id })
+          });
+          const rd = await r.json();
+          if (rd.success) { mostrarToast(`"${d.nombre}" eliminada`, true); await cargarEtiquetas(); }
+          else mostrarToast('Error al eliminar', false);
+        });
+      });
+    } catch {
+      etiquetasList.innerHTML = '<p style="text-align:center; color:#ef4444; font-weight:900; text-transform:uppercase; font-size:10px;">Error al cargar etiquetas.</p>';
+    }
+  }
+
+  document.getElementById('e-guardar')?.addEventListener('click', async () => {
+    const payload = {
+      id_etiqueta: eId.value,
+      nombre: eNombre.value.trim(),
+      color: eColor.value
+    };
+    if (!payload.nombre) return;
+    const r = await fetch('/api/etiquetas', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const rd = await r.json();
+    if (rd.success) {
+      mostrarToast(`"${payload.nombre}" actualizada`, true);
+      etiquetasForm.classList.add('hidden');
+      await cargarEtiquetas();
+    } else mostrarToast('Error al guardar', false);
+  });
+
+  document.getElementById('e-cancelar')?.addEventListener('click', () => {
+    etiquetasForm.classList.add('hidden');
+  });
+
+  document.getElementById('btn-etiquetas')?.addEventListener('click', async () => {
+    modalEtiquetas.classList.remove('hidden');
+    modalEtiquetas.style.display = 'flex';
+    etiquetasForm.classList.add('hidden');
+    await cargarEtiquetas();
+  });
+
+  document.getElementById('close-etiquetas')?.addEventListener('click', () => {
+    modalEtiquetas.classList.add('hidden');
+    modalEtiquetas.style.display = 'none';
+  });
+
+  // ── GESTOR DE PERFIL ──
+  const modalPerfil = document.getElementById('modal-perfil');
+  
+  document.getElementById('btn-perfil')?.addEventListener('click', () => {
+    modalPerfil?.classList.remove('hidden');
+    modalPerfil!.style.display = 'flex';
+  });
+
+  document.getElementById('close-perfil')?.addEventListener('click', () => {
+    modalPerfil?.classList.add('hidden');
+    modalPerfil!.style.display = 'none';
+  });
+
+  load();
+</script>
