@@ -1,0 +1,229 @@
+---
+import '../styles/global.css'
+import '../styles/recuperarcontrasena.css'
+import Layout from "../layouts/Layout.astro";
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recuperar contraseña - My Agenda</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/styles/recuperarcontrasena.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="/" class="navbar-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      My Agenda
+    </a>
+  </nav>
+
+  <main class="pagina">
+    <div class="tarjeta">
+      
+      <div class="encabezado">
+        <div class="burbuja">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <h1>Recuperar contraseña</h1>
+        <p>Verifica tu identidad para volver a<br/>acceder a tu cuenta.</p>
+      </div>
+
+      <div class="pasos">
+        <div class="paso activo" id="paso-1"><div class="paso-circulo">1</div><span class="paso-label">Método</span></div>
+        <div class="paso" id="paso-2"><div class="paso-circulo">2</div><span class="paso-label">Código</span></div>
+        <div class="paso" id="paso-3"><div class="paso-circulo">3</div><span class="paso-label">Nueva</span></div>
+      </div>
+
+      <div class="panel activo" id="panel-1">
+        <div class="campo">
+          <label>¿Cómo quieres recuperarla?</label>
+          <div class="selector">
+            <button class="btn-metodo seleccionado" id="btn-correo" onclick="seleccionarMetodo('email')">Correo</button>
+            <button class="btn-metodo" id="btn-sms" onclick="seleccionarMetodo('sms')">SMS</button>
+          </div>
+        </div>
+        <div class="campo" id="campo-correo">
+          <label for="input-correo">Correo electrónico</label>
+          <div class="wrap-input">
+            <input type="email" id="input-correo" placeholder="ejemplo@correo.com" />
+          </div>
+        </div>
+        <div class="campo oculto" id="campo-tel">
+          <label for="input-tel">Número de teléfono</label>
+          <div class="wrap-input">
+            <input type="tel" id="input-tel" placeholder="300 123 4567" />
+          </div>
+        </div>
+        <button class="btn-ok" id="btn-enviar" onclick="enviarCodigo()">Enviar código de verificación</button>
+        <div class="ir-login">¿Recordaste tu contraseña? <a href="/login">Iniciar sesión</a></div>
+      </div>
+
+      <div class="panel" id="panel-2">
+        <button class="btn-volver" onclick="irAPaso(1)">Volver</button>
+        <div class="mascara"><div class="punto"></div><span id="texto-mascara">Código enviado...</span></div>
+        <div class="campo">
+          <label>Código de 6 dígitos</label>
+          <div class="otp-fila">
+            <input class="otp-caja" type="text" maxlength="1" />
+            <input class="otp-caja" type="text" maxlength="1" />
+            <input class="otp-caja" type="text" maxlength="1" />
+            <input class="otp-caja" type="text" maxlength="1" />
+            <input class="otp-caja" type="text" maxlength="1" />
+            <input class="otp-caja" type="text" maxlength="1" />
+          </div>
+          <p class="msg info">El código expira en <span id="timer">2:00</span></p>
+        </div>
+        <button class="btn-ok" id="btn-verificar" onclick="verificarCodigo()" disabled>Verificar código</button>
+      </div>
+
+      <div class="panel" id="panel-3">
+        <div class="campo">
+          <label for="input-nueva">Nueva contraseña</label>
+          <div class="wrap-input"><input type="password" id="input-nueva" placeholder="Mínimo 8 caracteres" oninput="verificarConfirmacion()" /></div>
+        </div>
+        <div class="campo">
+          <label for="input-confirmar">Confirmar contraseña</label>
+          <div class="wrap-input"><input type="password" id="input-confirmar" placeholder="Repite la contraseña" oninput="verificarConfirmacion()" /></div>
+          <p class="msg" id="msg-confirmar"></p>
+        </div>
+        <button class="btn-ok" id="btn-guardar" onclick="guardarContrasena()" disabled>Guardar nueva contraseña</button>
+      </div>
+
+      <div class="panel" id="panel-4">
+        <div style="text-align:center;">
+          <h2>¡Contraseña actualizada!</h2>
+          <p>Ya puedes iniciar sesión con tu nueva contraseña.</p>
+          <a href="/login"><button class="btn-ok">Ir a iniciar sesión</button></a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script is:inline>
+    let correoActual = "";
+    let timerInterval = null;
+
+    window.seleccionarMetodo = (metodo) => {
+      document.getElementById("btn-correo").classList.toggle("seleccionado", metodo === 'email');
+      document.getElementById("btn-sms").classList.toggle("seleccionado", metodo === 'sms');
+      document.getElementById("campo-correo").classList.toggle("oculto", metodo !== 'email');
+      document.getElementById("campo-tel").classList.toggle("oculto", metodo !== 'sms');
+    };
+
+    window.irAPaso = (numPaso) => {
+      document.querySelectorAll(".panel").forEach(p => p.classList.remove("activo"));
+      document.getElementById(`panel-${numPaso}`).classList.add("activo");
+      
+      document.querySelectorAll(".paso").forEach(p => p.classList.remove("activo", "completado"));
+      for (let i = 1; i <= 3; i++) {
+        const pasoUI = document.getElementById(`paso-${i}`);
+        if (i < numPaso) pasoUI.classList.add("completado");
+        else if (i === numPaso) pasoUI.classList.add("activo");
+      }
+    };
+
+    window.enviarCodigo = async () => {
+      correoActual = document.getElementById("input-correo").value;
+      if (!correoActual) return alert("Ingresa tu correo.");
+      
+      const btn = document.getElementById("btn-enviar");
+      btn.textContent = "Enviando..."; btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/recuperarcontrasena', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accion: 'enviar_codigo', email: correoActual })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById("texto-mascara").textContent = `Código enviado a ${correoActual}`;
+          window.irAPaso(2); iniciarTemporizador();
+        } else alert(data.error);
+      } catch (e) { alert("Error de conexión."); } 
+      finally { btn.textContent = "Enviar código"; btn.disabled = false; }
+    };
+
+    const otpInputs = document.querySelectorAll(".otp-caja");
+    otpInputs.forEach((input, index) => {
+      input.addEventListener("input", () => {
+        input.value = input.value.replace(/[^0-9]/g, "");
+        if (input.value && index < 5) otpInputs[index + 1].focus();
+        document.getElementById("btn-verificar").disabled = !Array.from(otpInputs).every(i => i.value);
+      });
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !input.value && index > 0) otpInputs[index - 1].focus();
+      });
+    });
+
+    window.verificarCodigo = async () => {
+      let codigoDigitado = Array.from(otpInputs).map(i => i.value).join('');
+      const btn = document.getElementById("btn-verificar");
+      btn.textContent = "Verificando..."; btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/recuperarcontrasena', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accion: 'verificar_codigo', codigo: codigoDigitado })
+        });
+        if (res.ok) {
+          detenerTemporizador(); window.irAPaso(3);
+        } else {
+          alert("Código incorrecto."); otpInputs.forEach(i => i.value = ""); otpInputs[0].focus();
+        }
+      } catch (e) { alert("Error al verificar."); } 
+      finally { btn.textContent = "Verificar código"; btn.disabled = false; }
+    };
+
+    window.verificarConfirmacion = () => {
+      const p1 = document.getElementById("input-nueva").value;
+      const p2 = document.getElementById("input-confirmar").value;
+      const btn = document.getElementById("btn-guardar"), msg = document.getElementById("msg-confirmar");
+      
+      if (!p2) { msg.textContent = ""; btn.disabled = true; return; }
+      if (p1 === p2 && p1.length >= 8) { msg.textContent = "Coinciden"; msg.style.color = "green"; btn.disabled = false; } 
+      else { msg.textContent = "No coinciden"; msg.style.color = "red"; btn.disabled = true; }
+    };
+
+    window.guardarContrasena = async () => {
+      const nuevaClave = document.getElementById("input-nueva").value;
+      const btn = document.getElementById("btn-guardar");
+      btn.textContent = "Guardando..."; btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/recuperarcontrasena', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accion: 'actualizar_contrasena', email: correoActual, nuevaContrasena: nuevaClave })
+        });
+        if (res.ok) window.irAPaso(4);
+        else alert("Error al actualizar.");
+      } catch (e) { alert("Error de red."); } 
+      finally { btn.textContent = "Guardar"; btn.disabled = false; }
+    };
+
+    function iniciarTemporizador() {
+      let tiempo = 120; const display = document.getElementById("timer");
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        tiempo--; display.textContent = `${Math.floor(tiempo / 60)}:${(tiempo % 60).toString().padStart(2, '0')}`;
+        if (tiempo <= 0) clearInterval(timerInterval);
+      }, 1000);
+    }
+    function detenerTemporizador() { if (timerInterval) clearInterval(timerInterval); }
+  </script>
+</body>
+</html>
