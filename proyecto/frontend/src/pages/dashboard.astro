@@ -1,0 +1,665 @@
+---
+// src/pages/dashboard.astro
+import '../styles/dashboard.css'
+import Layout from "../layouts/Layout.astro";
+import NoteEditorModal from "../components/noteEditor.astro";
+---
+
+<Layout title="MyAgenda Pro 2026">
+  <div class="flex h-screen bg-[#f1f5f9] overflow-hidden font-sans text-slate-900 relative">
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="w-72 bg-[#0f172a] text-white p-8 flex flex-col gap-10 shadow-2xl z-20">
+      <div class="text-3xl font-black text-blue-400 flex items-center gap-3 italic tracking-tighter">
+        <span>📅</span> MY AGENDA
+      </div>
+      <div class="space-y-8">
+        <h3 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">FILTROS</h3>
+        <div class="space-y-5 text-sm font-bold">
+          <label class="flex items-center gap-4 cursor-pointer group">
+            <input type="checkbox" id="f-trabajo" checked class="w-6 h-6 rounded-lg accent-blue-500">
+            <span class="group-hover:text-blue-400 transition-colors uppercase italic">Trabajo</span>
+          </label>
+          <label class="flex items-center gap-4 cursor-pointer group">
+            <input type="checkbox" id="f-personal" checked class="w-6 h-6 rounded-lg accent-emerald-500">
+            <span class="group-hover:text-emerald-400 transition-colors uppercase italic">Personal</span>
+          </label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ══ MAIN ══ -->
+    <main class="flex-1 flex flex-col bg-white">
+      <header class="p-8 border-b flex justify-between items-center bg-white/90 backdrop-blur-md sticky top-0 z-10">
+        <div class="flex items-center gap-8">
+          <div class="flex gap-3">
+            <button id="prev-date" class="group bg-slate-100 hover:bg-blue-600 w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-600 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button id="next-date" class="group bg-slate-100 hover:bg-blue-600 w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-600 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+          <h2 id="header-title" class="text-3xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">Cargando...</h2>
+        </div>
+        <div class="flex items-center gap-3 bg-slate-100 p-1.5 rounded-[2rem]">
+          <button data-v="dia"    class="nav-btn px-8 py-2.5 rounded-[1.5rem] font-black text-[11px] transition-all">DIA</button>
+          <button data-v="semana" class="nav-btn px-8 py-2.5 rounded-[1.5rem] font-black text-[11px] transition-all">SEMANA</button>
+          <button data-v="mes"    class="nav-btn px-8 py-2.5 rounded-[1.5rem] font-black text-[11px] transition-all">MES</button>
+          <button id="btn-add" class="ml-4 bg-[#1e60ff] text-white px-8 py-2.5 rounded-[1.5rem] font-black text-[11px] shadow-lg hover:bg-blue-700 transition-all uppercase">+ NUEVA TAREA</button>
+        </div>
+      </header>
+      <div class="flex-1 overflow-y-auto p-8 bg-[#f8fafc]" id="view-container"></div>
+    </main>
+
+    <!-- ══ AI Toggle ══ -->
+    <button id="btn-ai-toggle" class="fixed bottom-8 right-8 w-16 h-16 bg-[#0f172a] text-blue-400 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all z-[150] border-4 border-white">
+      <span class="text-2xl">🤖</span>
+    </button>
+    <div id="ai-window" class="fixed bottom-28 right-8 w-80 h-[500px] bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 hidden flex-col overflow-hidden z-[150]">
+      <div class="p-6 bg-[#0f172a] text-white flex justify-between items-center font-black italic uppercase text-xs">Asistente IA</div>
+      <div class="flex-1 p-6 overflow-y-auto text-[10px] font-black uppercase italic text-slate-400">¿En qué puedo ayudarte?</div>
+      <div class="p-4 border-t bg-slate-50">
+        <input type="text" class="w-full bg-white border-none p-4 rounded-full font-black text-[10px] outline-none shadow-sm uppercase" placeholder="ESCRIBE...">
+      </div>
+    </div>
+
+    <!-- ══ MODAL CREAR TAREA ══ -->
+    <div id="modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden items-center justify-center z-[200] p-4">
+      <div class="bg-white w-full max-w-xl rounded-[2.5rem] p-8 shadow-2xl overflow-y-auto max-h-[95vh]">
+        <form id="task-form" class="space-y-5">
+          <h3 class="font-black italic uppercase text-2xl text-center tracking-tighter mb-2">AGENDAR TAREA</h3>
+
+          <input type="text" id="t-titulo" required placeholder="TÍTULO DE LA TAREA"
+            class="w-full bg-[#f8fafc] border-none p-5 rounded-[1.5rem] font-bold uppercase outline-none focus:ring-4 focus:ring-blue-100">
+          <textarea id="t-desc" placeholder="DESCRIPCIÓN O NOTAS" rows="2"
+            class="w-full bg-[#f8fafc] border-none p-5 rounded-[1.5rem] font-bold uppercase outline-none focus:ring-4 focus:ring-blue-100 resize-none"></textarea>
+
+          <div class="grid grid-cols-2 gap-4">
+            <select id="t-prioridad" class="bg-[#f8fafc] border-none p-5 rounded-[1.5rem] font-black text-[10px] uppercase outline-none">
+              <option value="alta">🔴 ALTA</option>
+              <option value="media" selected>🟡 MEDIA</option>
+              <option value="baja">🔵 BAJA</option>
+            </select>
+            <select id="t-cat" class="bg-[#f8fafc] border-none p-5 rounded-[1.5rem] font-black text-[10px] uppercase outline-none">
+              <option value="trabajo">💼 TRABAJO</option>
+              <option value="personal">🏠 PERSONAL</option>
+            </select>
+          </div>
+
+          <div class="flex flex-col items-center gap-3">
+            <label class="flex items-center gap-3 cursor-pointer group bg-slate-50 px-6 py-3 rounded-full border border-slate-100">
+              <input type="checkbox" id="t-usa-hora" class="w-5 h-5 accent-blue-600">
+              <span class="font-black text-[10px] uppercase italic text-slate-500">¿Asignar hora?</span>
+            </label>
+            <div id="wrapper-hora" class="hidden w-full max-w-[200px]">
+              <input type="time" id="t-hora-inicio" class="w-full bg-blue-50 border-none p-4 rounded-[1.5rem] font-black text-center outline-none text-blue-600">
+            </div>
+          </div>
+
+          <!-- ── Separador Extras ── -->
+          <div class="flex items-center gap-3 py-1">
+            <div class="flex-1 h-px bg-slate-100"></div>
+            <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">Extras</span>
+            <div class="flex-1 h-px bg-slate-100"></div>
+          </div>
+
+          <!-- ── BADGE nota adjunta (oculto hasta guardar) ── -->
+          <div id="nota-badge" class="hidden items-center gap-3 bg-green-50 border border-green-200 rounded-[1.5rem] px-5 py-3">
+            <span class="text-green-500 text-lg leading-none">✓</span>
+            <div class="flex-1 min-w-0">
+              <p class="font-black text-[11px] uppercase text-green-700 tracking-wide">Nota enriquecida adjunta</p>
+              <p id="nota-badge-title" class="text-[9px] text-green-500 font-bold uppercase mt-0.5 truncate"></p>
+            </div>
+            <button type="button" id="btn-editar-nota"
+              class="text-[9px] font-black uppercase text-green-600 hover:text-green-900 transition-colors flex-shrink-0">
+              Editar
+            </button>
+          </div>
+
+          <!-- ── Botón abrir editor de notas ── -->
+          <button type="button" id="btn-abrir-nota"
+            class="w-full flex items-center gap-4 bg-slate-50 hover:bg-blue-50 border-2 border-dashed border-slate-200 hover:border-blue-300 rounded-[1.5rem] px-5 py-4 transition-all group cursor-pointer">
+            <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 group-hover:border-blue-300 group-hover:bg-blue-500 flex items-center justify-center flex-shrink-0 transition-all shadow-sm">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 group-hover:text-white transition-colors">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-black text-[11px] uppercase text-slate-600 group-hover:text-blue-600 transition-colors tracking-wide">Agregar nota enriquecida</p>
+              <p class="text-[9px] text-slate-400 font-bold uppercase mt-0.5">Negrita · Cursiva · Listas · Colores</p>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300 group-hover:text-blue-400 group-hover:translate-x-1 transition-all flex-shrink-0">
+              <path d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+
+          <div class="pt-2 space-y-3">
+            <button type="submit" class="w-full bg-[#1e60ff] text-white py-5 rounded-full font-black uppercase text-xs shadow-lg hover:bg-blue-700 transition-all">GUARDAR TAREA</button>
+            <button type="button" id="close-modal" class="w-full py-2 font-black text-[10px] text-slate-400 uppercase tracking-widest hover:text-red-500">CANCELAR</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ══ MODAL VER TAREA ══ -->
+    <div id="modal-view" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden items-center justify-center z-[210] p-4">
+      <div class="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl relative border-t-8 border-blue-500">
+        <div id="view-content" class="space-y-6"></div>
+        <div class="mt-8 flex flex-col gap-3">
+          <button id="close-view" class="w-full bg-slate-900 text-white py-5 rounded-full font-black uppercase text-[11px] italic shadow-lg">ENTENDIDO</button>
+          <button id="btn-delete-task" class="w-full py-2 font-black text-[10px] text-red-400 uppercase tracking-widest hover:text-red-600 transition-colors">ELIMINAR TAREA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ BOTÓN ETIQUETAS ══ -->
+    <button id="btn-etiquetas" class="fixed bottom-28 right-8 w-16 h-16 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all z-[150] border-4 border-white" title="Gestionar etiquetas">
+      <span class="text-xl">🏷️</span>
+    </button>
+    <div id="modal-etiquetas" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden items-center justify-center z-[220] p-4">
+      <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="font-black italic uppercase text-2xl tracking-tighter">🏷️ Etiquetas</h3>
+          <button id="close-etiquetas" class="bg-slate-100 hover:bg-red-500 hover:text-white w-10 h-10 rounded-full font-black text-slate-500 transition-all">✕</button>
+        </div>
+        <div id="etiquetas-list" class="space-y-3 mb-6"></div>
+        <div id="etiquetas-form" class="hidden border-t pt-6 space-y-4">
+          <h4 class="font-black uppercase text-sm text-slate-500">✏️ Editar Etiqueta</h4>
+          <input type="hidden" id="e-id"/>
+          <input type="text" id="e-nombre" placeholder="NOMBRE" maxlength="100" class="w-full bg-slate-50 border-2 border-slate-200 p-4 rounded-2xl font-bold uppercase outline-none focus:border-blue-400"/>
+          <div class="flex items-center gap-4">
+            <input type="color" id="e-color" value="#3b82f6" class="w-14 h-14 rounded-full border-none cursor-pointer"/>
+            <span class="font-black text-sm text-slate-500">Elige un color</span>
+          </div>
+          <div class="flex gap-3">
+            <button id="e-guardar" class="flex-1 bg-blue-600 text-white py-4 rounded-full font-black uppercase text-xs hover:bg-blue-700 transition-all">GUARDAR</button>
+            <button id="e-cancelar" class="bg-slate-100 text-slate-500 px-6 py-4 rounded-full font-black uppercase text-xs hover:bg-slate-200 transition-all">CANCELAR</button>
+          </div>
+        </div>
+        <div id="etiquetas-toast" class="hidden text-center py-3 px-6 rounded-full text-xs font-black uppercase mt-4"></div>
+      </div>
+    </div>
+
+    <!-- ══ MODAL EDITOR DE NOTAS (componente Astro) ══ -->
+    <NoteEditorModal />
+
+  </div>
+</Layout>
+
+<script>
+  // ─────────────────────────────────────────────
+  //  TIPOS
+  // ─────────────────────────────────────────────
+  interface Tarea {
+    id: any; titulo: string; descripcion: string;
+    fecha: string; hora: string | null; prioridad: string; categoria: string;
+  }
+
+  // ─────────────────────────────────────────────
+  //  ESTADO GLOBAL
+  // ─────────────────────────────────────────────
+  let allTasks:    Tarea[]             = [];
+  let currentView: 'dia'|'semana'|'mes' = 'dia';
+  let viewDate     = new Date();
+  let selectedTaskId: any              = null;
+
+  // Estado de la nota en curso (se acumula hasta guardar la tarea)
+  let notaHtml:   string = '';
+  let notaTitulo: string = '';
+
+  // ─────────────────────────────────────────────
+  //  REFERENCIAS DOM
+  // ─────────────────────────────────────────────
+  const container   = document.getElementById('view-container') as HTMLDivElement;
+  const hTitle      = document.getElementById('header-title')   as HTMLElement;
+  const modalCreate = document.getElementById('modal')          as HTMLDivElement;
+  const modalView   = document.getElementById('modal-view')     as HTMLDivElement;
+  const viewContent = document.getElementById('view-content')   as HTMLDivElement;
+  const taskForm    = document.getElementById('task-form')      as HTMLFormElement;
+
+  // Editor de notas
+  const modalNota   = document.getElementById('modal-nota')  as HTMLDivElement;
+  const neEditor    = document.getElementById('ne-editor')   as HTMLDivElement;
+  const neTitleInput= document.getElementById('ne-title')    as HTMLInputElement;
+  const neWords     = document.getElementById('ne-words')    as HTMLSpanElement;
+  const neToast     = document.getElementById('ne-toast')    as HTMLDivElement;
+
+  // Badge en el modal de tarea
+  const notaBadge      = document.getElementById('nota-badge')       as HTMLDivElement;
+  const notaBadgeTitle = document.getElementById('nota-badge-title') as HTMLParagraphElement;
+  const btnAbrirNota   = document.getElementById('btn-abrir-nota')   as HTMLButtonElement;
+
+  // ─────────────────────────────────────────────
+  //  AI WINDOW
+  // ─────────────────────────────────────────────
+  document.getElementById('btn-ai-toggle')?.addEventListener('click', () => {
+    document.getElementById('ai-window')?.classList.toggle('hidden');
+  });
+
+  // ─────────────────────────────────────────────
+  //  MODAL CREAR TAREA
+  // ─────────────────────────────────────────────
+  function openModalTarea() {
+    modalCreate.classList.remove('hidden');
+    modalCreate.style.display = 'flex';
+  }
+
+  function closeModalTarea() {
+    modalCreate.classList.add('hidden');
+    modalCreate.style.display = 'none';
+  }
+
+  document.getElementById('btn-add')?.addEventListener('click', () => {
+    // resetear nota al abrir tarea nueva
+    resetNota();
+    openModalTarea();
+  });
+
+  document.getElementById('close-modal')?.addEventListener('click', closeModalTarea);
+
+  // ─────────────────────────────────────────────
+  //  MODAL EDITOR DE NOTAS
+  //  Flujo: modal tarea → abre editor → guarda nota en memoria → vuelve a modal tarea
+  // ─────────────────────────────────────────────
+  function openModalNota() {
+    // Esconder modal tarea (no cerrar, para volver)
+    modalCreate.style.display = 'none';
+    // Restaurar contenido previo si el usuario ya había escrito algo
+    if (notaHtml)   neEditor.innerHTML  = notaHtml;
+    if (notaTitulo) neTitleInput.value  = notaTitulo;
+    // Mostrar modal nota
+    modalNota.classList.remove('hidden');
+    modalNota.style.display = 'flex';
+    setTimeout(() => neEditor.focus(), 150);
+  }
+
+  function closeModalNota() {
+    modalNota.classList.add('hidden');
+    modalNota.style.display = 'none';
+    // Volver al modal tarea
+    modalCreate.style.display = 'flex';
+  }
+
+  function resetNota() {
+    notaHtml   = '';
+    notaTitulo = '';
+    neEditor.innerHTML = '';
+    neTitleInput.value = '';
+    neWords.textContent = '0 palabras';
+    notaBadge.classList.add('hidden');
+    notaBadge.style.display = '';
+    btnAbrirNota.style.display = '';
+  }
+
+  // Botón "Agregar nota enriquecida"
+  document.getElementById('btn-abrir-nota')?.addEventListener('click', openModalNota);
+  // Botón "Editar" en el badge
+  document.getElementById('btn-editar-nota')?.addEventListener('click', openModalNota);
+  // Dot rojo → cerrar sin guardar
+  document.getElementById('ne-dot-close')?.addEventListener('click', closeModalNota);
+  // Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (modalNota.style.display === 'flex') closeModalNota();
+    }
+  });
+
+  // ── Guardar nota en memoria (sin API todavía, se manda junto con la tarea) ──
+  document.getElementById('ne-save-btn')?.addEventListener('click', () => {
+    const html  = neEditor.innerHTML.trim();
+    const titulo = neTitleInput.value.trim();
+
+    if (!html) {
+      neEditor.classList.add('ne-editor--shake');
+      neEditor.addEventListener('animationend', () =>
+        neEditor.classList.remove('ne-editor--shake'), { once: true });
+      return;
+    }
+
+    // Guardar en estado local
+    notaHtml   = html;
+    notaTitulo = titulo || 'Nota sin título';
+
+    // Mostrar badge en modal tarea
+    notaBadgeTitle.textContent = notaTitulo;
+    notaBadge.classList.remove('hidden');
+    notaBadge.style.display = 'flex';
+    // Ocultar botón "agregar nota" (ya hay una)
+    btnAbrirNota.style.display = 'none';
+
+    // Toast de confirmación
+    showNeToast('Nota guardada ✓', true);
+    setTimeout(closeModalNota, 800);
+  });
+
+  // ── Contador de palabras ──
+  neEditor.addEventListener('input', () => {
+    const text  = neEditor.innerText.trim();
+    const count = text ? text.split(/\s+/).length : 0;
+    neWords.textContent = `${count} ${count === 1 ? 'palabra' : 'palabras'}`;
+  });
+
+  // ── Toolbar ──
+  document.querySelectorAll<HTMLButtonElement>('.ne-tool').forEach(btn => {
+    btn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      document.execCommand(btn.dataset.cmd!, false, btn.dataset.val ?? undefined);
+      neEditor.focus();
+      updateNeTool();
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.ne-color').forEach(btn => {
+    btn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      document.execCommand('foreColor', false, btn.dataset.color!);
+      neEditor.focus();
+    });
+  });
+
+  function updateNeTool() {
+    document.querySelectorAll<HTMLButtonElement>('.ne-tool').forEach(btn => {
+      try { btn.classList.toggle('ne-tool--active', document.queryCommandState(btn.dataset.cmd!)); }
+      catch {}
+    });
+  }
+
+  neEditor.addEventListener('keyup',   updateNeTool);
+  neEditor.addEventListener('mouseup', updateNeTool);
+  neEditor.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === 'b') { e.preventDefault(); document.execCommand('bold'); }
+      if (e.key === 'i') { e.preventDefault(); document.execCommand('italic'); }
+      if (e.key === 'u') { e.preventDefault(); document.execCommand('underline'); }
+    }
+  });
+
+  function showNeToast(msg: string, ok: boolean) {
+    neToast.textContent = msg;
+    neToast.className = `ne-toast ${ok ? 'ne-toast--ok' : 'ne-toast--err'}`;
+    setTimeout(() => { neToast.className = 'ne-toast hidden'; }, 2500);
+  }
+
+  // ─────────────────────────────────────────────
+  //  SUBMIT TAREA (incluye nota si existe)
+  // ─────────────────────────────────────────────
+  taskForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const payload: Record<string, any> = {
+      titulo:      (document.getElementById('t-titulo')    as HTMLInputElement).value,
+      descripcion: (document.getElementById('t-desc')      as HTMLTextAreaElement).value,
+      fecha:       viewDate.toISOString().split('T')[0],
+      hora:        (document.getElementById('t-usa-hora')  as HTMLInputElement).checked
+                     ? (document.getElementById('t-hora-inicio') as HTMLInputElement).value
+                     : null,
+      prioridad:   (document.getElementById('t-prioridad') as HTMLSelectElement).value,
+      categoria:   (document.getElementById('t-cat')       as HTMLSelectElement).value,
+    };
+
+    // Si hay nota, incluirla para que el backend la inserte en la tabla `nota`
+    if (notaHtml) {
+      payload.nota_contenido = notaHtml;
+      payload.nota_titulo    = notaTitulo;
+    }
+
+    try {
+      const res  = await fetch('/api/dashboard', { method: 'POST', body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (data.success) {
+        closeModalTarea();
+        taskForm.reset();
+        resetNota();
+        await load();
+      }
+    } catch (err) {
+      console.error('Error al guardar tarea:', err);
+    }
+  });
+
+  // ─────────────────────────────────────────────
+  //  MODAL VER TAREA
+  // ─────────────────────────────────────────────
+  document.getElementById('close-view')?.addEventListener('click', () => {
+    modalView.classList.add('hidden');
+    modalView.style.display = 'none';
+  });
+
+  (window as any).verDetalle = (id: string) => {
+    selectedTaskId = id;
+    const t = allTasks.find(task => String(task.id) === String(id));
+    if (!t || !viewContent) return;
+    viewContent.innerHTML = `
+      <div class="flex justify-between items-start">
+        <span class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">${t.categoria}</span>
+        <span class="text-slate-300 font-black text-[10px] uppercase">${t.fecha} | ${t.hora || 'S.H'}</span>
+      </div>
+      <h3 class="text-3xl font-black italic uppercase tracking-tighter text-slate-800 leading-none">${t.titulo}</h3>
+      <p class="font-bold text-slate-500 uppercase text-[11px] leading-relaxed border-l-4 border-slate-100 pl-4">${t.descripcion || 'Sin descripción.'}</p>
+      <div class="pt-4 flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full ${t.prioridad === 'alta' ? 'bg-red-500' : t.prioridad === 'media' ? 'bg-yellow-500' : 'bg-blue-500'}"></div>
+        <span class="font-black text-[9px] uppercase text-slate-400">Prioridad ${t.prioridad}</span>
+      </div>`;
+    modalView.classList.remove('hidden');
+    modalView.style.display = 'flex';
+  };
+
+  // ─────────────────────────────────────────────
+  //  CARGA Y RENDER DE TAREAS
+  // ─────────────────────────────────────────────
+  async function load() {
+    try {
+      const res  = await fetch('/api/dashboard');
+      const data = await res.json();
+      if (data.success) {
+        allTasks = data.tareas.map((t: any) => ({
+          id:          t.id_tarea,
+          titulo:      t.titulo,
+          descripcion: t.descripcion,
+          fecha:       t.fecha_inicio ? new Date(t.fecha_inicio).toISOString().split('T')[0] : '',
+          hora:        t.hora_inicio,
+          prioridad:   t.prioridad,
+          categoria:   t.categoria || 'personal',
+        }));
+        render();
+      }
+    } catch (err) { console.error('Error al cargar:', err); }
+  }
+
+  function render() {
+    if (!container) return;
+    const sT = (document.getElementById('f-trabajo') as HTMLInputElement).checked;
+    const sP = (document.getElementById('f-personal') as HTMLInputElement).checked;
+    const filtered = allTasks.filter(t =>
+      (t.categoria === 'trabajo' && sT) || (t.categoria === 'personal' && sP)
+    );
+    document.querySelectorAll<HTMLElement>('.nav-btn').forEach(btn => {
+      btn.className = `nav-btn px-8 py-2.5 rounded-[1.5rem] font-black text-[11px] transition-all ${
+        btn.dataset.v === currentView
+          ? 'bg-[#0f172a] text-white shadow-xl scale-105'
+          : 'text-slate-400 hover:text-slate-600'
+      }`;
+    });
+    if      (currentView === 'dia')    renderDia(filtered);
+    else if (currentView === 'semana') renderSemana(filtered);
+    else                               renderMes(filtered);
+  }
+
+  function renderDia(filtered: Tarea[]) {
+    const dStr = viewDate.toISOString().split('T')[0];
+    hTitle.innerText = viewDate.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' }).toUpperCase();
+    let html = `<div class="grid grid-cols-[100px_1fr] bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-2xl">`;
+    for (let i = 0; i < 24; i++) {
+      const h     = i.toString().padStart(2, '0');
+      const tasks = filtered.filter(t => t.fecha === dStr && t.hora?.startsWith(h + ':'));
+      html += `<div class="min-h-[100px] border-b border-r flex items-center justify-center text-[11px] font-black text-slate-300 bg-slate-50/30">${h}:00</div>`;
+      html += `<div class="border-b p-5 space-y-2">${tasks.map(crearCard).join('')}</div>`;
+    }
+    container.innerHTML = html + `</div>`;
+  }
+
+  function renderSemana(filtered: Tarea[]) {
+    hTitle.innerText = 'VISTA SEMANAL';
+    const start = new Date(viewDate);
+    start.setDate(start.getDate() - (start.getDay() === 0 ? 6 : start.getDay() - 1));
+    let html = `<div class="grid grid-cols-7 gap-4">`;
+    for (let i = 0; i < 7; i++) {
+      const d  = new Date(start); d.setDate(start.getDate() + i);
+      const ds = d.toISOString().split('T')[0];
+      html += `<div class="bg-white p-4 rounded-[2rem] border border-slate-100 min-h-[400px]">
+        <div class="text-center mb-4">
+          <div class="text-[9px] font-black text-slate-300 uppercase">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div>
+          <div class="text-xl font-black">${d.getDate()}</div>
+        </div>
+        <div class="space-y-2">${filtered.filter(t => t.fecha === ds).map(crearCard).join('')}</div>
+      </div>`;
+    }
+    container.innerHTML = html + `</div>`;
+  }
+
+  function renderMes(filtered: Tarea[]) {
+    hTitle.innerText = viewDate.toLocaleDateString('es-ES', { month:'long', year:'numeric' }).toUpperCase();
+    const year  = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+    const first = new Date(year, month, 1).getDay();
+    const days  = new Date(year, month + 1, 0).getDate();
+    const off   = first === 0 ? 6 : first - 1;
+    let html = `<div class="grid grid-cols-7 gap-2 bg-slate-100 p-2 rounded-[2rem] shadow-inner">`;
+    ['Lun','Mar','Mie','Jue','Vie','Sab','Dom'].forEach(d =>
+      html += `<div class="text-center p-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">${d}</div>`
+    );
+    for (let i = 0; i < off; i++) html += `<div></div>`;
+    for (let d = 1; d <= days; d++) {
+      const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const dt = filtered.filter(t => t.fecha === ds);
+      html += `<div class="bg-white min-h-[120px] rounded-[1.5rem] p-3 border border-slate-50 shadow-sm">
+        <span class="text-[10px] font-black text-slate-800">${d}</span>
+        <div class="mt-2 space-y-1">${dt.map(t =>
+          `<div onclick="window.verDetalle('${t.id}')" class="h-2 rounded-full cursor-pointer ${t.prioridad==='alta'?'bg-red-500':'bg-blue-500'}"></div>`
+        ).join('')}</div>
+      </div>`;
+    }
+    container.innerHTML = html + `</div>`;
+  }
+
+  function crearCard(t: Tarea): string {
+    const colors: Record<string,string> = { alta:'bg-red-600', media:'bg-yellow-500', baja:'bg-blue-500' };
+    return `<div onclick="window.verDetalle('${t.id}')"
+      class="${colors[t.prioridad]} p-4 rounded-[1.5rem] mb-2 cursor-pointer transition-all hover:brightness-110 text-white shadow-sm active:scale-95">
+      <span class="text-[7px] font-black block opacity-80 uppercase">${t.hora || 'TODO EL DÍA'}</span>
+      <h4 class="font-black text-[11px] uppercase truncate">${t.titulo}</h4>
+    </div>`;
+  }
+
+  // ─────────────────────────────────────────────
+  //  NAVEGACIÓN (filtros, vistas, fechas)
+  // ─────────────────────────────────────────────
+  document.getElementById('f-trabajo')?.addEventListener('change', render);
+  document.getElementById('f-personal')?.addEventListener('change', render);
+  document.getElementById('t-usa-hora')?.addEventListener('change', (e) => {
+    document.getElementById('wrapper-hora')?.classList.toggle('hidden', !(e.target as HTMLInputElement).checked);
+  });
+  document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', (e) => {
+    currentView = (e.target as HTMLElement).dataset.v as any;
+    render();
+  }));
+  document.getElementById('prev-date')?.addEventListener('click', () => {
+    if (currentView === 'mes') viewDate.setMonth(viewDate.getMonth() - 1);
+    else viewDate.setDate(viewDate.getDate() - (currentView === 'semana' ? 7 : 1));
+    render();
+  });
+  document.getElementById('next-date')?.addEventListener('click', () => {
+    if (currentView === 'mes') viewDate.setMonth(viewDate.getMonth() + 1);
+    else viewDate.setDate(viewDate.getDate() + (currentView === 'semana' ? 7 : 1));
+    render();
+  });
+
+  // ─────────────────────────────────────────────
+  //  GESTOR DE ETIQUETAS
+  // ─────────────────────────────────────────────
+  const modalEtiquetas = document.getElementById('modal-etiquetas')!;
+  const etiquetasList  = document.getElementById('etiquetas-list')!;
+  const etiquetasForm  = document.getElementById('etiquetas-form')!;
+  const etiquetasToast = document.getElementById('etiquetas-toast')!;
+  const eId     = document.getElementById('e-id')     as HTMLInputElement;
+  const eNombre = document.getElementById('e-nombre') as HTMLInputElement;
+  const eColor  = document.getElementById('e-color')  as HTMLInputElement;
+
+  function mostrarToastEtiqueta(msg: string, ok: boolean) {
+    etiquetasToast.textContent = msg;
+    etiquetasToast.className = `text-center py-3 px-6 rounded-full text-xs font-black uppercase mt-4 ${ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`;
+    setTimeout(() => { etiquetasToast.className = 'hidden'; }, 3000);
+  }
+
+  async function cargarEtiquetas() {
+    etiquetasList.innerHTML = '<p class="text-center text-slate-400 text-xs font-black uppercase py-4">Cargando...</p>';
+    try {
+      const res  = await fetch('/api/etiquetas');
+      const data = await res.json();
+      if (!data.success) throw new Error();
+      if (!data.etiquetas.length) {
+        etiquetasList.innerHTML = '<p class="text-center text-slate-400 text-xs font-black uppercase py-4">No hay etiquetas.</p>';
+        return;
+      }
+      etiquetasList.innerHTML = data.etiquetas.map((e: any) => `
+        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full" style="background:${e.color}"></div>
+            <span class="font-black uppercase text-sm text-slate-700">${e.nombre}</span>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn-editar-etiqueta bg-slate-800 text-white px-4 py-2 rounded-full text-[9px] font-black uppercase hover:bg-blue-600 transition-all"
+              data-id="${e.id_etiqueta}" data-nombre="${e.nombre}" data-color="${e.color}">Editar</button>
+            <button class="btn-eliminar-etiqueta bg-red-100 text-red-500 px-4 py-2 rounded-full text-[9px] font-black uppercase hover:bg-red-500 hover:text-white transition-all"
+              data-id="${e.id_etiqueta}" data-nombre="${e.nombre}">Eliminar</button>
+          </div>
+        </div>`).join('');
+
+      document.querySelectorAll('.btn-editar-etiqueta').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const d = (btn as HTMLElement).dataset;
+          eId.value = d.id!; eNombre.value = d.nombre!; eColor.value = d.color!;
+          etiquetasForm.classList.remove('hidden');
+          etiquetasForm.scrollIntoView({ behavior:'smooth', block:'nearest' });
+        });
+      });
+      document.querySelectorAll('.btn-eliminar-etiqueta').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const d = (btn as HTMLElement).dataset;
+          if (!confirm(`¿Eliminar "${d.nombre}"?`)) return;
+          const r  = await fetch('/api/etiquetas', { method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id_etiqueta: d.id }) });
+          const rd = await r.json();
+          if (rd.success) { mostrarToastEtiqueta(`"${d.nombre}" eliminada`, true); await cargarEtiquetas(); }
+          else mostrarToastEtiqueta('Error al eliminar', false);
+        });
+      });
+    } catch {
+      etiquetasList.innerHTML = '<p class="text-center text-red-400 text-xs font-black uppercase py-4">Error al cargar.</p>';
+    }
+  }
+
+  document.getElementById('e-guardar')?.addEventListener('click', async () => {
+    const payload = { id_etiqueta: eId.value, nombre: eNombre.value.trim(), color: eColor.value };
+    if (!payload.nombre) return;
+    const r  = await fetch('/api/etiquetas', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const rd = await r.json();
+    if (rd.success) { mostrarToastEtiqueta(`"${payload.nombre}" actualizada`, true); etiquetasForm.classList.add('hidden'); await cargarEtiquetas(); }
+    else mostrarToastEtiqueta('Error al guardar', false);
+  });
+  document.getElementById('e-cancelar')?.addEventListener('click', () => etiquetasForm.classList.add('hidden'));
+  document.getElementById('btn-etiquetas')?.addEventListener('click', async () => {
+    modalEtiquetas.classList.remove('hidden'); modalEtiquetas.style.display = 'flex';
+    etiquetasForm.classList.add('hidden');
+    await cargarEtiquetas();
+  });
+  document.getElementById('close-etiquetas')?.addEventListener('click', () => {
+    modalEtiquetas.classList.add('hidden'); modalEtiquetas.style.display = 'none';
+  });
+
+  // ─────────────────────────────────────────────
+  //  INIT
+  // ─────────────────────────────────────────────
+  load();
+</script>
