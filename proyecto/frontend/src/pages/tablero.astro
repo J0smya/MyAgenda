@@ -1,497 +1,620 @@
 ---
+// src/pages/dashboard.astro
 import Layout from "../layouts/Layout.astro";
+import NoteEditor from "../components/noteEditor.astro";
 import '../styles/tablero.css';
+import '../styles/noteEditor.css';
 ---
 
 <Layout title="MyAgenda Pro 2026">
-  <div>
-    
-    <aside>
-      <div>
-        <span>📅</span> MY AGENDA
-      </div>
-      
-      <div>
-        <h3>FILTROS</h3>
-        <div>
-            <label>
-              <input type="checkbox" id="f-trabajo" checked> 
-              <span>Trabajo</span>
-            </label>
-            
-            <label>
-              <input type="checkbox" id="f-personal" checked> 
-              <span>Personal</span>
-            </label>
-        </div>
-      </div>
+<div class="db-layout">
 
-      <button id="btn-perfil" title="Mi Perfil">
-          <img src="https://ui-avatars.com/api/?name=Usuario&background=1e60ff&color=fff&bold=true" alt="Perfil">
-          <div>
-            <div>Usuario</div>
-            <div>usuario@myagenda.pro</div>
-          </div>
-      </button>
-    </aside>
-
-    <main>
-      <header>
-        <div>
-            <div>
-                <button id="prev-date">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M15 19l-7-7 7-7" /></svg>
-                </button>
-                <button id="next-date">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M9 5l7 7-7 7" /></svg>
-                </button>
-            </div>
-            <div>
-                <h2 id="header-title">Cargando...</h2>
-            </div>
-        </div>
-        
-        <div>
-            <button data-v="dia" class="nav-btn active">DÍA</button>
-            <button data-v="semana" class="nav-btn">SEMANA</button>
-            <button data-v="mes" class="nav-btn">MES</button>
-            <button id="btn-add">+ NUEVA TAREA</button>
-        </div>
-      </header>
-
-      <div id="view-container"></div>
-    </main>
-
-    <button id="btn-ai-toggle">
-        <span>🤖</span>
-    </button>
-
-    <div id="ai-window" class="hidden">
-        <div>
-          <span>Asistente IA</span>
-        </div>
-        <div>¿En qué puedo ayudarte?</div>
-        <div>
-            <input type="text" placeholder="ESCRIBE...">
-        </div>
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="db-sidebar">
+    <div class="db-logo">
+      <div class="db-logo-icon">📅</div>
+      My Agenda
     </div>
 
-    <div id="modal" class="hidden">
-      <div>
-        <form id="task-form">
-          <h3>AGENDAR TAREA</h3>
-          <input type="text" id="t-titulo" required placeholder="TÍTULO DE LA TAREA">
-          <textarea id="t-desc" placeholder="DESCRIPCIÓN O NOTAS"></textarea>
-          
-          <div>
-              <select id="t-prioridad">
-                  <option value="alta">🔴 ALTA</option>
-                  <option value="media" selected>🟡 MEDIA</option>
-                  <option value="baja">🔵 BAJA</option>
-              </select>
-              <select id="t-cat">
-                  <option value="trabajo">💼 TRABAJO</option>
-                  <option value="personal">🏠 PERSONAL</option>
-              </select>
-          </div>
-
-          <div>
-              <label>
-                  <input type="checkbox" id="t-usa-hora">
-                  <span>¿Asignar hora?</span>
-              </label>
-              <div id="wrapper-hora" class="hidden">
-                  <input type="time" id="t-hora-inicio">
-              </div>
-          </div>
-
-          <div>
-              <button type="submit">GUARDAR TAREA</button>
-              <button type="button" id="close-modal">CANCELAR</button>
-          </div>
-        </form>
-      </div>
+    <div class="db-sidebar-section">
+      <h3>Filtros</h3>
+      <label class="db-filter-label">
+        <input type="checkbox" id="f-trabajo" checked>
+        <span>Trabajo</span>
+      </label>
+      <label class="db-filter-label">
+        <input type="checkbox" id="f-personal" checked>
+        <span>Personal</span>
+      </label>
     </div>
+  </aside>
 
-    <div id="modal-view" class="hidden">
-      <div>
-        <div id="view-content"></div>
-        <div>
-            <button id="close-view">ENTENDIDO</button>
-            <button id="btn-delete-task">ELIMINAR TAREA</button>
-        </div>
+  <!-- ══ MAIN ══ -->
+  <main class="db-main">
+
+    <!-- Header -->
+    <header class="db-header">
+      <div class="db-header-left">
+        <button id="prev-date" class="db-nav-arrow" title="Anterior">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button id="next-date" class="db-nav-arrow" title="Siguiente">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <h2 id="header-title" class="db-date-title">Cargando...</h2>
       </div>
-    </div>
 
-    <button id="btn-etiquetas" title="Gestionar etiquetas">
-      <span>🏷️</span>
-    </button>
-
-    <div id="modal-etiquetas" class="hidden">
-      <div>
-        <div>
-          <h3>🏷️ Etiquetas</h3>
-          <button id="close-etiquetas">✕</button>
+      <div class="db-header-right">
+        <div class="db-view-tabs">
+          <button data-v="dia"    class="db-view-btn nav-btn">Día</button>
+          <button data-v="semana" class="db-view-btn nav-btn">Semana</button>
+          <button data-v="mes"    class="db-view-btn nav-btn">Mes</button>
         </div>
-        <div id="etiquetas-list"></div>
-        <div id="etiquetas-form" class="hidden">
-          <h4>✏️ Editar Etiqueta</h4>
-          <input type="hidden" id="e-id" />
-          <input type="text" id="e-nombre" placeholder="NOMBRE" maxlength="100" />
-          <div>
-            <input type="color" id="e-color" value="#3b82f6" />
-            <span>Elige un color</span>
-          </div>
-          <div>
-            <button id="e-guardar">GUARDAR</button>
-            <button id="e-cancelar">CANCELAR</button>
-          </div>
-        </div>
-        <div id="etiquetas-toast" class="hidden"></div>
+        <button id="btn-add" class="db-btn-add">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nueva tarea
+        </button>
       </div>
-    </div>
+    </header>
 
-    <div id="modal-perfil" class="hidden">
-      <div>
-        <div>
-          <button id="close-perfil">✕</button>
-        </div>
-        <div>
-            <img src="https://ui-avatars.com/api/?name=Usuario&background=0f172a&color=fff&bold=true&size=128" alt="Perfil Grande">
-        </div>
-        <h3>Mi Cuenta</h3>
-        <p>usuario@myagenda.pro</p>
-        
-        <div>
-            <button>Ajustes de cuenta</button>
-            <button>Cerrar Sesión</button>
-        </div>
-      </div>
-    </div>
+    <!-- Vista -->
+    <div class="db-view-container" id="view-container"></div>
+  </main>
 
+  <!-- ══ FAB Ver notas ══ -->
+  <button id="btn-ver-notas" class="db-fab db-fab--notas" title="Ver todas las notas">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/>
+      <line x1="16" y1="17" x2="8" y2="17"/>
+    </svg>
+  </button>
+
+  <!-- ══ FAB AI ══ -->
+  <button id="btn-ai-toggle" class="db-fab db-fab--ai" title="Asistente IA">
+    <span>🤖</span>
+  </button>
+  <div id="ai-window" class="db-ai-window hidden">
+    <div class="db-ai-header">Asistente IA</div>
+    <div class="db-ai-body">¿En qué puedo ayudarte?</div>
+    <div class="db-ai-footer">
+      <input type="text" class="db-ai-input" placeholder="Escribe aquí…">
+    </div>
   </div>
+
+  <!-- ══ FAB Etiquetas ══ -->
+  <button id="btn-etiquetas" class="db-fab db-fab--etiquetas" title="Gestionar etiquetas">
+    <span>🏷️</span>
+  </button>
+
+  <!-- ══ MODAL CREAR TAREA ══ -->
+  <div id="modal" class="db-modal-backdrop">
+    <div class="db-modal-box">
+      <form id="task-form">
+        <h3 class="db-modal-title">Nueva tarea</h3>
+
+        <div class="space-y-4">
+          <input type="text" id="t-titulo" required placeholder="Título de la tarea" class="db-input">
+          <textarea id="t-desc" placeholder="Descripción o notas" rows="2" class="db-input" style="resize:none"></textarea>
+
+          <div class="grid-2">
+            <select id="t-prioridad" class="db-select">
+              <option value="alta">🔴 Alta</option>
+              <option value="media" selected>🟡 Media</option>
+              <option value="baja">🔵 Baja</option>
+            </select>
+            <select id="t-cat" class="db-select">
+              <option value="trabajo">💼 Trabajo</option>
+              <option value="personal">🏠 Personal</option>
+            </select>
+          </div>
+
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <label class="db-hora-toggle">
+              <input type="checkbox" id="t-usa-hora">
+              <span>¿Asignar hora?</span>
+            </label>
+            <div id="wrapper-hora" class="hidden">
+              <input type="time" id="t-hora-inicio" class="db-input" style="text-align:center;max-width:160px;">
+            </div>
+          </div>
+
+          <!-- Separador -->
+          <div class="db-form-sep">
+            <div class="db-form-sep-line"></div>
+            <span class="db-form-sep-text">Extras</span>
+            <div class="db-form-sep-line"></div>
+          </div>
+
+          <!-- Badge nota adjunta -->
+          <div id="nota-badge" class="db-nota-badge">
+            <span class="db-nota-badge-check">✓</span>
+            <div class="db-nota-badge-info">
+              <p class="db-nota-badge-label">Nota adjunta</p>
+              <p id="nota-badge-title" class="db-nota-badge-title"></p>
+            </div>
+            <button type="button" id="btn-editar-nota" class="db-nota-badge-edit">Editar</button>
+          </div>
+
+          <!-- Botón Agregar nota -->
+          <button type="button" id="btn-agregar-nota" class="db-btn-nota">
+            <div class="db-btn-nota-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </div>
+            <div class="db-btn-nota-text">
+              <p class="db-btn-nota-label">Agregar nota</p>
+              <p class="db-btn-nota-sub">Negrita · Cursiva · Listas · Colores</p>
+            </div>
+            <svg class="db-btn-nota-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+
+          <div class="space-y-3" style="margin-top:8px;">
+            <button type="submit" class="db-btn-submit">Guardar tarea</button>
+            <button type="button" id="close-modal" class="db-btn-cancel">Cancelar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ══ MODAL VER TAREA ══ -->
+  <div id="modal-view" class="db-modal-backdrop" style="z-index:210;">
+    <div class="db-view-modal-box">
+      <div id="view-content" class="space-y-4"></div>
+      <div class="space-y-3" style="margin-top:24px;">
+        <button id="close-view" class="db-btn-understood">Entendido</button>
+        <button id="btn-delete-task" class="db-btn-delete">Eliminar tarea</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL ETIQUETAS ══ -->
+  <div id="modal-etiquetas" class="db-modal-backdrop" style="z-index:220;">
+    <div class="db-etiquetas-box">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <h3 class="db-etiquetas-title">🏷️ Etiquetas</h3>
+        <button id="close-etiquetas" class="db-btn-tag-del" style="padding:6px 14px;">✕</button>
+      </div>
+      <div id="etiquetas-list" class="space-y-3"></div>
+      <div id="etiquetas-form" class="hidden space-y-3" style="margin-top:20px;padding-top:20px;border-top:1px solid #f3f4f6;">
+        <p style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.06em;">✏️ Editar etiqueta</p>
+        <input type="hidden" id="e-id"/>
+        <input type="text" id="e-nombre" placeholder="Nombre" maxlength="100" class="db-input"/>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <input type="color" id="e-color" value="#0ea5e9" style="width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;"/>
+          <span style="font-size:13px;font-weight:600;color:#6b7280;">Color</span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button id="e-guardar" class="db-btn-submit" style="padding:10px;">Guardar</button>
+          <button id="e-cancelar" class="db-btn-cancel" style="width:auto;padding:10px 16px;background:#f3f4f6;color:#6b7280;border-radius:10px;">Cancelar</button>
+        </div>
+      </div>
+      <div id="etiquetas-toast" class="hidden" style="text-align:center;margin-top:12px;font-size:11px;font-weight:700;"></div>
+    </div>
+  </div>
+
+  <!-- ══ EDITOR DE NOTAS + LISTA ══ -->
+  <NoteEditor />
+
+</div>
 </Layout>
 
 <script>
-  interface Tarea { id: any; titulo: string; descripcion: string; fecha: string; hora: string | null; prioridad: string; categoria: string; }
-  
-  let allTasks: Tarea[] = [];
-  let currentView: 'dia' | 'semana' | 'mes' = 'dia';
-  let viewDate = new Date();
-  let selectedTaskId: any = null;
+  interface Tarea {
+    id: any; titulo: string; descripcion: string;
+    fecha: string; hora: string | null; prioridad: string; categoria: string;
+  }
 
-  const container = document.getElementById('view-container') as HTMLDivElement;
-  const hTitle = document.getElementById('header-title') as HTMLElement;
-  const modalCreate = document.getElementById('modal');
-  const modalView = document.getElementById('modal-view');
-  const viewContent = document.getElementById('view-content');
-  const taskForm = document.getElementById('task-form') as HTMLFormElement;
+  let allTasks:    Tarea[]              = [];
+  let currentView: 'dia'|'semana'|'mes' = 'dia';
+  let viewDate     = new Date();
+  let selectedTaskId: any               = null;
+  let notaHtml     = '';
+  let notaTitulo   = '';
 
+  // DOM
+  const container      = document.getElementById('view-container')   as HTMLDivElement;
+  const hTitle         = document.getElementById('header-title')     as HTMLElement;
+  const modalCreate    = document.getElementById('modal')            as HTMLDivElement;
+  const modalView      = document.getElementById('modal-view')       as HTMLDivElement;
+  const viewContent    = document.getElementById('view-content')     as HTMLDivElement;
+  const taskForm       = document.getElementById('task-form')        as HTMLFormElement;
+  const modalNota      = document.getElementById('modal-nota')       as HTMLDivElement;
+  const neEditor       = document.getElementById('ne-editor')        as HTMLDivElement;
+  const neTitleInput   = document.getElementById('ne-title')         as HTMLInputElement;
+  const neWords        = document.getElementById('ne-words')         as HTMLSpanElement;
+  const neToast        = document.getElementById('ne-toast')         as HTMLDivElement;
+  const notaBadge      = document.getElementById('nota-badge')       as HTMLDivElement;
+  const notaBadgeTitle = document.getElementById('nota-badge-title') as HTMLElement;
+  const btnAgregarNota = document.getElementById('btn-agregar-nota') as HTMLButtonElement;
+  const modalNotasLista= document.getElementById('modal-notas-lista')as HTMLDivElement;
+  const notasListaBody = document.getElementById('notas-lista-body') as HTMLDivElement;
+
+  /* ── AI ── */
   document.getElementById('btn-ai-toggle')?.addEventListener('click', () => {
     document.getElementById('ai-window')?.classList.toggle('hidden');
   });
 
+  /* ── Modal tarea ── */
+  function openModalTarea() {
+    modalCreate.classList.add('open');
+  }
+  function closeModalTarea() {
+    modalCreate.classList.remove('open');
+  }
+
+  document.getElementById('btn-add')?.addEventListener('click', () => { resetNota(); openModalTarea(); });
+  document.getElementById('close-modal')?.addEventListener('click', closeModalTarea);
+
+  /* ── Editor de notas ── */
+  function openEditorNota() {
+    modalCreate.classList.remove('open');
+    if (notaHtml)   neEditor.innerHTML = notaHtml;
+    if (notaTitulo) neTitleInput.value  = notaTitulo;
+    modalNota.classList.add('ne-open');
+    setTimeout(() => neEditor.focus(), 150);
+  }
+
+  function closeEditorNota() {
+    modalNota.classList.remove('ne-open');
+    modalCreate.classList.add('open');
+  }
+
+  function resetNota() {
+    notaHtml = ''; notaTitulo = '';
+    neEditor.innerHTML = ''; neTitleInput.value = '';
+    neWords.textContent = '0 palabras';
+    notaBadge.classList.remove('show');
+    btnAgregarNota.style.display = '';
+  }
+
+  btnAgregarNota?.addEventListener('click', openEditorNota);
+  document.getElementById('btn-editar-nota')?.addEventListener('click', openEditorNota);
+  document.getElementById('ne-dot-close')?.addEventListener('click', closeEditorNota);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalNota.classList.contains('ne-open')) closeEditorNota();
+  });
+
+  document.getElementById('ne-save-btn')?.addEventListener('click', () => {
+    const html = neEditor.innerHTML.trim();
+    if (!html) {
+      neEditor.classList.add('ne-shake');
+      neEditor.addEventListener('animationend', () => neEditor.classList.remove('ne-shake'), { once: true });
+      return;
+    }
+    notaHtml   = html;
+    notaTitulo = neTitleInput.value.trim() || 'Nota sin título';
+    notaBadgeTitle.textContent = notaTitulo;
+    notaBadge.classList.add('show');
+    btnAgregarNota.style.display = 'none';
+    showNeToast('Nota lista ✓', true);
+    setTimeout(closeEditorNota, 700);
+  });
+
+  neEditor?.addEventListener('input', () => {
+    const t = neEditor.innerText.trim();
+    const c = t ? t.split(/\s+/).length : 0;
+    neWords.textContent = `${c} ${c === 1 ? 'palabra' : 'palabras'}`;
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.ne-tool').forEach(btn => {
+    btn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      document.execCommand(btn.dataset.cmd!, false, btn.dataset.val ?? undefined);
+      neEditor.focus();
+      syncTools();
+    });
+  });
+  document.querySelectorAll<HTMLButtonElement>('.ne-color').forEach(btn => {
+    btn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      document.execCommand('foreColor', false, btn.dataset.color!);
+      neEditor.focus();
+    });
+  });
+  function syncTools() {
+    document.querySelectorAll<HTMLButtonElement>('.ne-tool').forEach(btn => {
+      try { btn.classList.toggle('active', document.queryCommandState(btn.dataset.cmd!)); } catch {}
+    });
+  }
+  neEditor?.addEventListener('keyup', syncTools);
+  neEditor?.addEventListener('mouseup', syncTools);
+  neEditor?.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === 'b') { e.preventDefault(); document.execCommand('bold'); }
+      if (e.key === 'i') { e.preventDefault(); document.execCommand('italic'); }
+      if (e.key === 'u') { e.preventDefault(); document.execCommand('underline'); }
+    }
+  });
+
+  function showNeToast(msg: string, ok: boolean) {
+    neToast.textContent = msg;
+    neToast.className = `ne-toast show ${ok ? 'ne-toast-ok' : 'ne-toast-err'}`;
+    setTimeout(() => { neToast.className = 'ne-toast'; }, 2500);
+  }
+
+  /* ── Submit tarea ── */
+  taskForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload: Record<string,any> = {
+      titulo:      (document.getElementById('t-titulo')    as HTMLInputElement).value,
+      descripcion: (document.getElementById('t-desc')      as HTMLTextAreaElement).value,
+      fecha:       viewDate.toISOString().split('T')[0],
+      hora:        (document.getElementById('t-usa-hora')  as HTMLInputElement).checked
+                     ? (document.getElementById('t-hora-inicio') as HTMLInputElement).value : null,
+      prioridad:   (document.getElementById('t-prioridad') as HTMLSelectElement).value,
+      categoria:   (document.getElementById('t-cat')       as HTMLSelectElement).value,
+    };
+    if (notaHtml) { payload.nota_contenido = notaHtml; payload.nota_titulo = notaTitulo; }
+    try {
+      const res  = await fetch('/api/dashboard', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (data.success) { closeModalTarea(); taskForm.reset(); resetNota(); await load(); }
+    } catch (err) { console.error(err); }
+  });
+
+  /* ── Ver tarea ── */
+  document.getElementById('close-view')?.addEventListener('click', () => modalView.classList.remove('open'));
+  (window as any).verDetalle = (id: string) => {
+    selectedTaskId = id;
+    const t = allTasks.find(x => String(x.id) === String(id));
+    if (!t) return;
+    const prioColor = t.prioridad==='alta'?'#ef4444':t.prioridad==='media'?'#f59e0b':'#0ea5e9';
+    viewContent.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="db-view-cat">${t.categoria}</span>
+        <span class="db-view-date">${t.fecha} ${t.hora ? '· '+t.hora : ''}</span>
+      </div>
+      <h3 class="db-view-title">${t.titulo}</h3>
+      <p class="db-view-desc">${t.descripcion || 'Sin descripción.'}</p>
+      <div class="db-view-priority">
+        <div class="db-view-priority-dot" style="background:${prioColor}"></div>
+        <span class="db-view-priority-text">Prioridad ${t.prioridad}</span>
+      </div>`;
+    modalView.classList.add('open');
+  };
+
+  /* ── Lista de notas ── */
+  async function cargarTodasLasNotas() {
+    notasListaBody.innerHTML = '<p class="notas-loading">Cargando notas…</p>';
+    try {
+      const res  = await fetch('/api/noteEditor');
+      const data = await res.json();
+      if (!data.success || !data.notas.length) {
+        notasListaBody.innerHTML = '<p class="notas-empty">No hay notas guardadas aún.</p>';
+        return;
+      }
+      notasListaBody.innerHTML = data.notas.map((n: any) => {
+        const fecha = n.fecha_creacion
+          ? new Date(n.fecha_creacion).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})
+          : '';
+        return `
+          <div class="nota-card">
+            <div class="nota-card-header">
+              <span class="nota-card-title">${n.nota_titulo ?? 'Sin título'}</span>
+              <span class="nota-card-date">${fecha}</span>
+            </div>
+            ${n.tarea_titulo ? `<span class="nota-card-tarea">📌 ${n.tarea_titulo}</span>` : ''}
+            <div class="nota-card-preview">${n.contenido ?? ''}</div>
+            <div class="nota-card-actions">
+              <button class="nota-card-btn nota-card-btn--del" data-id="${n.id_nota}">Eliminar</button>
+            </div>
+          </div>`;
+      }).join('');
+      notasListaBody.querySelectorAll<HTMLButtonElement>('.nota-card-btn--del').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('¿Eliminar esta nota?')) return;
+          const r  = await fetch('/api/noteEditor', { method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id_nota: btn.dataset.id }) });
+          if ((await r.json()).success) await cargarTodasLasNotas();
+        });
+      });
+    } catch {
+      notasListaBody.innerHTML = '<p class="notas-empty">Error al cargar notas.</p>';
+    }
+  }
+
+  document.getElementById('btn-ver-notas')?.addEventListener('click', async () => {
+    modalNotasLista.classList.add('open');
+    await cargarTodasLasNotas();
+  });
+  document.getElementById('notas-lista-close')?.addEventListener('click', () => {
+    modalNotasLista.classList.remove('open');
+  });
+
+  /* ── Load y render ── */
   async function load() {
     try {
-        const response = await fetch('/api/dashboard');
-        const data = await response.json();
-        if (data.success) {
-            allTasks = data.tareas.map((t: any) => ({
-                id: t.id_tarea,
-                titulo: t.titulo,
-                descripcion: t.descripcion,
-                fecha: t.fecha_inicio ? new Date(t.fecha_inicio).toISOString().split('T')[0] : '',
-                hora: t.hora_inicio,
-                prioridad: t.prioridad,
-                categoria: t.categoria || 'personal'
-            }));
-            render();
-        }
-    } catch (err) { console.error("Error al cargar:", err); }
+      const res  = await fetch('/api/dashboard');
+      const data = await res.json();
+      if (data.success) {
+        allTasks = data.tareas.map((t: any) => ({
+          id: t.id_tarea, titulo: t.titulo, descripcion: t.descripcion,
+          fecha: t.fecha_inicio ? new Date(t.fecha_inicio).toISOString().split('T')[0] : '',
+          hora: t.hora_inicio, prioridad: t.prioridad, categoria: t.categoria || 'personal',
+        }));
+        render();
+      }
+    } catch(e) { console.error(e); }
   }
 
   function render() {
-    if (!container) return;
     const sT = (document.getElementById('f-trabajo') as HTMLInputElement).checked;
     const sP = (document.getElementById('f-personal') as HTMLInputElement).checked;
-    const filtered = allTasks.filter(t => (t.categoria === 'trabajo' && sT) || (t.categoria === 'personal' && sP));
-    
-    // Asigna la clase 'active' al botón seleccionado
-    document.querySelectorAll('.nav-btn').forEach(b => {
-        const btn = b as HTMLElement;
-        if(btn.dataset.v === currentView) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
+    const filtered = allTasks.filter(t => (t.categoria==='trabajo'&&sT)||(t.categoria==='personal'&&sP));
+
+    // Actualizar vista activa
+    document.querySelectorAll<HTMLElement>('.db-view-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.v === currentView);
     });
-    
-    if (currentView === 'dia') renderDia(filtered);
+
+    if      (currentView === 'dia')    renderDia(filtered);
     else if (currentView === 'semana') renderSemana(filtered);
-    else renderMes(filtered);
+    else                               renderMes(filtered);
   }
 
   function renderDia(filtered: Tarea[]) {
     const dStr = viewDate.toISOString().split('T')[0];
-    hTitle.innerText = viewDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-    
-    // Se inserta la clase .vista-dia para conectar con el CSS
-    let html = `<div class="vista-dia">`;
+    hTitle.textContent = viewDate.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})
+      .replace(/^\w/, c => c.toUpperCase());
+
+    let html = `<div class="db-day-grid">`;
     for (let i = 0; i < 24; i++) {
-        const h = i.toString().padStart(2, '0');
-        const tasksH = filtered.filter(t => t.fecha === dStr && t.hora?.startsWith(h + ':'));
-        html += `<div class="hora-label">${h}:00</div>`;
-        html += `<div class="hora-tasks">${tasksH.map(t => crearCard(t)).join('')}</div>`;
+      const h = i.toString().padStart(2,'0');
+      const tasks = filtered.filter(t => t.fecha===dStr && t.hora?.startsWith(h+':'));
+      html += `<div class="db-day-row">
+        <div class="db-hour-label">${h}:00</div>
+        <div class="db-hour-tasks">${tasks.map(crearCard).join('')}</div>
+      </div>`;
     }
     container.innerHTML = html + `</div>`;
   }
 
   function renderSemana(filtered: Tarea[]) {
-    hTitle.innerText = "VISTA SEMANAL";
-    // Se inserta la clase .vista-semana
-    let html = `<div class="vista-semana">`;
+    hTitle.textContent = 'Vista semanal';
     const start = new Date(viewDate);
-    start.setDate(start.getDate() - (start.getDay() === 0 ? 6 : start.getDay() - 1));
+    start.setDate(start.getDate() - (start.getDay()===0?6:start.getDay()-1));
+    let html = `<div class="db-week-grid">`;
     for (let i = 0; i < 7; i++) {
-        const d = new Date(start); d.setDate(start.getDate() + i);
-        const ds = d.toISOString().split('T')[0];
-        html += `<div class="semana-columna">
-            <div style="text-align: center; margin-bottom: 1rem;">
-                <div style="font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase;">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div>
-                <div style="font-size: 1.5rem; font-weight: 900; color: #1e293b;">${d.getDate()}</div>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 0.5rem;">${filtered.filter(t => t.fecha === ds).map(t => crearCard(t)).join('')}</div>
-        </div>`;
+      const d  = new Date(start); d.setDate(start.getDate()+i);
+      const ds = d.toISOString().split('T')[0];
+      html += `<div class="db-week-col">
+        <div class="db-week-col-header">
+          <div class="db-week-col-day">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div>
+          <div class="db-week-col-num">${d.getDate()}</div>
+        </div>
+        ${filtered.filter(t=>t.fecha===ds).map(crearCard).join('')}
+      </div>`;
     }
     container.innerHTML = html + `</div>`;
   }
 
   function renderMes(filtered: Tarea[]) {
-    hTitle.innerText = viewDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
-    const year = viewDate.getFullYear();
-    const month = viewDate.getMonth();
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const offset = firstDay === 0 ? 6 : firstDay - 1;
-    
-    // Se insertan las clases de la vista de Mes
-    let html = `<div class="vista-mes-header">`;
-    ['Lun','Mar','Mie','Jue','Vie','Sab','Dom'].forEach(d => {
-        html += `<div class="mes-dia-header">${d}</div>`;
-    });
-    html += `</div><div class="vista-mes-grid">`;
-    
-    for (let i = 0; i < offset; i++) html += `<div></div>`;
-    for (let d = 1; d <= daysInMonth; d++) {
-        const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        const dayTasks = filtered.filter(t => t.fecha === ds);
-        html += `<div class="mes-dia-celda">
-            <span class="mes-dia-numero">${d}</span>
-            <div style="display: flex; flex-direction: column; gap: 4px;">
-              ${dayTasks.map(t => `<div onclick="window.verDetalle('${t.id}')" style="height: 6px; border-radius: 4px; cursor: pointer;" class="${t.prioridad === 'alta' ? 'prioridad-alta' : (t.prioridad === 'media' ? 'prioridad-media' : 'prioridad-baja')}"></div>`).join('')}
-            </div>
-        </div>`;
+    const y=viewDate.getFullYear(), m=viewDate.getMonth();
+    hTitle.textContent = viewDate.toLocaleDateString('es-ES',{month:'long',year:'numeric'})
+      .replace(/^\w/, c => c.toUpperCase());
+    const first = new Date(y,m,1).getDay();
+    const days  = new Date(y,m+1,0).getDate();
+    const off   = first===0?6:first-1;
+    let html = `<div class="db-month-grid">`;
+    ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].forEach(d =>
+      html += `<div class="db-month-header-cell">${d}</div>`
+    );
+    for (let i=0;i<off;i++) html += `<div></div>`;
+    for (let d=1;d<=days;d++) {
+      const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const dt = filtered.filter(t=>t.fecha===ds);
+      html += `<div class="db-month-day">
+        <div class="db-month-day-num">${d}</div>
+        ${dt.map(t=>`<div onclick="window.verDetalle('${t.id}')"
+          class="db-month-dot db-month-dot--${t.prioridad}"></div>`).join('')}
+      </div>`;
     }
     container.innerHTML = html + `</div>`;
   }
 
-  function crearCard(t: Tarea) {
-    const prioridades: any = { 'alta': 'prioridad-alta', 'media': 'prioridad-media', 'baja': 'prioridad-baja' };
-    return `<div onclick="window.verDetalle('${t.id}')" class="tarjeta-tarea ${prioridades[t.prioridad]}">
-        <span>${t.hora || 'TODO EL DÍA'}</span>
-        <h4>${t.titulo}</h4>
+  function crearCard(t: Tarea): string {
+    return `<div onclick="window.verDetalle('${t.id}')" class="db-task-card db-task--${t.prioridad}">
+      <div class="db-task-card-time">${t.hora || 'Todo el día'}</div>
+      <div class="db-task-card-title">${t.titulo}</div>
     </div>`;
   }
 
-  (window as any).verDetalle = (id: string) => {
-      selectedTaskId = id;
-      const t = allTasks.find(task => String(task.id) === String(id));
-      if (!t || !viewContent) return;
-      viewContent.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-            <span style="background-color: #dbeafe; color: #2563eb; padding: 0.25rem 1rem; border-radius: 9999px; font-size: 9px; font-weight: 900; text-transform: uppercase;">${t.categoria}</span>
-            <span style="color: #94a3b8; font-weight: 900; font-size: 10px; text-transform: uppercase;">${t.fecha} | ${t.hora || 'S.H'}</span>
-          </div>
-          <h3 style="font-size: 1.875rem; font-weight: 900; font-style: italic; text-transform: uppercase; color: #1e293b; margin: 0 0 1rem 0;">${t.titulo}</h3>
-          <p style="font-weight: bold; color: #64748b; text-transform: uppercase; font-size: 11px; border-left: 4px solid #f1f5f9; padding-left: 1rem; margin-bottom: 1rem;">${t.descripcion || 'Sin descripción adicional.'}</p>
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <div style="width: 12px; height: 12px; border-radius: 50%;" class="${t.prioridad === 'alta' ? 'prioridad-alta' : (t.prioridad === 'media' ? 'prioridad-media' : 'prioridad-baja')}"></div>
-            <span style="font-weight: 900; font-size: 9px; text-transform: uppercase; color: #94a3b8;">Prioridad ${t.prioridad}</span>
-          </div>
-      `;
-      modalView?.classList.remove('hidden');
-  };
-
-  document.getElementById('btn-add')?.addEventListener('click', () => { modalCreate?.classList.remove('hidden'); });
-  document.getElementById('close-modal')?.addEventListener('click', () => modalCreate?.classList.add('hidden'));
-  document.getElementById('close-view')?.addEventListener('click', () => modalView?.classList.add('hidden'));
-
-  taskForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const payload = { 
-        titulo: (document.getElementById('t-titulo') as HTMLInputElement).value, 
-        descripcion: (document.getElementById('t-desc') as HTMLTextAreaElement).value,
-        fecha: viewDate.toISOString().split('T')[0], 
-        hora: (document.getElementById('t-usa-hora') as HTMLInputElement).checked ? (document.getElementById('t-hora-inicio') as HTMLInputElement).value : null, 
-        prioridad: (document.getElementById('t-prioridad') as HTMLSelectElement).value,
-        categoria: (document.getElementById('t-cat') as HTMLSelectElement).value 
-    };
-    
-    const res = await fetch('/api/dashboard', { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload) 
-    });
-    
-    if ((await res.json()).success) {
-        modalCreate?.classList.add('hidden');
-        taskForm.reset();
-        await load();
-    }
-  });
-
+  /* ── Navegación ── */
   document.getElementById('f-trabajo')?.addEventListener('change', render);
   document.getElementById('f-personal')?.addEventListener('change', render);
   document.getElementById('t-usa-hora')?.addEventListener('change', (e) => {
     document.getElementById('wrapper-hora')?.classList.toggle('hidden', !(e.target as HTMLInputElement).checked);
   });
-  
-  // LOGICA PARA VOLVER A LA FECHA ACTUAL AL CAMBIAR DE PESTAÑA
-  document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', (e) => { 
-    currentView = (e.target as HTMLElement).dataset.v as any; 
-    viewDate = new Date(); // Resetea a la fecha de hoy
-    render(); 
-  }));
-  
-  document.getElementById('prev-date')?.addEventListener('click', () => { 
-    if(currentView === 'mes') viewDate.setMonth(viewDate.getMonth() - 1);
-    else viewDate.setDate(viewDate.getDate() - (currentView === 'semana' ? 7 : 1));
-    render(); 
+  document.querySelectorAll<HTMLElement>('.db-view-btn').forEach(btn => {
+    btn.addEventListener('click', () => { currentView = btn.dataset.v as any; render(); });
   });
-  document.getElementById('next-date')?.addEventListener('click', () => { 
-    if(currentView === 'mes') viewDate.setMonth(viewDate.getMonth() + 1);
-    else viewDate.setDate(viewDate.getDate() + (currentView === 'semana' ? 7 : 1));
-    render(); 
+  document.getElementById('prev-date')?.addEventListener('click', () => {
+    if (currentView==='mes') viewDate.setMonth(viewDate.getMonth()-1);
+    else viewDate.setDate(viewDate.getDate()-(currentView==='semana'?7:1));
+    render();
+  });
+  document.getElementById('next-date')?.addEventListener('click', () => {
+    if (currentView==='mes') viewDate.setMonth(viewDate.getMonth()+1);
+    else viewDate.setDate(viewDate.getDate()+(currentView==='semana'?7:1));
+    render();
   });
 
-  // ── GESTOR DE ETIQUETAS ──
+  /* ── Etiquetas ── */
   const modalEtiquetas = document.getElementById('modal-etiquetas')!;
   const etiquetasList  = document.getElementById('etiquetas-list')!;
   const etiquetasForm  = document.getElementById('etiquetas-form')!;
   const etiquetasToast = document.getElementById('etiquetas-toast')!;
-  const eId     = document.getElementById('e-id') as HTMLInputElement;
+  const eId     = document.getElementById('e-id')     as HTMLInputElement;
   const eNombre = document.getElementById('e-nombre') as HTMLInputElement;
-  const eColor  = document.getElementById('e-color') as HTMLInputElement;
+  const eColor  = document.getElementById('e-color')  as HTMLInputElement;
 
-  function mostrarToast(msg: string, ok: boolean) {
+  function toastEtiqueta(msg: string, ok: boolean) {
     etiquetasToast.textContent = msg;
-    etiquetasToast.classList.remove('hidden');
-    etiquetasToast.style.backgroundColor = ok ? '#dcfce7' : '#fee2e2';
-    etiquetasToast.style.color = ok ? '#15803d' : '#b91c1c';
-    setTimeout(() => { etiquetasToast.classList.add('hidden'); }, 3000);
+    etiquetasToast.className = ok ? 'db-toast show db-toast--ok' : 'db-toast show db-toast--err';
+    setTimeout(() => { etiquetasToast.className = 'hidden'; }, 3000);
   }
 
   async function cargarEtiquetas() {
-    etiquetasList.innerHTML = '<p style="text-align:center; color:#94a3b8; font-weight:900; text-transform:uppercase; font-size:10px;">Cargando...</p>';
+    etiquetasList.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:12px;padding:16px;">Cargando...</p>';
     try {
-      const res = await fetch('/api/etiquetas');
+      const res  = await fetch('/api/etiquetas');
       const data = await res.json();
-      if (!data.success) throw new Error();
-      if (data.etiquetas.length === 0) {
-        etiquetasList.innerHTML = '<p style="text-align:center; color:#94a3b8; font-weight:900; text-transform:uppercase; font-size:10px;">No hay etiquetas.</p>';
+      if (!data.success||!data.etiquetas.length) {
+        etiquetasList.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:12px;padding:16px;">No hay etiquetas.</p>';
         return;
       }
       etiquetasList.innerHTML = data.etiquetas.map((e: any) => `
-        <div style="display:flex; align-items:center; justify-content:space-between; background-color:#f8fafc; padding:1rem; border-radius:1rem; margin-bottom:0.5rem;">
-          <div style="display:flex; align-items:center; gap:0.75rem;">
-            <div style="width:2rem; height:2rem; border-radius:50%; background:${e.color}"></div>
-            <span style="font-weight:900; text-transform:uppercase; font-size:0.875rem;">${e.nombre}</span>
+        <div class="db-etiqueta-row">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="db-etiqueta-dot" style="background:${e.color}"></div>
+            <span class="db-etiqueta-name">${e.nombre}</span>
           </div>
-          <div style="display:flex; gap:0.5rem;">
-            <button class="btn-editar-etiqueta" data-id="${e.id_etiqueta}" data-nombre="${e.nombre}" data-color="${e.color}">Editar</button>
-            <button class="btn-eliminar-etiqueta" data-id="${e.id_etiqueta}" data-nombre="${e.nombre}">Eliminar</button>
+          <div style="display:flex;gap:6px;">
+            <button class="db-btn-tag-edit btn-editar-etiqueta"
+              data-id="${e.id_etiqueta}" data-nombre="${e.nombre}" data-color="${e.color}">Editar</button>
+            <button class="db-btn-tag-del btn-eliminar-etiqueta"
+              data-id="${e.id_etiqueta}" data-nombre="${e.nombre}">Eliminar</button>
           </div>
-        </div>
-      `).join('');
-
-      document.querySelectorAll('.btn-editar-etiqueta').forEach(btn => {
+        </div>`).join('');
+      etiquetasList.querySelectorAll('.btn-editar-etiqueta').forEach(btn => {
         btn.addEventListener('click', () => {
           const d = (btn as HTMLElement).dataset;
-          eId.value = d.id!;
-          eNombre.value = d.nombre!;
-          eColor.value = d.color!;
+          eId.value=d.id!; eNombre.value=d.nombre!; eColor.value=d.color!;
           etiquetasForm.classList.remove('hidden');
-          etiquetasForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          etiquetasForm.scrollIntoView({behavior:'smooth',block:'nearest'});
         });
       });
-
-      document.querySelectorAll('.btn-eliminar-etiqueta').forEach(btn => {
+      etiquetasList.querySelectorAll('.btn-eliminar-etiqueta').forEach(btn => {
         btn.addEventListener('click', async () => {
           const d = (btn as HTMLElement).dataset;
-          if (!confirm(`¿Eliminar la etiqueta "${d.nombre}"?`)) return;
-          const r = await fetch('/api/etiquetas', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_etiqueta: d.id })
-          });
+          if (!confirm(`¿Eliminar "${d.nombre}"?`)) return;
+          const r  = await fetch('/api/etiquetas',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_etiqueta:d.id})});
           const rd = await r.json();
-          if (rd.success) { mostrarToast(`"${d.nombre}" eliminada`, true); await cargarEtiquetas(); }
-          else mostrarToast('Error al eliminar', false);
+          if (rd.success) { toastEtiqueta(`"${d.nombre}" eliminada`,true); await cargarEtiquetas(); }
+          else toastEtiqueta('Error al eliminar',false);
         });
       });
-    } catch {
-      etiquetasList.innerHTML = '<p style="text-align:center; color:#ef4444; font-weight:900; text-transform:uppercase; font-size:10px;">Error al cargar etiquetas.</p>';
-    }
+    } catch { etiquetasList.innerHTML = '<p style="color:#ef4444;text-align:center;font-size:12px;padding:16px;">Error al cargar.</p>'; }
   }
 
   document.getElementById('e-guardar')?.addEventListener('click', async () => {
-    const payload = {
-      id_etiqueta: eId.value,
-      nombre: eNombre.value.trim(),
-      color: eColor.value
-    };
-    if (!payload.nombre) return;
-    const r = await fetch('/api/etiquetas', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    const p = {id_etiqueta:eId.value,nombre:eNombre.value.trim(),color:eColor.value};
+    if (!p.nombre) return;
+    const r  = await fetch('/api/etiquetas',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
     const rd = await r.json();
-    if (rd.success) {
-      mostrarToast(`"${payload.nombre}" actualizada`, true);
-      etiquetasForm.classList.add('hidden');
-      await cargarEtiquetas();
-    } else mostrarToast('Error al guardar', false);
+    if (rd.success) { toastEtiqueta(`"${p.nombre}" actualizada`,true); etiquetasForm.classList.add('hidden'); await cargarEtiquetas(); }
+    else toastEtiqueta('Error al guardar',false);
   });
-
-  document.getElementById('e-cancelar')?.addEventListener('click', () => {
-    etiquetasForm.classList.add('hidden');
-  });
-
+  document.getElementById('e-cancelar')?.addEventListener('click', () => etiquetasForm.classList.add('hidden'));
   document.getElementById('btn-etiquetas')?.addEventListener('click', async () => {
-    modalEtiquetas.classList.remove('hidden');
-    modalEtiquetas.style.display = 'flex';
-    etiquetasForm.classList.add('hidden');
+    modalEtiquetas.classList.add('open'); etiquetasForm.classList.add('hidden');
     await cargarEtiquetas();
   });
-
-  document.getElementById('close-etiquetas')?.addEventListener('click', () => {
-    modalEtiquetas.classList.add('hidden');
-    modalEtiquetas.style.display = 'none';
-  });
-
-  // ── GESTOR DE PERFIL ──
-  const modalPerfil = document.getElementById('modal-perfil');
-  
-  document.getElementById('btn-perfil')?.addEventListener('click', () => {
-    modalPerfil?.classList.remove('hidden');
-    modalPerfil!.style.display = 'flex';
-  });
-
-  document.getElementById('close-perfil')?.addEventListener('click', () => {
-    modalPerfil?.classList.add('hidden');
-    modalPerfil!.style.display = 'none';
-  });
+  document.getElementById('close-etiquetas')?.addEventListener('click', () => modalEtiquetas.classList.remove('open'));
 
   load();
 </script>

@@ -1,161 +1,236 @@
-export const prerender = false;
-
+// src/pages/api/noteEditor.ts
 import type { APIRoute } from "astro";
-import { pool } from "../../lib/db";
+import { db } from "../../lib/db"; // ← ajusta al path de tu cliente de BD
 
-
+/* ═══════════════════════════════════════════════════════════
+   GET  /api/noteEditor
+        Sin params  → todas las notas activas (con título de tarea)
+        ?id_tarea=  → notas de esa tarea
+        ?id_nota=   → nota específica
+═══════════════════════════════════════════════════════════ */
 export const GET: APIRoute = async ({ url }) => {
   try {
     const idTarea = url.searchParams.get("id_tarea");
+    const idNota  = url.searchParams.get("id_nota");
 
-    const { rows } = idTarea
-      ? await pool.query(
-          `SELECT id_nota, contenido, fecha_creacion, id_tarea
-           FROM nota
-           WHERE id_tarea = $1
-             AND deleted_at IS NULL
-           ORDER BY fecha_creacion DESC`,
-          [idTarea]
-        )
-      : await pool.query(
-          `SELECT id_nota, contenido, fecha_creacion, id_tarea
-           FROM nota
-           WHERE deleted_at IS NULL
-           ORDER BY fecha_creacion DESC`
-        );
+    let rows: any[];
 
-    return json({ success: true, notas: rows });
+    if (idNota) {
+      // Nota específica
+      const r = await db.query(
+        `SELECT n.id_nota,
+                n.contenido,
+                n.fecha_creacion,
+                n.id_tarea,
+                t.titulo AS tarea_titulo
+         FROM nota n
+         LEFT JOIN tarea t ON t.id_tarea = n.id_tarea
+         WHERE n.id_nota = $1
+           AND n.deleted_at IS NULL`,
+        [idNota]
+      );
+      rows = r.rows;
+
+    } else if (idTarea) {
+      // Notas de una tarea
+      const r = await db.query(
+        `SELECT n.id_nota,
+                n.contenido,
+                n.fecha_creacion,
+                n.id_tarea,
+                t.titulo AS tarea_titulo
+         FROM nota n
+         LEFT JOIN tarea t ON t.id_tarea = n.id_tarea
+         WHERE n.id_tarea = $1
+           AND n.deleted_at IS NULL
+         ORDER BY n.fecha_creacion DESC`,
+        [idTarea]
+      );
+      rows = r.rows;
+
+    } else {
+      // Todas las notas activas
+      const r = await db.query(
+        `SELECT n.id_nota,
+                n.contenido,
+                n.fecha_creacion,
+                n.id_tarea,
+                t.titulo AS tarea_titulo
+         FROM nota n
+         LEFT JOIN tarea t ON t.id_tarea = n.id_tarea
+         WHERE n.deleted_at IS NULL
+         ORDER BY n.fecha_creacion DESC`
+      );
+      rows = r.rows;
+    }
+
+    return ok({ notas: rows });
   } catch (err) {
     console.error("[GET /api/noteEditor]", err);
-    return json({ success: false, error: "Error al obtener notas" }, 500);
+    return fail("Error al obtener notas", 500);
   }
 };
 
+/* ═══════════════════════════════════════════════════════════
+   POST /api/noteEditor
+   Crea una nota vinculada a una tarea.
 
+   Body JSON:
+   {
+     contenido : string  ← HTML enriquecido  (obligatorio)
+     id_tarea  : string  ← UUID de la tarea  (obligatorio)
+   }
+
+   Llamado desde /api/dashboard después de crear la tarea,
+   pasando el id_tarea recién generado.
+═══════════════════════════════════════════════════════════ */
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await parseBody(request);
-
-    const contenido: string      = (body.contenido ?? "").trim();
+    const contenido: string      = String(body.contenido ?? "").trim();
     const idTarea:   string|null = body.id_tarea ?? null;
 
+    // Validaciones
     if (!contenido) {
-      return json({ success: false, error: "El contenido no puede estar vacío" }, 400);
+      return fail("El contenido no puede estar vacío", 400);
     }
-
     if (!idTarea) {
-      return json({ success: false, error: "id_tarea es obligatorio" }, 400);
+      return fail("id_tarea es obligatorio", 400);
     }
 
-    // Verificar que la tarea existe (evita FK violation)
-    const tareaCheck = await pool.query(
+    // Verificar que la tarea existe
+    const check = await db.query(
       `SELECT id_tarea FROM tarea WHERE id_tarea = $1 LIMIT 1`,
       [idTarea]
     );
-    if (tareaCheck.rowCount === 0) {
-      return json({ success: false, error: "Tarea no encontrada" }, 404);
+    if (check.rowCount === 0) {
+      return fail("Tarea no encontrada", 404);
     }
 
-   
-    const { rows } = await pool.query(
+    // Insertar nota
+    // id_nota       → gen_random_uuid() en la BD
+    // fecha_creacion → DEFAULT NOW()
+    // deleted_at    → NULL por defecto
+    const { rows } = await db.query(
       `INSERT INTO nota (id_nota, contenido, id_tarea)
        VALUES (gen_random_uuid(), $1, $2)
        RETURNING id_nota, contenido, fecha_creacion, id_tarea`,
       [contenido, idTarea]
     );
 
-    return json({ success: true, nota: rows[0] }, 201);
+    return ok({ nota: rows[0] }, 201);
   } catch (err) {
     console.error("[POST /api/noteEditor]", err);
-    return json({ success: false, error: "Error al guardar la nota" }, 500);
+    return fail("Error al guardar la nota", 500);
   }
 };
 
+/* ═══════════════════════════════════════════════════════════
+   PUT /api/noteEditor
+   Actualiza el contenido de una nota existente.
 
+   Body JSON:
+   {
+     id_nota   : string  (obligatorio)
+     contenido : string  (obligatorio)
+   }
+═══════════════════════════════════════════════════════════ */
 export const PUT: APIRoute = async ({ request }) => {
   try {
     const body = await parseBody(request);
-    const { id_nota, contenido } = body;
+    const idNota    = body.id_nota ?? "";
+    const contenido = String(body.contenido ?? "").trim();
 
-    if (!id_nota || !String(contenido ?? "").trim()) {
-      return json({ success: false, error: "id_nota y contenido son obligatorios" }, 400);
+    if (!idNota || !contenido) {
+      return fail("id_nota y contenido son obligatorios", 400);
     }
 
-    // Comprobar que existe y no fue eliminada
-    const check = await pool.query(
+    // Verificar que existe y no está eliminada
+    const check = await db.query(
       `SELECT id_nota FROM nota WHERE id_nota = $1 AND deleted_at IS NULL`,
-      [id_nota]
+      [idNota]
     );
     if (check.rowCount === 0) {
-      return json({ success: false, error: "Nota no encontrada" }, 404);
+      return fail("Nota no encontrada", 404);
     }
 
-    const { rows } = await pool.query(
+    const { rows } = await db.query(
       `UPDATE nota
        SET contenido = $1
        WHERE id_nota = $2
          AND deleted_at IS NULL
        RETURNING id_nota, contenido, fecha_creacion, id_tarea`,
-      [String(contenido).trim(), id_nota]
+      [contenido, idNota]
     );
 
-    return json({ success: true, nota: rows[0] });
+    return ok({ nota: rows[0] });
   } catch (err) {
     console.error("[PUT /api/noteEditor]", err);
-    return json({ success: false, error: "Error al actualizar la nota" }, 500);
+    return fail("Error al actualizar la nota", 500);
   }
 };
 
+/* ═══════════════════════════════════════════════════════════
+   DELETE /api/noteEditor
+   Soft-delete: pone deleted_at = NOW().
+
+   Body JSON:
+   { id_nota: string }
+═══════════════════════════════════════════════════════════ */
 export const DELETE: APIRoute = async ({ request }) => {
   try {
-    const body = await parseBody(request);
-    const { id_nota } = body;
+    const body   = await parseBody(request);
+    const idNota = body.id_nota ?? "";
 
-    if (!id_nota) {
-      return json({ success: false, error: "id_nota es obligatorio" }, 400);
+    if (!idNota) {
+      return fail("id_nota es obligatorio", 400);
     }
 
-    const check = await pool.query(
+    const check = await db.query(
       `SELECT id_nota FROM nota WHERE id_nota = $1 AND deleted_at IS NULL`,
-      [id_nota]
+      [idNota]
     );
     if (check.rowCount === 0) {
-      return json({ success: false, error: "Nota no encontrada o ya eliminada" }, 404);
+      return fail("Nota no encontrada o ya eliminada", 404);
     }
 
-    await pool.query(
+    await db.query(
       `UPDATE nota SET deleted_at = NOW() WHERE id_nota = $1`,
-      [id_nota]
+      [idNota]
     );
 
-    return json({ success: true, message: "Nota eliminada" });
+    return ok({ message: "Nota eliminada correctamente" });
   } catch (err) {
     console.error("[DELETE /api/noteEditor]", err);
-    return json({ success: false, error: "Error al eliminar la nota" }, 500);
+    return fail("Error al eliminar la nota", 500);
   }
 };
 
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    HELPERS
-═══════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════════ */
 
-/** Parsea body como JSON o FormData según Content-Type */
 async function parseBody(request: Request): Promise<Record<string, any>> {
   const ct = request.headers.get("content-type") ?? "";
   if (ct.includes("application/json")) {
     return await request.json();
   }
-  // FormData / urlencoded
   const form = await request.formData();
   const obj: Record<string, any> = {};
   form.forEach((val, key) => { obj[key] = val; });
   return obj;
 }
 
-/** Crea una respuesta JSON con el status indicado */
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
+function ok(data: Record<string, any>, status = 200): Response {
+  return new Response(
+    JSON.stringify({ success: true, ...data }),
+    { status, headers: { "Content-Type": "application/json" } }
+  );
+}
+
+function fail(error: string, status = 400): Response {
+  return new Response(
+    JSON.stringify({ success: false, error }),
+    { status, headers: { "Content-Type": "application/json" } }
+  );
 }

@@ -1,196 +1,493 @@
- /* ══ Caja del modal ══ */
-  .ne-modal-box {
-    background: #ffffff;
-    width: 100%;
-    max-width: 860px;
-    height: 88vh;
-    border-radius: 2rem;
-    box-shadow: 0 32px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.06);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    animation: ne-pop-in 0.22s cubic-bezier(0.34,1.56,0.64,1) both;
-  }
+/* ═══════════════════════════════════════════
+   src/styles/noteEditor.css
+   Estilos para el modal editor de notas
+═══════════════════════════════════════════ */
 
-  @keyframes ne-pop-in {
-    from { opacity: 0; transform: scale(0.94) translateY(12px); }
-    to   { opacity: 1; transform: scale(1)    translateY(0); }
-  }
+/* ── Modal backdrop ── */
+#modal-nota {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 350;
+  padding: 1rem;
+}
 
-  /* ══ Topbar ══ */
-  .ne-topbar {
-    background: #0f172a;
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
+#modal-nota.ne-open {
+  display: flex;
+}
 
-  .ne-dot {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    border: none; padding: 0;
-    cursor: pointer;
-    transition: filter 0.15s;
-  }
-  .ne-dot:hover { filter: brightness(0.85); }
+/* ── Caja del modal ── */
+.ne-box {
+  background: #ffffff;
+  width: 100%;
+  max-width: 880px;
+  height: 88vh;
+  border-radius: 2rem;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.28), 0 0 0 1px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: ne-pop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
 
-  /* ══ Cuerpo ══ */
-  .ne-body {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-  }
+@keyframes ne-pop {
+  from { opacity: 0; transform: scale(0.94) translateY(14px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
 
-  /* ══ Sidebar de herramientas ══ */
-  .ne-sidebar {
-    width: 3.5rem;
-    background: #ffffff;
-    border-right: 1px solid #f1f5f9;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 12px 0;
-    gap: 2px;
-    overflow-y: auto;
-    flex-shrink: 0;
-  }
+/* ── Topbar ── */
+.ne-topbar {
+  background: #0f172a;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 12px;
+}
 
-  .ne-tool-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    width: 100%;
-  }
+.ne-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-  .ne-sep {
-    width: 28px; height: 1px;
-    background: #f1f5f9;
-    margin: 4px 0;
-    flex-shrink: 0;
-  }
+/* Dots macOS */
+.ne-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
 
-  .ne-tool {
-    width: 2rem; height: 2rem;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 8px;
-    color: #64748b;
-    transition: background 0.12s, color 0.12s;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    padding: 0;
-  }
-  .ne-tool:hover    { background: #eff6ff; color: #2563eb; }
-  .ne-tool--active  { background: #dbeafe !important; color: #2563eb !important; }
-  .ne-tool--sm      { font-weight: 900; font-size: 0.68rem; color: #475569; }
-  .ne-tool-label    { font-size: 0.85rem; line-height: 1; pointer-events: none; }
+.ne-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: filter 0.15s;
+  display: inline-block;
+}
+.ne-dot:hover { filter: brightness(0.82); }
+.ne-dot--red    { background: #ff5f57; }
+.ne-dot--yellow { background: #febc2e; cursor: default; }
+.ne-dot--green  { background: #28c840; cursor: default; }
 
-  .ne-color-label {
-    font-size: 7px;
-    font-weight: 900;
-    text-transform: uppercase;
-    color: #cbd5e1;
-    letter-spacing: 0.05em;
-    margin-bottom: 2px;
-  }
+.ne-divider-v {
+  width: 1px;
+  height: 16px;
+  background: rgba(255,255,255,0.15);
+}
 
-  .ne-color {
-    width: 1rem; height: 1rem;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer; padding: 0;
-    transition: transform 0.12s;
-    flex-shrink: 0;
-  }
-  .ne-color:hover { transform: scale(1.3); }
+.ne-topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #60a5fa;
+}
 
-  /* ══ Área de edición ══ */
-  .ne-edit-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: #fff;
-  }
+.ne-topbar-title span {
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: #fff;
+}
 
-  .ne-title-wrap {
-    padding: 20px 40px 12px;
-    border-bottom: 1px solid #f8fafc;
-    flex-shrink: 0;
-  }
+.ne-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-  .ne-title-input {
-    width: 100%;
-    font-size: 1.4rem;
-    font-weight: 900;
-    color: #1e293b;
-    background: transparent;
-    border: none;
-    outline: none;
-    letter-spacing: -0.02em;
-  }
-  .ne-title-input::placeholder { color: #e2e8f0; }
+#ne-words {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #475569;
+  letter-spacing: 0.1em;
+}
 
-  .ne-editor {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px 40px 32px;
-    outline: none;
-    color: #374151;
-    font-size: 0.9rem;
-    line-height: 1.8;
-    caret-color: #3b9edd;
-    transition: box-shadow 0.2s;
-  }
-  .ne-editor:empty::before {
-    content: attr(data-placeholder);
-    color: #cbd5e1;
-    pointer-events: none;
-  }
-  .ne-editor h1 { font-size: 1.5rem; font-weight: 900; margin: 0.6rem 0 0.3rem; line-height: 1.2; }
-  .ne-editor h2 { font-size: 1.1rem; font-weight: 700; margin: 0.5rem 0 0.2rem; }
-  .ne-editor p  { margin-bottom: 0.4rem; }
-  .ne-editor ul, .ne-editor ol { padding-left: 1.4rem; margin-bottom: 0.4rem; }
-  .ne-editor li { margin-bottom: 0.2rem; }
-  .ne-editor strong { font-weight: 700; }
-  .ne-editor em     { font-style: italic; }
+/* Botón guardar topbar */
+.ne-btn-save {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 7px 18px;
+  font-weight: 900;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+  transition: background 0.15s, transform 0.12s;
+  white-space: nowrap;
+}
+.ne-btn-save:hover  { background: #1d4ed8; }
+.ne-btn-save:active { transform: scale(0.96); }
+.ne-btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
 
-  /* shake cuando se intenta guardar vacío */
-  .ne-editor--shake {
-    animation: ne-shake 0.35s ease;
-    box-shadow: 0 0 0 2px #fca5a5;
-    border-radius: 8px;
-  }
-  @keyframes ne-shake {
-    0%,100% { transform: translateX(0); }
-    20%  { transform: translateX(-6px); }
-    40%  { transform: translateX( 6px); }
-    60%  { transform: translateX(-4px); }
-    80%  { transform: translateX( 4px); }
-  }
+/* ── Cuerpo: sidebar + editor ── */
+.ne-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
 
-  /* ══ Toast ══ */
-  .ne-toast {
-    position: absolute;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 8px 20px;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    white-space: nowrap;
-    z-index: 10;
-    animation: ne-toast-in 0.2s ease;
-  }
-  .ne-toast--ok  { background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; }
-  .ne-toast--err { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
-  @keyframes ne-toast-in {
-    from { opacity:0; transform:translateX(-50%) translateY(8px); }
-    to   { opacity:1; transform:translateX(-50%) translateY(0); }
-  }
+/* ── Sidebar de herramientas ── */
+.ne-sidebar {
+  width: 3.5rem;
+  background: #fff;
+  border-right: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  gap: 2px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.ne-tool-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.ne-sep {
+  width: 28px;
+  height: 1px;
+  background: #f1f5f9;
+  margin: 4px 0;
+  flex-shrink: 0;
+}
+
+/* Botones de herramienta */
+.ne-tool {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: #64748b;
+  transition: background 0.12s, color 0.12s;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+.ne-tool:hover   { background: #eff6ff; color: #2563eb; }
+.ne-tool.active  { background: #dbeafe; color: #2563eb; }
+.ne-tool-sm      { font-weight: 900; font-size: 0.68rem; }
+
+/* Botones de color */
+.ne-color-label {
+  font-size: 7px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #cbd5e1;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.ne-color {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s;
+  flex-shrink: 0;
+}
+.ne-color:hover { transform: scale(1.35); }
+
+/* ── Área de edición ── */
+.ne-edit-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Título de la nota */
+.ne-title-wrap {
+  padding: 20px 40px 12px;
+  border-bottom: 1px solid #f8fafc;
+  flex-shrink: 0;
+}
+
+.ne-title-input {
+  width: 100%;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #1e293b;
+  background: transparent;
+  border: none;
+  outline: none;
+  letter-spacing: -0.02em;
+  font-family: inherit;
+}
+.ne-title-input::placeholder { color: #e2e8f0; }
+
+/* Editor contenteditable */
+.ne-editor {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 40px 32px;
+  outline: none;
+  color: #374151;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  caret-color: #3b9edd;
+  transition: box-shadow 0.2s;
+  font-family: inherit;
+}
+.ne-editor:empty::before {
+  content: attr(data-placeholder);
+  color: #cbd5e1;
+  pointer-events: none;
+}
+.ne-editor h1       { font-size: 1.5rem; font-weight: 900; margin: 0.6rem 0 0.3rem; line-height: 1.2; }
+.ne-editor h2       { font-size: 1.1rem; font-weight: 700; margin: 0.5rem 0 0.2rem; }
+.ne-editor p        { margin-bottom: 0.4rem; }
+.ne-editor ul,
+.ne-editor ol       { padding-left: 1.4rem; margin-bottom: 0.4rem; }
+.ne-editor li       { margin-bottom: 0.2rem; }
+.ne-editor strong   { font-weight: 700; }
+.ne-editor em       { font-style: italic; }
+
+/* Shake al guardar vacío */
+.ne-editor.ne-shake {
+  animation: ne-shake-anim 0.35s ease;
+  box-shadow: 0 0 0 2px #fca5a5;
+  border-radius: 8px;
+}
+@keyframes ne-shake-anim {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-6px); }
+  40%     { transform: translateX( 6px); }
+  60%     { transform: translateX(-4px); }
+  80%     { transform: translateX( 4px); }
+}
+
+/* ── Toast interno del editor ── */
+.ne-toast {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  z-index: 10;
+  display: none;
+  animation: ne-toast-in 0.2s ease;
+}
+.ne-toast.show        { display: block; }
+.ne-toast.ne-toast-ok  { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.ne-toast.ne-toast-err { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+@keyframes ne-toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ════════════════════════════════════════════
+   MODAL VER TODAS LAS NOTAS
+════════════════════════════════════════════ */
+#modal-notas-lista {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(5px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 340;
+  padding: 1rem;
+}
+#modal-notas-lista.open { display: flex; }
+
+.notas-lista-box {
+  background: #fff;
+  width: 100%;
+  max-width: 680px;
+  max-height: 88vh;
+  border-radius: 2rem;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: ne-pop 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+.notas-lista-header {
+  background: #0f172a;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.notas-lista-header h2 {
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  color: #fff;
+}
+
+.notas-lista-close {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.notas-lista-close:hover { background: #ef4444; }
+
+.notas-lista-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Tarjeta de nota en el listado */
+.nota-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: box-shadow 0.15s;
+}
+.nota-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+
+.nota-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.nota-card-title {
+  font-weight: 900;
+  font-size: 13px;
+  text-transform: uppercase;
+  color: #1e293b;
+  letter-spacing: 0.03em;
+}
+
+.nota-card-date {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.nota-card-tarea {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.nota-card-preview {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nota-card-preview h1,
+.nota-card-preview h2 { font-weight: 700; font-size: inherit; }
+
+.nota-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.nota-card-btn {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: none;
+  border-radius: 999px;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.nota-card-btn--del {
+  background: #fef2f2;
+  color: #dc2626;
+}
+.nota-card-btn--del:hover { background: #fee2e2; }
+
+.notas-empty {
+  text-align: center;
+  padding: 48px 0;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.notas-loading {
+  text-align: center;
+  padding: 32px 0;
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}

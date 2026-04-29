@@ -1,0 +1,184 @@
+---
+// src/components/noteEditor.astro
+// Importar en dashboard.astro:
+//   import NoteEditor from "../components/noteEditor.astro";
+//   <NoteEditor />
+// Y en el frontmatter del dashboard:
+//   import '../styles/noteEditor.css';
+---
+
+<!-- ════════════════════════════════════════════════
+     MODAL EDITOR DE NOTAS
+     Se abre desde el botón "Agregar nota" dentro
+     del modal de crear tarea.
+════════════════════════════════════════════════ -->
+<div id="modal-nota" role="dialog" aria-modal="true" aria-labelledby="ne-modal-label">
+  <div class="ne-box">
+
+    <!-- ── Topbar ── -->
+    <header class="ne-topbar">
+      <div class="ne-topbar-left">
+        <!-- Dots macOS -->
+        <div class="ne-dots">
+          <button id="ne-dot-close" class="ne-dot ne-dot--red" title="Cerrar sin guardar"></button>
+          <span class="ne-dot ne-dot--yellow"></span>
+          <span class="ne-dot ne-dot--green"></span>
+        </div>
+        <div class="ne-divider-v"></div>
+        <div class="ne-topbar-title">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          <span id="ne-modal-label">Editor de Nota</span>
+        </div>
+      </div>
+
+      <div class="ne-topbar-right">
+        <span id="ne-words">0 palabras</span>
+        <button id="ne-save-btn" class="ne-btn-save">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Guardar nota
+        </button>
+      </div>
+    </header>
+
+    <!-- ── Cuerpo ── -->
+    <div class="ne-body">
+
+      <!-- Sidebar herramientas -->
+      <aside class="ne-sidebar">
+
+        <div class="ne-tool-group">
+          <button class="ne-tool" data-cmd="bold"          title="Negrita (Ctrl+B)"><strong style="font-size:13px;pointer-events:none">B</strong></button>
+          <button class="ne-tool" data-cmd="italic"        title="Cursiva (Ctrl+I)"><em     style="font-size:13px;pointer-events:none">I</em></button>
+          <button class="ne-tool" data-cmd="underline"     title="Subrayado (Ctrl+U)">
+            <span style="font-size:13px;text-decoration:underline;pointer-events:none">U</span>
+          </button>
+          <button class="ne-tool" data-cmd="strikeThrough" title="Tachado">
+            <span style="font-size:13px;text-decoration:line-through;pointer-events:none">S</span>
+          </button>
+        </div>
+
+        <div class="ne-sep"></div>
+
+        <div class="ne-tool-group">
+          <button class="ne-tool ne-tool-sm" data-cmd="formatBlock" data-val="h1" title="Título 1">H1</button>
+          <button class="ne-tool ne-tool-sm" data-cmd="formatBlock" data-val="h2" title="Título 2">H2</button>
+          <button class="ne-tool ne-tool-sm" data-cmd="formatBlock" data-val="p"  title="Párrafo">¶</button>
+        </div>
+
+        <div class="ne-sep"></div>
+
+        <div class="ne-tool-group">
+          <button class="ne-tool" data-cmd="insertUnorderedList" title="Lista con viñetas">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="9" y1="6"  x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/>
+              <circle cx="4" cy="6"  r="1.5" fill="currentColor" stroke="none"/>
+              <circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+              <circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/>
+            </svg>
+          </button>
+          <button class="ne-tool" data-cmd="insertOrderedList" title="Lista numerada">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="10" y1="6"  x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/>
+              <text x="1" y="8"  font-size="7" fill="currentColor" stroke="none" font-family="sans-serif">1</text>
+              <text x="1" y="14" font-size="7" fill="currentColor" stroke="none" font-family="sans-serif">2</text>
+              <text x="1" y="20" font-size="7" fill="currentColor" stroke="none" font-family="sans-serif">3</text>
+            </svg>
+          </button>
+          <button class="ne-tool" data-cmd="indent" title="Sangría">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/>
+              <polyline points="3 10 7 14 3 18"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="ne-sep"></div>
+
+        <div class="ne-tool-group">
+          <button class="ne-tool" data-cmd="justifyLeft"   title="Izquierda">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+          </button>
+          <button class="ne-tool" data-cmd="justifyCenter" title="Centrar">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          </button>
+          <button class="ne-tool" data-cmd="justifyRight"  title="Derecha">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div class="ne-sep"></div>
+
+        <!-- Colores -->
+        <div class="ne-tool-group">
+          <span class="ne-color-label">Color</span>
+          <button class="ne-color" data-color="#1f2937" style="background:#1f2937" title="Negro"></button>
+          <button class="ne-color" data-color="#3b9edd" style="background:#3b9edd" title="Azul"></button>
+          <button class="ne-color" data-color="#16a34a" style="background:#16a34a" title="Verde"></button>
+          <button class="ne-color" data-color="#dc2626" style="background:#dc2626" title="Rojo"></button>
+          <button class="ne-color" data-color="#d97706" style="background:#d97706" title="Naranja"></button>
+          <button class="ne-color" data-color="#7c3aed" style="background:#7c3aed" title="Morado"></button>
+          <button class="ne-color" data-color="#db2777" style="background:#db2777" title="Rosa"></button>
+        </div>
+
+        <div class="ne-sep"></div>
+
+        <div class="ne-tool-group">
+          <button class="ne-tool" data-cmd="undo" title="Deshacer">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+          </button>
+          <button class="ne-tool" data-cmd="redo" title="Rehacer">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-3.5"/></svg>
+          </button>
+        </div>
+
+      </aside>
+
+      <!-- Área de edición -->
+      <div class="ne-edit-area">
+        <div class="ne-title-wrap">
+          <input
+            id="ne-title"
+            type="text"
+            placeholder="Título de la nota…"
+            maxlength="120"
+            class="ne-title-input"
+          />
+        </div>
+        <div
+          id="ne-editor"
+          contenteditable="true"
+          spellcheck="true"
+          data-placeholder="Escribe tu nota enriquecida aquí…"
+          class="ne-editor"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Toast interno -->
+    <div id="ne-toast" class="ne-toast"></div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     MODAL VER TODAS LAS NOTAS
+     Botón flotante en la ventana principal.
+════════════════════════════════════════════════ -->
+<div id="modal-notas-lista" role="dialog" aria-modal="true">
+  <div class="notas-lista-box">
+    <div class="notas-lista-header">
+      <h2>📝 Todas las notas</h2>
+      <button id="notas-lista-close" class="notas-lista-close" title="Cerrar">✕</button>
+    </div>
+    <div id="notas-lista-body" class="notas-lista-body">
+      <p class="notas-loading">Cargando notas…</p>
+    </div>
+  </div>
+</div>
