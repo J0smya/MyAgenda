@@ -7,7 +7,13 @@ import { pool } from "../../lib/db";
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    console.log("Creando tarea:", body.titulo);
+    
+    if (!body.titulo || body.titulo.trim() === "") {
+        return new Response(
+            JSON.stringify({ success: false, message: "El título es obligatorio." }),
+            { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+    }
 
     const query = `
       INSERT INTO public.tarea (
@@ -17,22 +23,20 @@ export const POST: APIRoute = async ({ request }) => {
         hora_inicio, 
         prioridad, 
         categoria,
-        etiquetas,
         estado, 
         fecha_creacion
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', NOW())
+      VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', NOW())
       RETURNING *;
     `;
 
     const values = [
-      body.titulo || "Sin título",
-      body.descripcion || "",
-      body.fecha || null,
-      body.hora || null,
+      body.titulo.trim(),
+      body.descripcion?.trim() || "",
+      body.fecha ? body.fecha : null,
+      body.hora ? body.hora : null,
       body.prioridad || "media",
-      body.categoria || "personal",
-      body.etiquetas || null
+      body.categoria || "personal"
     ];
 
     const result = await pool.query(query, values);
@@ -42,6 +46,7 @@ export const POST: APIRoute = async ({ request }) => {
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error: any) {
+    console.error("Error al crear tarea:", error.message);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
       { status: 500, headers: { "Content-Type": "application/json" } }
@@ -62,9 +67,10 @@ export const GET: APIRoute = async () => {
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error: any) {
+    console.error("Error al obtener tareas:", error.message);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
-      { status: 500 }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };
@@ -72,13 +78,12 @@ export const GET: APIRoute = async () => {
 // --- MÉTODO DELETE: ELIMINAR TAREA ---
 export const DELETE: APIRoute = async ({ url }) => {
   try {
-    // Obtenemos el ID de la URL (ej: /api/dashboard?id=123)
     const id = url.searchParams.get("id");
 
     if (!id) {
       return new Response(
         JSON.stringify({ success: false, message: "ID no proporcionado" }),
-        { status: 400 }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -88,7 +93,7 @@ export const DELETE: APIRoute = async ({ url }) => {
     if (result.rowCount === 0) {
       return new Response(
         JSON.stringify({ success: false, message: "Tarea no encontrada" }),
-        { status: 404 }
+        { status: 404, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -97,11 +102,10 @@ export const DELETE: APIRoute = async ({ url }) => {
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    console.error("Error al eliminar:", error.message);
+    console.error("Error al eliminar tarea:", error.message);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
-      { status: 500 }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
-};
-
+}; 
