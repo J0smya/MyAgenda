@@ -1,10 +1,6 @@
 ---
-// src/components/noteEditor.astro
-// Importar en dashboard.astro:
-//   import NoteEditor from "../components/noteEditor.astro";
-//   <NoteEditor />
-// Y en el frontmatter del dashboard:
-//   import '../styles/noteEditor.css';
+
+import '../styles/noteEditor.css';
 ---
 
 <!-- ════════════════════════════════════════════════
@@ -142,6 +138,9 @@
 
       <!-- Área de edición -->
       <div class="ne-edit-area">
+        <!-- Adjuntos para esta nota -->
+        <slot name="note-attachments" />
+
         <div class="ne-title-wrap">
           <input
             id="ne-title"

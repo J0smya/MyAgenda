@@ -1,12 +1,3 @@
-/* ═══════════════════════════════════════════════
-   src/styles/dashboard.css
-   Estética alineada con la landing page:
-   — Fondo blanco limpio
-   — Tipografía Inter/sans-serif, bold, sin italic excesivo
-   — Azul cyan como color principal (#0ea5e9)
-   — Sidebar gris muy claro, no navy oscuro
-   — Bordes y sombras suaves
-═══════════════════════════════════════════════ */
 
 /* ── Reset y base ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -948,3 +939,245 @@ body {
 .space-y-4 > * + * { margin-top: 12px; }
 .space-y-3 > * + * { margin-top: 8px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── Campo con etiqueta superior ── */
+.db-field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.db-field-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Input fecha ── */
+.db-input--date {
+  cursor: pointer;
+  color: #111827;
+}
+
+.db-input--date::-webkit-calendar-picker-indicator {
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.db-input--date:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
+}
+
+/* ── Subir archivo ── */
+.db-file-input {
+  display: none;
+}
+
+.db-file-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border: 1.5px dashed #d1d5db;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #f9fafb;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  user-select: none;
+}
+
+.db-file-label:hover {
+  border-color: #6366f1;
+  background: #eef2ff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+}
+
+.db-file-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: #e0e7ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6366f1;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.db-file-label:hover .db-file-icon {
+  background: #c7d2fe;
+}
+
+.db-file-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  flex: 1;
+}
+
+.db-file-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6366f1;
+  margin-top: 2px;
+  padding-left: 2px;
+  word-break: break-all;
+}
+
+
+.db-fab--perfil:hover {
+  background: #d97706;
+  transform: scale(1.08);
+}
+
+/* ── Modal perfil ── */
+.db-perfil-box {
+  background: #fff;
+  border-radius: 22px;
+  padding: 28px 24px 24px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.14);
+  animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.db-perfil-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.db-perfil-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+}
+
+.db-perfil-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.db-perfil-email {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-top: 3px;
+}
+
+/* Estadísticas */
+.db-perfil-stats {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.db-perfil-stat {
+  flex: 1;
+  background: #f3f4f6;
+  border-radius: 14px;
+  padding: 14px 8px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: background 0.2s;
+}
+
+.db-perfil-stat:hover {
+  background: #e0e7ff;
+}
+
+.db-perfil-stat-num {
+  font-size: 24px;
+  font-weight: 900;
+  color: #6366f1;
+  line-height: 1;
+}
+
+.db-perfil-stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Sidebar como columna flex para empujar el perfil al fondo */
+.db-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* o 100% según tu layout */
+}
+
+/* El bloque de filtros crece y empuja el perfil hacia abajo */
+.db-sidebar-section {
+  flex: 1;
+}
+
+/* Perfil fijo al fondo */
+.db-profile-bottom {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.db-sidebar-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 10px;
+  transition: background 0.15s;
+  text-align: left;
+}
+
+.db-sidebar-profile-btn:hover {
+  background: #f3f4f6;
+}
+
+.db-profile-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e0f0ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #0ea5e9;
+}
+
+.db-profile-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.db-profile-email {
+  font-size: 11px;
+  color: #9ca3af;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
+}

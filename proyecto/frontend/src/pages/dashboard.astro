@@ -10,23 +10,42 @@ import '../styles/noteEditor.css';
 <div class="db-layout">
 
   <aside class="db-sidebar">
-    <div class="db-logo">
-      <div class="db-logo-icon">📅</div>
-      My Agenda
-    </div>
+  <div class="db-logo">
+    <div class="db-logo-icon">📅</div>
+    My Agenda
+  </div>
 
-    <div class="db-sidebar-section">
-      <h3>Filtros</h3>
-      <label class="db-filter-label">
-        <input type="checkbox" id="f-trabajo" checked>
-        <span>Trabajo</span>
-      </label>
-      <label class="db-filter-label">
-        <input type="checkbox" id="f-personal" checked>
-        <span>Personal</span>
-      </label>
+  <div class="db-sidebar-section">
+    <h3>Filtros</h3>
+    <label class="db-filter-label">
+      <input type="checkbox" id="f-trabajo" checked>
+      <span>Trabajo</span>
+    </label>
+    <label class="db-filter-label">
+      <input type="checkbox" id="f-personal" checked>
+      <span>Personal</span>
+    </label>
+  </div>
+
+  <!-- PERFIL al fondo del aside -->
+  <div id="profile-bottom" class="db-profile-bottom">
+    <div class="db-sidebar-profile">
+      <button id="btn-perfil" class="db-sidebar-profile-btn">
+        <div class="db-profile-avatar">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="db-profile-info">
+          <p class="db-profile-name">Mi Perfil</p>
+          <p class="db-profile-email">usuario@email.com</p>
+        </div>
+      </button>
     </div>
-  </aside>
+  </div>
+
+</aside>
 
   <main class="db-main">
     <header class="db-header">
@@ -56,11 +75,8 @@ import '../styles/noteEditor.css';
     <div class="db-view-container" id="view-container"></div>
   </main>
 
-  <!-- BOTÓN NUEVO EN LA PARTE IZQUIERDA ABAJO -->
-  <button id="btn-extra-izquierdo" class="db-fab" title="Botón Izquierdo" style="position: fixed; bottom: 20px; left: 20px; right: auto; z-index: 100;">
-    <span>⚙️</span>
-  </button>
 
+  <!-- FAB notas -->
   <button id="btn-ver-notas" class="db-fab db-fab--notas" title="Ver todas las notas">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -70,6 +86,7 @@ import '../styles/noteEditor.css';
     </svg>
   </button>
 
+  <!-- FAB IA -->
   <button id="btn-ai-toggle" class="db-fab db-fab--ai" title="Asistente IA">
     <span>🤖</span>
   </button>
@@ -82,19 +99,27 @@ import '../styles/noteEditor.css';
     </div>
   </div>
 
+  <!-- FAB etiquetas -->
   <button id="btn-etiquetas" class="db-fab db-fab--etiquetas" title="Gestionar etiquetas">
     <span>🏷️</span>
   </button>
 
+  <!-- ═══════════════════════════════════════
+       MODAL: NUEVA TAREA
+  ════════════════════════════════════════ -->
   <div id="modal" class="db-modal-backdrop">
     <div class="db-modal-box">
       <form id="task-form">
         <h3 class="db-modal-title">Nueva tarea</h3>
 
         <div class="space-y-4">
+          <!-- Título -->
           <input type="text" id="t-titulo" required placeholder="Título de la tarea" class="db-input">
+
+          <!-- Descripción -->
           <textarea id="t-desc" placeholder="Descripción o notas" rows="2" class="db-input" style="resize:none"></textarea>
 
+          <!-- Prioridad y categoría -->
           <div class="grid-2">
             <select id="t-prioridad" class="db-select">
               <option value="alta">🔴 Alta</option>
@@ -107,6 +132,13 @@ import '../styles/noteEditor.css';
             </select>
           </div>
 
+          <!-- ── FECHA ── -->
+          <div class="db-field-row">
+            <label class="db-field-label" for="t-fecha">📅 Fecha de la tarea</label>
+            <input type="date" id="t-fecha" class="db-input db-input--date">
+          </div>
+
+          <!-- ── HORA ── -->
           <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
             <label class="db-hora-toggle">
               <input type="checkbox" id="t-usa-hora">
@@ -117,12 +149,32 @@ import '../styles/noteEditor.css';
             </div>
           </div>
 
+          <!-- ── SUBIR ARCHIVO ── -->
+          <div class="db-field-row">
+            <label class="db-field-label">📎 Adjuntar archivo</label>
+            <label class="db-file-label" id="file-label">
+              <input type="file" id="t-archivo" class="db-file-input" accept="*/*">
+              <span class="db-file-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </span>
+              <span class="db-file-text" id="file-text">Subir archivo</span>
+            </label>
+            <p class="db-file-name hidden" id="file-name-display"></p>
+          </div>
+
+          <!-- Separador Extras -->
           <div class="db-form-sep">
             <div class="db-form-sep-line"></div>
             <span class="db-form-sep-text">Extras</span>
             <div class="db-form-sep-line"></div>
           </div>
 
+          <!-- Badge nota adjunta -->
           <div id="nota-badge" class="db-nota-badge">
             <span class="db-nota-badge-check">✓</span>
             <div class="db-nota-badge-info">
@@ -132,6 +184,7 @@ import '../styles/noteEditor.css';
             <button type="button" id="btn-editar-nota" class="db-nota-badge-edit">Editar</button>
           </div>
 
+          <!-- Botón agregar nota -->
           <button type="button" id="btn-agregar-nota" class="db-btn-nota">
             <div class="db-btn-nota-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -146,6 +199,7 @@ import '../styles/noteEditor.css';
             <svg class="db-btn-nota-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
           </button>
 
+          <!-- Acciones -->
           <div class="space-y-3" style="margin-top:8px;">
             <button type="submit" class="db-btn-submit">Guardar tarea</button>
             <button type="button" id="close-modal" class="db-btn-cancel">Cancelar</button>
@@ -155,6 +209,9 @@ import '../styles/noteEditor.css';
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════
+       MODAL: VER TAREA
+  ════════════════════════════════════════ -->
   <div id="modal-view" class="db-modal-backdrop" style="z-index:210;">
     <div class="db-view-modal-box">
       <div id="view-content" class="space-y-4"></div>
@@ -165,6 +222,9 @@ import '../styles/noteEditor.css';
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════
+       MODAL: ETIQUETAS
+  ════════════════════════════════════════ -->
   <div id="modal-etiquetas" class="db-modal-backdrop" style="z-index:220;">
     <div class="db-etiquetas-box">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
@@ -189,6 +249,52 @@ import '../styles/noteEditor.css';
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════
+       MODAL: PERFIL
+  ════════════════════════════════════════ -->
+  <div id="modal-perfil" class="db-modal-backdrop" style="z-index:230;">
+    <div class="db-perfil-box">
+      <div class="db-perfil-header">
+        <div class="db-perfil-avatar">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div>
+          <p class="db-perfil-name">Mi Perfil</p>
+          <p class="db-perfil-email">usuario@email.com</p>
+        </div>
+      </div>
+
+      <div class="db-perfil-stats">
+        <div class="db-perfil-stat">
+          <span class="db-perfil-stat-num" id="perfil-total">0</span>
+          <span class="db-perfil-stat-label">Totales</span>
+        </div>
+        <div class="db-perfil-stat">
+          <span class="db-perfil-stat-num" id="perfil-trabajo">0</span>
+          <span class="db-perfil-stat-label">Trabajo</span>
+        </div>
+        <div class="db-perfil-stat">
+          <span class="db-perfil-stat-num" id="perfil-personal">0</span>
+          <span class="db-perfil-stat-label">Personal</span>
+        </div>
+      </div>
+
+      <div class="db-perfil-section">
+        <p class="db-perfil-section-title">⚙️ Preferencias</p>
+        <label class="db-filter-label">
+          <input type="checkbox" id="perfil-dark" disabled>
+          <span>Modo oscuro <span style="font-size:10px;color:#9ca3af;">(próximamente)</span></span>
+        </label>
+      </div>
+
+      <button id="close-perfil" class="db-btn-cancel" style="margin-top:20px;">Cerrar</button>
+    </div>
+  </div>
+
   <NoteEditor />
 
 </div>
@@ -207,33 +313,45 @@ import '../styles/noteEditor.css';
   let notaHtml     = '';
   let notaTitulo   = '';
 
-  // DOM
-  const container      = document.getElementById('view-container')   as HTMLDivElement;
-  const hTitle         = document.getElementById('header-title')     as HTMLElement;
-  const modalCreate    = document.getElementById('modal')            as HTMLDivElement;
-  const modalView      = document.getElementById('modal-view')       as HTMLDivElement;
-  const viewContent    = document.getElementById('view-content')     as HTMLDivElement;
-  const taskForm       = document.getElementById('task-form')        as HTMLFormElement;
-  const modalNota      = document.getElementById('modal-nota')       as HTMLDivElement;
-  const neEditor       = document.getElementById('ne-editor')        as HTMLDivElement;
-  const neTitleInput   = document.getElementById('ne-title')         as HTMLInputElement;
-  const neWords        = document.getElementById('ne-words')         as HTMLSpanElement;
-  const neToast        = document.getElementById('ne-toast')         as HTMLDivElement;
-  const notaBadge      = document.getElementById('nota-badge')       as HTMLDivElement;
-  const notaBadgeTitle = document.getElementById('nota-badge-title') as HTMLElement;
-  const btnAgregarNota = document.getElementById('btn-agregar-nota') as HTMLButtonElement;
-  const modalNotasLista= document.getElementById('modal-notas-lista')as HTMLDivElement;
-  const notasListaBody = document.getElementById('notas-lista-body') as HTMLDivElement;
+  // ── DOM refs ──
+  const container      = document.getElementById('view-container')    as HTMLDivElement;
+  const hTitle         = document.getElementById('header-title')      as HTMLElement;
+  const modalCreate    = document.getElementById('modal')             as HTMLDivElement;
+  const modalView      = document.getElementById('modal-view')        as HTMLDivElement;
+  const viewContent    = document.getElementById('view-content')      as HTMLDivElement;
+  const taskForm       = document.getElementById('task-form')         as HTMLFormElement;
+  const modalNota      = document.getElementById('modal-nota')        as HTMLDivElement;
+  const neEditor       = document.getElementById('ne-editor')         as HTMLDivElement;
+  const neTitleInput   = document.getElementById('ne-title')          as HTMLInputElement;
+  const neWords        = document.getElementById('ne-words')          as HTMLSpanElement;
+  const neToast        = document.getElementById('ne-toast')          as HTMLDivElement;
+  const notaBadge      = document.getElementById('nota-badge')        as HTMLDivElement;
+  const notaBadgeTitle = document.getElementById('nota-badge-title')  as HTMLElement;
+  const btnAgregarNota = document.getElementById('btn-agregar-nota')  as HTMLButtonElement;
+  const modalNotasLista= document.getElementById('modal-notas-lista') as HTMLDivElement;
+  const notasListaBody = document.getElementById('notas-lista-body')  as HTMLDivElement;
+  const modalPerfil    = document.getElementById('modal-perfil')      as HTMLDivElement;
+  const fechaInput     = document.getElementById('t-fecha')           as HTMLInputElement;
+  const archivoInput   = document.getElementById('t-archivo')         as HTMLInputElement;
+  const fileText       = document.getElementById('file-text')         as HTMLElement;
+  const fileNameDisplay= document.getElementById('file-name-display') as HTMLElement;
 
-  /* ── AI ── */
+  /* ══════════════════════════════════════
+     AI
+  ══════════════════════════════════════ */
   document.getElementById('btn-ai-toggle')?.addEventListener('click', () => {
     document.getElementById('ai-window')?.classList.toggle('hidden');
   });
 
-  /* ── Modal tarea ── */
+  /* ══════════════════════════════════════
+     MODAL TAREA — abrir / cerrar
+  ══════════════════════════════════════ */
   function openModalTarea() {
+    // Inicializa fecha con el día actual de la vista
+    fechaInput.value = viewDate.toISOString().split('T')[0];
     modalCreate.classList.add('open');
   }
+
   function closeModalTarea() {
     modalCreate.classList.remove('open');
   }
@@ -241,7 +359,24 @@ import '../styles/noteEditor.css';
   document.getElementById('btn-add')?.addEventListener('click', () => { resetNota(); openModalTarea(); });
   document.getElementById('close-modal')?.addEventListener('click', closeModalTarea);
 
-  /* ── Editor de notas ── */
+  /* ══════════════════════════════════════
+     ARCHIVO — preview nombre
+  ══════════════════════════════════════ */
+  archivoInput?.addEventListener('change', () => {
+    const file = archivoInput.files?.[0];
+    if (file) {
+      fileNameDisplay.textContent = `✓ ${file.name}`;
+      fileNameDisplay.classList.remove('hidden');
+      fileText.textContent = 'Cambiar archivo';
+    } else {
+      fileNameDisplay.classList.add('hidden');
+      fileText.textContent = 'Subir archivo';
+    }
+  });
+
+  /* ══════════════════════════════════════
+     EDITOR DE NOTAS
+  ══════════════════════════════════════ */
   function openEditorNota() {
     modalCreate.classList.remove('open');
     if (notaHtml)   neEditor.innerHTML = notaHtml;
@@ -257,10 +392,15 @@ import '../styles/noteEditor.css';
 
   function resetNota() {
     notaHtml = ''; notaTitulo = '';
-    neEditor.innerHTML = ''; neTitleInput.value = '';
-    neWords.textContent = '0 palabras';
+    if (neEditor)       neEditor.innerHTML  = '';
+    if (neTitleInput)   neTitleInput.value  = '';
+    if (neWords)        neWords.textContent = '0 palabras';
     notaBadge.classList.remove('show');
     btnAgregarNota.style.display = '';
+    // reset archivo
+    archivoInput.value = '';
+    fileNameDisplay.classList.add('hidden');
+    fileText.textContent = 'Subir archivo';
   }
 
   btnAgregarNota?.addEventListener('click', openEditorNota);
@@ -300,6 +440,7 @@ import '../styles/noteEditor.css';
       syncTools();
     });
   });
+
   document.querySelectorAll<HTMLButtonElement>('.ne-color').forEach(btn => {
     btn.addEventListener('mousedown', (e) => {
       e.preventDefault();
@@ -307,13 +448,15 @@ import '../styles/noteEditor.css';
       neEditor.focus();
     });
   });
+
   function syncTools() {
     document.querySelectorAll<HTMLButtonElement>('.ne-tool').forEach(btn => {
       try { btn.classList.toggle('active', document.queryCommandState(btn.dataset.cmd!)); } catch {}
     });
   }
-  neEditor?.addEventListener('keyup', syncTools);
-  neEditor?.addEventListener('mouseup', syncTools);
+
+  neEditor?.addEventListener('keyup',    syncTools);
+  neEditor?.addEventListener('mouseup',  syncTools);
   neEditor?.addEventListener('keydown', (e) => {
     if (e.ctrlKey || e.metaKey) {
       if (e.key === 'b') { e.preventDefault(); document.execCommand('bold'); }
@@ -328,74 +471,116 @@ import '../styles/noteEditor.css';
     setTimeout(() => { neToast.className = 'ne-toast'; }, 2500);
   }
 
-  /* ── Submit tarea ── */
+  /* ══════════════════════════════════════
+     SUBMIT TAREA
+  ══════════════════════════════════════ */
   taskForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const payload: Record<string,any> = {
-      titulo:      (document.getElementById('t-titulo')    as HTMLInputElement).value,
-      descripcion: (document.getElementById('t-desc')      as HTMLTextAreaElement).value,
-      fecha:       viewDate.toISOString().split('T')[0],
-      hora:        (document.getElementById('t-usa-hora')  as HTMLInputElement).checked
-                     ? (document.getElementById('t-hora-inicio') as HTMLInputElement).value : null,
-      prioridad:   (document.getElementById('t-prioridad') as HTMLSelectElement).value,
-      categoria:   (document.getElementById('t-cat')       as HTMLSelectElement).value,
+
+    const payload: Record<string, any> = {
+      titulo:      (document.getElementById('t-titulo')     as HTMLInputElement).value,
+      descripcion: (document.getElementById('t-desc')       as HTMLTextAreaElement).value,
+      // Usa la fecha elegida en el picker; si está vacía usa viewDate
+      fecha:       fechaInput.value || viewDate.toISOString().split('T')[0],
+      hora:        (document.getElementById('t-usa-hora')   as HTMLInputElement).checked
+                     ? (document.getElementById('t-hora-inicio') as HTMLInputElement).value
+                     : null,
+      prioridad:   (document.getElementById('t-prioridad')  as HTMLSelectElement).value,
+      categoria:   (document.getElementById('t-cat')        as HTMLSelectElement).value,
     };
-    if (notaHtml) { payload.nota_contenido = notaHtml; payload.nota_titulo = notaTitulo; }
+
+    if (notaHtml) {
+      payload.nota_contenido = notaHtml;
+      payload.nota_titulo    = notaTitulo;
+    }
+
+    // Si hay archivo adjunto, usa FormData; si no, JSON normal
+    const archivo = archivoInput.files?.[0];
+
     try {
-      const res  = await fetch('/api/dashboard', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      let res: Response;
+
+      if (archivo) {
+        const fd = new FormData();
+        Object.entries(payload).forEach(([k, v]) => {
+          if (v !== null && v !== undefined) fd.append(k, String(v));
+        });
+        fd.append('archivo', archivo);
+        res = await fetch('/api/dashboard', { method: 'POST', body: fd });
+      } else {
+        res = await fetch('/api/dashboard', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(payload),
+        });
+      }
+
       const data = await res.json();
-      if (data.success) { 
-        closeModalTarea(); taskForm.reset(); resetNota(); await load(); 
+      if (data.success) {
+        closeModalTarea();
+        taskForm.reset();
+        resetNota();
+        await load();
       } else {
         alert(data.message || data.error || 'Error al guardar la tarea');
       }
-    } catch (err) { 
-      console.error("Error de conexión:", err); 
-      alert("No se pudo conectar con el servidor.");
+    } catch (err) {
+      console.error('Error de conexión:', err);
+      alert('No se pudo conectar con el servidor.');
     }
   });
 
-  /* ── Ver tarea ── */
-  document.getElementById('close-view')?.addEventListener('click', () => modalView.classList.remove('open'));
+  /* ══════════════════════════════════════
+     VER DETALLE DE TAREA
+  ══════════════════════════════════════ */
+  document.getElementById('close-view')?.addEventListener('click', () =>
+    modalView.classList.remove('open')
+  );
+
   (window as any).verDetalle = (id: string) => {
     selectedTaskId = id;
     const t = allTasks.find(x => String(x.id) === String(id));
     if (!t) return;
-    const prioColor = t.prioridad==='alta'?'#ef4444':t.prioridad==='media'?'#f59e0b':'#0ea5e9';
+    const prioColor = t.prioridad === 'alta' ? '#ef4444'
+                    : t.prioridad === 'media' ? '#f59e0b'
+                    : '#0ea5e9';
     viewContent.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span class="db-view-cat">${t.categoria}</span>
-        <span class="db-view-date">${t.fecha} ${t.hora ? '· '+t.hora : ''}</span>
+        <span class="db-view-date">${t.fecha} ${t.hora ? '· ' + t.hora : ''}</span>
       </div>
       <h3 class="db-view-title">${t.titulo}</h3>
       <p class="db-view-desc">${t.descripcion || 'Sin descripción.'}</p>
       <div class="db-view-priority">
         <div class="db-view-priority-dot" style="background:${prioColor}"></div>
         <span class="db-view-priority-text">Prioridad ${t.prioridad}</span>
-      </div>`;  
+      </div>`;
     modalView.classList.add('open');
   };
 
-  /* ── Eliminar tarea (Agregado) ── */
+  /* ══════════════════════════════════════
+     ELIMINAR TAREA
+  ══════════════════════════════════════ */
   document.getElementById('btn-delete-task')?.addEventListener('click', async () => {
     if (!selectedTaskId) return;
-    if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
-      try {
-        const res = await fetch(`/api/dashboard?id=${selectedTaskId}`, { method: 'DELETE' });
-        const data = await res.json();
-        if (data.success) {
-          modalView.classList.remove('open');
-          await load();
-        } else {
-          alert(data.message || data.error || 'Error al eliminar la tarea');
-        }
-      } catch (err) {
-        console.error("Error al eliminar:", err);
+    if (!confirm('¿Estás seguro de que deseas eliminar esta tarea?')) return;
+    try {
+      const res  = await fetch(`/api/dashboard?id=${selectedTaskId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        modalView.classList.remove('open');
+        await load();
+      } else {
+        alert(data.message || data.error || 'Error al eliminar la tarea');
       }
+    } catch (err) {
+      console.error('Error al eliminar:', err);
     }
   });
 
-  /* ── Lista de notas ── */
+  /* ══════════════════════════════════════
+     LISTA DE NOTAS
+  ══════════════════════════════════════ */
   async function cargarTodasLasNotas() {
     notasListaBody.innerHTML = '<p class="notas-loading">Cargando notas…</p>';
     try {
@@ -407,7 +592,7 @@ import '../styles/noteEditor.css';
       }
       notasListaBody.innerHTML = data.notas.map((n: any) => {
         const fecha = n.fecha_creacion
-          ? new Date(n.fecha_creacion).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})
+          ? new Date(n.fecha_creacion).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
           : '';
         return `
           <div class="nota-card">
@@ -422,10 +607,15 @@ import '../styles/noteEditor.css';
             </div>
           </div>`;
       }).join('');
+
       notasListaBody.querySelectorAll<HTMLButtonElement>('.nota-card-btn--del').forEach(btn => {
         btn.addEventListener('click', async () => {
           if (!confirm('¿Eliminar esta nota?')) return;
-          const r  = await fetch('/api/noteEditor', { method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id_nota: btn.dataset.id }) });
+          const r = await fetch('/api/noteEditor', {
+            method:  'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ id_nota: btn.dataset.id }),
+          });
           if ((await r.json()).success) await cargarTodasLasNotas();
         });
       });
@@ -442,28 +632,49 @@ import '../styles/noteEditor.css';
     modalNotasLista.classList.remove('open');
   });
 
-  /* ── Load y render ── */
+  /* ══════════════════════════════════════
+     PERFIL
+  ══════════════════════════════════════ */
+  document.getElementById('btn-perfil')?.addEventListener('click', () => {
+    // Estadísticas calculadas en tiempo real
+    document.getElementById('perfil-total')!.textContent    = String(allTasks.length);
+    document.getElementById('perfil-trabajo')!.textContent  = String(allTasks.filter(t => t.categoria === 'trabajo').length);
+    document.getElementById('perfil-personal')!.textContent = String(allTasks.filter(t => t.categoria === 'personal').length);
+    modalPerfil.classList.add('open');
+  });
+  document.getElementById('close-perfil')?.addEventListener('click', () => {
+    modalPerfil.classList.remove('open');
+  });
+
+  /* ══════════════════════════════════════
+     LOAD Y RENDER
+  ══════════════════════════════════════ */
   async function load() {
     try {
       const res  = await fetch('/api/dashboard');
       const data = await res.json();
       if (data.success) {
         allTasks = data.tareas.map((t: any) => ({
-          id: t.id_tarea, titulo: t.titulo, descripcion: t.descripcion,
-          fecha: t.fecha_inicio ? new Date(t.fecha_inicio).toISOString().split('T')[0] : '',
-          hora: t.hora_inicio, prioridad: t.prioridad, categoria: t.categoria || 'personal',
+          id:          t.id_tarea,
+          titulo:      t.titulo,
+          descripcion: t.descripcion,
+          fecha:       t.fecha_inicio ? new Date(t.fecha_inicio).toISOString().split('T')[0] : '',
+          hora:        t.hora_inicio,
+          prioridad:   t.prioridad,
+          categoria:   t.categoria || 'personal',
         }));
         render();
       }
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
   }
 
   function render() {
-    const sT = (document.getElementById('f-trabajo') as HTMLInputElement).checked;
+    const sT = (document.getElementById('f-trabajo')  as HTMLInputElement).checked;
     const sP = (document.getElementById('f-personal') as HTMLInputElement).checked;
-    const filtered = allTasks.filter(t => (t.categoria==='trabajo'&&sT)||(t.categoria==='personal'&&sP));
+    const filtered = allTasks.filter(t =>
+      (t.categoria === 'trabajo' && sT) || (t.categoria === 'personal' && sP)
+    );
 
-    // Actualizar vista activa
     document.querySelectorAll<HTMLElement>('.db-view-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.v === currentView);
     });
@@ -475,13 +686,14 @@ import '../styles/noteEditor.css';
 
   function renderDia(filtered: Tarea[]) {
     const dStr = viewDate.toISOString().split('T')[0];
-    hTitle.textContent = viewDate.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})
+    hTitle.textContent = viewDate
+      .toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })
       .replace(/^\w/, c => c.toUpperCase());
 
     let html = `<div class="db-day-grid">`;
     for (let i = 0; i < 24; i++) {
-      const h = i.toString().padStart(2,'0');
-      const tasks = filtered.filter(t => t.fecha===dStr && t.hora?.startsWith(h+':'));
+      const h     = i.toString().padStart(2, '0');
+      const tasks = filtered.filter(t => t.fecha === dStr && t.hora?.startsWith(h + ':'));
       html += `<div class="db-day-row">
         <div class="db-hour-label">${h}:00</div>
         <div class="db-hour-tasks">${tasks.map(crearCard).join('')}</div>
@@ -493,40 +705,46 @@ import '../styles/noteEditor.css';
   function renderSemana(filtered: Tarea[]) {
     hTitle.textContent = 'Vista semanal';
     const start = new Date(viewDate);
-    start.setDate(start.getDate() - (start.getDay()===0?6:start.getDay()-1));
+    start.setDate(start.getDate() - (start.getDay() === 0 ? 6 : start.getDay() - 1));
+
     let html = `<div class="db-week-grid">`;
     for (let i = 0; i < 7; i++) {
-      const d  = new Date(start); d.setDate(start.getDate()+i);
+      const d  = new Date(start);
+      d.setDate(start.getDate() + i);
       const ds = d.toISOString().split('T')[0];
       html += `<div class="db-week-col">
         <div class="db-week-col-header">
-          <div class="db-week-col-day">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div>
+          <div class="db-week-col-day">${d.toLocaleDateString('es-ES', { weekday: 'short' })}</div>
           <div class="db-week-col-num">${d.getDate()}</div>
         </div>
-        ${filtered.filter(t=>t.fecha===ds).map(crearCard).join('')}
+        ${filtered.filter(t => t.fecha === ds).map(crearCard).join('')}
       </div>`;
     }
     container.innerHTML = html + `</div>`;
   }
 
   function renderMes(filtered: Tarea[]) {
-    const y=viewDate.getFullYear(), m=viewDate.getMonth();
-    hTitle.textContent = viewDate.toLocaleDateString('es-ES',{month:'long',year:'numeric'})
+    const y = viewDate.getFullYear();
+    const m = viewDate.getMonth();
+    hTitle.textContent = viewDate
+      .toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
       .replace(/^\w/, c => c.toUpperCase());
-    const first = new Date(y,m,1).getDay();
-    const days  = new Date(y,m+1,0).getDate();
-    const off   = first===0?6:first-1;
+
+    const first = new Date(y, m, 1).getDay();
+    const days  = new Date(y, m + 1, 0).getDate();
+    const off   = first === 0 ? 6 : first - 1;
+
     let html = `<div class="db-month-grid">`;
     ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].forEach(d =>
       html += `<div class="db-month-header-cell">${d}</div>`
     );
-    for (let i=0;i<off;i++) html += `<div></div>`;
-    for (let d=1;d<=days;d++) {
-      const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const dt = filtered.filter(t=>t.fecha===ds);
+    for (let i = 0; i < off; i++) html += `<div></div>`;
+    for (let d = 1; d <= days; d++) {
+      const ds = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const dt = filtered.filter(t => t.fecha === ds);
       html += `<div class="db-month-day">
         <div class="db-month-day-num">${d}</div>
-        ${dt.map(t=>`<div onclick="window.verDetalle('${t.id}')"
+        ${dt.map(t => `<div onclick="window.verDetalle('${t.id}')"
           class="db-month-dot db-month-dot--${t.prioridad}"></div>`).join('')}
       </div>`;
     }
@@ -540,27 +758,37 @@ import '../styles/noteEditor.css';
     </div>`;
   }
 
-  /* ── Navegación ── */
+  /* ══════════════════════════════════════
+     NAVEGACIÓN
+  ══════════════════════════════════════ */
   document.getElementById('f-trabajo')?.addEventListener('change', render);
   document.getElementById('f-personal')?.addEventListener('change', render);
+
   document.getElementById('t-usa-hora')?.addEventListener('change', (e) => {
-    document.getElementById('wrapper-hora')?.classList.toggle('hidden', !(e.target as HTMLInputElement).checked);
+    document.getElementById('wrapper-hora')?.classList.toggle(
+      'hidden', !(e.target as HTMLInputElement).checked
+    );
   });
+
   document.querySelectorAll<HTMLElement>('.db-view-btn').forEach(btn => {
     btn.addEventListener('click', () => { currentView = btn.dataset.v as any; render(); });
   });
+
   document.getElementById('prev-date')?.addEventListener('click', () => {
-    if (currentView==='mes') viewDate.setMonth(viewDate.getMonth()-1);
-    else viewDate.setDate(viewDate.getDate()-(currentView==='semana'?7:1));
-    render();
-  });
-  document.getElementById('next-date')?.addEventListener('click', () => {
-    if (currentView==='mes') viewDate.setMonth(viewDate.getMonth()+1);
-    else viewDate.setDate(viewDate.getDate()+(currentView==='semana'?7:1));
+    if (currentView === 'mes') viewDate.setMonth(viewDate.getMonth() - 1);
+    else viewDate.setDate(viewDate.getDate() - (currentView === 'semana' ? 7 : 1));
     render();
   });
 
-  /* ── Etiquetas ── */
+  document.getElementById('next-date')?.addEventListener('click', () => {
+    if (currentView === 'mes') viewDate.setMonth(viewDate.getMonth() + 1);
+    else viewDate.setDate(viewDate.getDate() + (currentView === 'semana' ? 7 : 1));
+    render();
+  });
+
+  /* ══════════════════════════════════════
+     ETIQUETAS
+  ══════════════════════════════════════ */
   const modalEtiquetas = document.getElementById('modal-etiquetas')!;
   const etiquetasList  = document.getElementById('etiquetas-list')!;
   const etiquetasForm  = document.getElementById('etiquetas-form')!;
@@ -571,7 +799,9 @@ import '../styles/noteEditor.css';
 
   function toastEtiqueta(msg: string, ok: boolean) {
     etiquetasToast.textContent = msg;
-    etiquetasToast.className = ok ? 'db-toast show db-toast--ok' : 'db-toast show db-toast--err';
+    etiquetasToast.className = ok
+      ? 'db-toast show db-toast--ok'
+      : 'db-toast show db-toast--err';
     setTimeout(() => { etiquetasToast.className = 'hidden'; }, 3000);
   }
 
@@ -580,7 +810,7 @@ import '../styles/noteEditor.css';
     try {
       const res  = await fetch('/api/etiquetas');
       const data = await res.json();
-      if (!data.success||!data.etiquetas.length) {
+      if (!data.success || !data.etiquetas.length) {
         etiquetasList.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:12px;padding:16px;">No hay etiquetas.</p>';
         return;
       }
@@ -597,41 +827,69 @@ import '../styles/noteEditor.css';
               data-id="${e.id_etiqueta}" data-nombre="${e.nombre}">Eliminar</button>
           </div>
         </div>`).join('');
+
       etiquetasList.querySelectorAll('.btn-editar-etiqueta').forEach(btn => {
         btn.addEventListener('click', () => {
           const d = (btn as HTMLElement).dataset;
-          eId.value=d.id!; eNombre.value=d.nombre!; eColor.value=d.color!;
+          eId.value     = d.id!;
+          eNombre.value = d.nombre!;
+          eColor.value  = d.color!;
           etiquetasForm.classList.remove('hidden');
-          etiquetasForm.scrollIntoView({behavior:'smooth',block:'nearest'});
+          etiquetasForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
       });
+
       etiquetasList.querySelectorAll('.btn-eliminar-etiqueta').forEach(btn => {
         btn.addEventListener('click', async () => {
           const d = (btn as HTMLElement).dataset;
           if (!confirm(`¿Eliminar "${d.nombre}"?`)) return;
-          const r  = await fetch('/api/etiquetas',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_etiqueta:d.id})});
+          const r  = await fetch('/api/etiquetas', {
+            method:  'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ id_etiqueta: d.id }),
+          });
           const rd = await r.json();
-          if (rd.success) { toastEtiqueta(`"${d.nombre}" eliminada`,true); await cargarEtiquetas(); }
-          else toastEtiqueta('Error al eliminar',false);
+          if (rd.success) { toastEtiqueta(`"${d.nombre}" eliminada`, true); await cargarEtiquetas(); }
+          else              toastEtiqueta('Error al eliminar', false);
         });
       });
-    } catch { etiquetasList.innerHTML = '<p style="color:#ef4444;text-align:center;font-size:12px;padding:16px;">Error al cargar.</p>'; }
+    } catch {
+      etiquetasList.innerHTML = '<p style="color:#ef4444;text-align:center;font-size:12px;padding:16px;">Error al cargar.</p>';
+    }
   }
 
   document.getElementById('e-guardar')?.addEventListener('click', async () => {
-    const p = {id_etiqueta:eId.value,nombre:eNombre.value.trim(),color:eColor.value};
+    const p = { id_etiqueta: eId.value, nombre: eNombre.value.trim(), color: eColor.value };
     if (!p.nombre) return;
-    const r  = await fetch('/api/etiquetas',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
+    const r  = await fetch('/api/etiquetas', {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(p),
+    });
     const rd = await r.json();
-    if (rd.success) { toastEtiqueta(`"${p.nombre}" actualizada`,true); etiquetasForm.classList.add('hidden'); await cargarEtiquetas(); }
-    else toastEtiqueta('Error al guardar',false);
+    if (rd.success) {
+      toastEtiqueta(`"${p.nombre}" actualizada`, true);
+      etiquetasForm.classList.add('hidden');
+      await cargarEtiquetas();
+    } else {
+      toastEtiqueta('Error al guardar', false);
+    }
   });
-  document.getElementById('e-cancelar')?.addEventListener('click', () => etiquetasForm.classList.add('hidden'));
+
+  document.getElementById('e-cancelar')?.addEventListener('click', () =>
+    etiquetasForm.classList.add('hidden')
+  );
+
   document.getElementById('btn-etiquetas')?.addEventListener('click', async () => {
-    modalEtiquetas.classList.add('open'); etiquetasForm.classList.add('hidden');
+    modalEtiquetas.classList.add('open');
+    etiquetasForm.classList.add('hidden');
     await cargarEtiquetas();
   });
-  document.getElementById('close-etiquetas')?.addEventListener('click', () => modalEtiquetas.classList.remove('open'));
 
+  document.getElementById('close-etiquetas')?.addEventListener('click', () =>
+    modalEtiquetas.classList.remove('open')
+  );
+
+  // ── Arranque ──
   load();
-</script>-
+</script>
