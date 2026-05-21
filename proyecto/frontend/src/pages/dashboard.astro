@@ -56,8 +56,7 @@ import '../styles/noteEditor.css';
     <div class="db-view-container" id="view-container"></div>
   </main>
 
-  <!-- BOTÓN NUEVO EN LA PARTE IZQUIERDA ABAJO -->
-  <button id="btn-extra-izquierdo" class="db-fab" title="Botón Izquierdo" style="position: fixed; bottom: 20px; left: 20px; right: auto; z-index: 100;">
+  <button id="btn-extra-izquierdo" class="db-fab" title="Configuración" style="position: fixed; bottom: 20px; left: 20px; right: auto; z-index: 100;">
     <span>⚙️</span>
   </button>
 
@@ -225,6 +224,12 @@ import '../styles/noteEditor.css';
   const modalNotasLista= document.getElementById('modal-notas-lista')as HTMLDivElement;
   const notasListaBody = document.getElementById('notas-lista-body') as HTMLDivElement;
 
+  /* ── MEJORA: Botón izquierdo (Configuración/Extra) ── */
+  document.getElementById('btn-extra-izquierdo')?.addEventListener('click', () => {
+    // Puedes reemplazar esto con la apertura de un modal o navegación
+    alert("Botón de configuración extra presionado");
+  });
+
   /* ── AI ── */
   document.getElementById('btn-ai-toggle')?.addEventListener('click', () => {
     document.getElementById('ai-window')?.classList.toggle('hidden');
@@ -341,6 +346,7 @@ import '../styles/noteEditor.css';
       categoria:   (document.getElementById('t-cat')       as HTMLSelectElement).value,
     };
     if (notaHtml) { payload.nota_contenido = notaHtml; payload.nota_titulo = notaTitulo; }
+    
     try {
       const res  = await fetch('/api/dashboard', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
       const data = await res.json();
@@ -351,7 +357,7 @@ import '../styles/noteEditor.css';
       }
     } catch (err) { 
       console.error("Error de conexión:", err); 
-      alert("No se pudo conectar con el servidor.");
+      alert("No se pudo conectar con el servidor. Verifica que tu base de datos y backend estén en línea.");
     }
   });
 
@@ -376,7 +382,7 @@ import '../styles/noteEditor.css';
     modalView.classList.add('open');
   };
 
-  /* ── Eliminar tarea (Agregado) ── */
+  /* ── Eliminar tarea ── */
   document.getElementById('btn-delete-task')?.addEventListener('click', async () => {
     if (!selectedTaskId) return;
     if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
@@ -391,6 +397,7 @@ import '../styles/noteEditor.css';
         }
       } catch (err) {
         console.error("Error al eliminar:", err);
+        alert("Problema de conexión al intentar eliminar la tarea.");
       }
     }
   });
@@ -475,6 +482,7 @@ import '../styles/noteEditor.css';
 
   function renderDia(filtered: Tarea[]) {
     const dStr = viewDate.toISOString().split('T')[0];
+    // Se asegura de que la primera letra del día sea mayúscula para mejor estética
     hTitle.textContent = viewDate.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})
       .replace(/^\w/, c => c.toUpperCase());
 
@@ -500,7 +508,7 @@ import '../styles/noteEditor.css';
       const ds = d.toISOString().split('T')[0];
       html += `<div class="db-week-col">
         <div class="db-week-col-header">
-          <div class="db-week-col-day">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div>
+          <div class="db-week-col-day">${d.toLocaleDateString('es-ES',{weekday:'short'}).toUpperCase()}</div>
           <div class="db-week-col-num">${d.getDate()}</div>
         </div>
         ${filtered.filter(t=>t.fecha===ds).map(crearCard).join('')}
@@ -634,4 +642,4 @@ import '../styles/noteEditor.css';
   document.getElementById('close-etiquetas')?.addEventListener('click', () => modalEtiquetas.classList.remove('open'));
 
   load();
-</script>-
+</script>
