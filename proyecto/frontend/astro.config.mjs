@@ -6,9 +6,4 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone',
   }),
-  // Esto es lo nuevo para asegurar que escuche en el puerto correcto
-  server: {
-    port: process.env.PORT || 10000,
-    host: '0.0.0.0' 
-  }
 });
