@@ -1,13 +1,8 @@
 // src/pages/api/noteEditor.ts
 import type { APIRoute } from "astro";
-import { db } from "../../lib/db"; // ← ajusta al path de tu cliente de BD
+import { pool } from "../../lib/db";
 
-/* ═══════════════════════════════════════════════════════════
-   GET  /api/noteEditor
-        Sin params  → todas las notas activas (con título de tarea)
-        ?id_tarea=  → notas de esa tarea
-        ?id_nota=   → nota específica
-═══════════════════════════════════════════════════════════ */
+
 export const GET: APIRoute = async ({ url }) => {
   try {
     const idTarea = url.searchParams.get("id_tarea");
@@ -16,8 +11,7 @@ export const GET: APIRoute = async ({ url }) => {
     let rows: any[];
 
     if (idNota) {
-      // Nota específica
-      const r = await db.query(
+      const r = await pool.query(
         `SELECT n.id_nota,
                 n.contenido,
                 n.fecha_creacion,
@@ -32,8 +26,7 @@ export const GET: APIRoute = async ({ url }) => {
       rows = r.rows;
 
     } else if (idTarea) {
-      // Notas de una tarea
-      const r = await db.query(
+      const r = await pool.query(
         `SELECT n.id_nota,
                 n.contenido,
                 n.fecha_creacion,
@@ -49,8 +42,7 @@ export const GET: APIRoute = async ({ url }) => {
       rows = r.rows;
 
     } else {
-      // Todas las notas activas
-      const r = await db.query(
+      const r = await pool.query(
         `SELECT n.id_nota,
                 n.contenido,
                 n.fecha_creacion,
@@ -71,47 +63,28 @@ export const GET: APIRoute = async ({ url }) => {
   }
 };
 
-/* ═══════════════════════════════════════════════════════════
-   POST /api/noteEditor
-   Crea una nota vinculada a una tarea.
 
-   Body JSON:
-   {
-     contenido : string  ← HTML enriquecido  (obligatorio)
-     id_tarea  : string  ← UUID de la tarea  (obligatorio)
-   }
-
-   Llamado desde /api/dashboard después de crear la tarea,
-   pasando el id_tarea recién generado.
-═══════════════════════════════════════════════════════════ */
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const body = await parseBody(request);
-    const contenido: string      = String(body.contenido ?? "").trim();
-    const idTarea:   string|null = body.id_tarea ?? null;
+    const body     = await parseBody(request);
+    const contenido = String(body.contenido ?? "").trim();
+    const idTarea   = String(body.id_tarea  ?? "").trim();
 
-    // Validaciones
-    if (!contenido) {
-      return fail("El contenido no puede estar vacío", 400);
-    }
-    if (!idTarea) {
-      return fail("id_tarea es obligatorio", 400);
-    }
+    if (!contenido) return fail("El contenido no puede estar vacío", 400);
+    if (!idTarea)   return fail("id_tarea es obligatorio", 400);
 
     // Verificar que la tarea existe
-    const check = await db.query(
+    const check = await pool.query(
       `SELECT id_tarea FROM tarea WHERE id_tarea = $1 LIMIT 1`,
       [idTarea]
     );
-    if (check.rowCount === 0) {
-      return fail("Tarea no encontrada", 404);
-    }
+    if (check.rowCount === 0) return fail("Tarea no encontrada", 404);
 
     // Insertar nota
-    // id_nota       → gen_random_uuid() en la BD
-    // fecha_creacion → DEFAULT NOW()
-    // deleted_at    → NULL por defecto
-    const { rows } = await db.query(
+    // id_nota        → gen_random_uuid() generado en BD
+    // fecha_creacion → DEFAULT NOW() en BD
+    // deleted_at     → NULL por defecto
+    const { rows } = await pool.query(
       `INSERT INTO nota (id_nota, contenido, id_tarea)
        VALUES (gen_random_uuid(), $1, $2)
        RETURNING id_nota, contenido, fecha_creacion, id_tarea`,
@@ -125,36 +98,22 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-/* ═══════════════════════════════════════════════════════════
-   PUT /api/noteEditor
-   Actualiza el contenido de una nota existente.
-
-   Body JSON:
-   {
-     id_nota   : string  (obligatorio)
-     contenido : string  (obligatorio)
-   }
-═══════════════════════════════════════════════════════════ */
 export const PUT: APIRoute = async ({ request }) => {
   try {
-    const body = await parseBody(request);
-    const idNota    = body.id_nota ?? "";
+    const body      = await parseBody(request);
+    const idNota    = String(body.id_nota   ?? "").trim();
     const contenido = String(body.contenido ?? "").trim();
 
-    if (!idNota || !contenido) {
-      return fail("id_nota y contenido son obligatorios", 400);
-    }
+    if (!idNota)    return fail("id_nota es obligatorio", 400);
+    if (!contenido) return fail("contenido es obligatorio", 400);
 
-    // Verificar que existe y no está eliminada
-    const check = await db.query(
+    const check = await pool.query(
       `SELECT id_nota FROM nota WHERE id_nota = $1 AND deleted_at IS NULL`,
       [idNota]
     );
-    if (check.rowCount === 0) {
-      return fail("Nota no encontrada", 404);
-    }
+    if (check.rowCount === 0) return fail("Nota no encontrada", 404);
 
-    const { rows } = await db.query(
+    const { rows } = await pool.query(
       `UPDATE nota
        SET contenido = $1
        WHERE id_nota = $2
@@ -170,31 +129,21 @@ export const PUT: APIRoute = async ({ request }) => {
   }
 };
 
-/* ═══════════════════════════════════════════════════════════
-   DELETE /api/noteEditor
-   Soft-delete: pone deleted_at = NOW().
 
-   Body JSON:
-   { id_nota: string }
-═══════════════════════════════════════════════════════════ */
 export const DELETE: APIRoute = async ({ request }) => {
   try {
     const body   = await parseBody(request);
-    const idNota = body.id_nota ?? "";
+    const idNota = String(body.id_nota ?? "").trim();
 
-    if (!idNota) {
-      return fail("id_nota es obligatorio", 400);
-    }
+    if (!idNota) return fail("id_nota es obligatorio", 400);
 
-    const check = await db.query(
+    const check = await pool.query(
       `SELECT id_nota FROM nota WHERE id_nota = $1 AND deleted_at IS NULL`,
       [idNota]
     );
-    if (check.rowCount === 0) {
-      return fail("Nota no encontrada o ya eliminada", 404);
-    }
+    if (check.rowCount === 0) return fail("Nota no encontrada o ya eliminada", 404);
 
-    await db.query(
+    await pool.query(
       `UPDATE nota SET deleted_at = NOW() WHERE id_nota = $1`,
       [idNota]
     );
@@ -206,15 +155,10 @@ export const DELETE: APIRoute = async ({ request }) => {
   }
 };
 
-/* ═══════════════════════════════════════════════════════════
-   HELPERS
-═══════════════════════════════════════════════════════════ */
 
 async function parseBody(request: Request): Promise<Record<string, any>> {
   const ct = request.headers.get("content-type") ?? "";
-  if (ct.includes("application/json")) {
-    return await request.json();
-  }
+  if (ct.includes("application/json")) return await request.json();
   const form = await request.formData();
   const obj: Record<string, any> = {};
   form.forEach((val, key) => { obj[key] = val; });
