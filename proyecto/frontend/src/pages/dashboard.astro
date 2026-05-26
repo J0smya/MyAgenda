@@ -4,6 +4,7 @@ import Layout from "../layouts/Layout.astro";
 import NoteEditor from "../components/noteEditor.astro";
 import '../styles/tablero.css';
 import '../styles/noteEditor.css';
+import EditarPerfil from './editarPerfil.astro';
 ---
 
 <Layout title="MyAgenda Pro 2026">
@@ -56,9 +57,9 @@ import '../styles/noteEditor.css';
     <div class="db-view-container" id="view-container"></div>
   </main>
 
-  <button id="btn-extra-izquierdo" class="db-fab" title="Configuración" style="position: fixed; bottom: 20px; left: 20px; right: auto; z-index: 100;">
-    <span>⚙️</span>
-  </button>
+  <div style="position: fixed; bottom: 20px; left: 20px; z-index: 9999;">
+    <EditarPerfil />
+  </div>
 
   <button id="btn-ver-notas" class="db-fab db-fab--notas" title="Ver todas las notas">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -85,30 +86,85 @@ import '../styles/noteEditor.css';
     <span>🏷️</span>
   </button>
 
-  <div id="modal" class="db-modal-backdrop">
+ <div id="modal" class="db-modal-backdrop">
     <div class="db-modal-box">
       <form id="task-form">
         <h3 class="db-modal-title">Nueva tarea</h3>
 
         <div class="space-y-4">
-          <input type="text" id="t-titulo" required placeholder="Título de la tarea" class="db-input">
-          <textarea id="t-desc" placeholder="Descripción o notas" rows="2" class="db-input" style="resize:none"></textarea>
-
-          <div class="grid-2">
-            <select id="t-prioridad" class="db-select">
-              <option value="alta">🔴 Alta</option>
-              <option value="media" selected>🟡 Media</option>
-              <option value="baja">🔵 Baja</option>
-            </select>
-            <select id="t-cat" class="db-select">
-              <option value="trabajo">💼 Trabajo</option>
-              <option value="personal">🏠 Personal</option>
-            </select>
+          <div>
+            <label for="t-titulo" class="db-label">
+              <svg class="db-label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+              </svg>
+              Título de la tarea
+            </label>
+            <input type="text" id="t-titulo" required placeholder="Ej. Terminar componente Astro" class="db-input">
           </div>
 
-          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div>
+            <label for="t-desc" class="db-label">
+              <svg class="db-label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="21" x2="3" y1="6" y2="6"></line>
+                <line x1="21" x2="9" y1="12" y2="12"></line>
+                <line x1="21" x2="7" y1="18" y2="18"></line>
+              </svg>
+              Descripción
+            </label>
+            <textarea id="t-desc" placeholder="Detalles o notas adicionales..." rows="2" class="db-input" style="resize:none"></textarea>
+          </div>
+
+          <div>
+            <label for="t-fecha" class="db-label">
+              <svg class="db-label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+                <line x1="16" x2="16" y1="2" y2="6"></line>
+                <line x1="8" x2="8" y1="2" y2="6"></line>
+                <line x1="3" x2="21" y1="10" y2="10"></line>
+              </svg>
+              Calendario / Fecha
+            </label>
+            <input type="date" id="t-fecha" required class="db-input">
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <label for="t-prioridad" class="db-label">
+                <svg class="db-label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                  <line x1="4" x2="4" y1="22" y2="15"></line>
+                </svg>
+                Prioridad
+              </label>
+              <select id="t-prioridad" class="db-select">
+                <option value="alta">Alta</option>
+                <option value="media" selected>Media</option>
+                <option value="baja">Baja</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="t-cat" class="db-label">
+                <svg class="db-label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
+                </svg>
+                Modo (Categoría)
+              </label>
+              <select id="t-cat" class="db-select">
+                <option value="trabajo">Trabajo</option>
+                <option value="personal">Personal</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px; margin-top: 10px;">
             <label class="db-hora-toggle">
               <input type="checkbox" id="t-usa-hora">
+              <svg class="db-label-icon" style="color: #6b7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
               <span>¿Asignar hora?</span>
             </label>
             <div id="wrapper-hora" class="hidden">
@@ -123,7 +179,9 @@ import '../styles/noteEditor.css';
           </div>
 
           <div id="nota-badge" class="db-nota-badge">
-            <span class="db-nota-badge-check">✓</span>
+            <span class="db-nota-badge-check">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
             <div class="db-nota-badge-info">
               <p class="db-nota-badge-label">Nota adjunta</p>
               <p id="nota-badge-title" class="db-nota-badge-title"></p>
