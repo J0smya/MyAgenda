@@ -4,18 +4,16 @@ import Layout from "../layouts/Layout.astro";
 import NoteEditor from "../components/noteEditor.astro";
 import '../styles/tablero.css';
 import '../styles/noteEditor.css';
-import EditarPerfil from './editarPerfil.astro';
 ---
-
+ 
 <Layout title="MyAgenda Pro 2026">
 <div class="db-layout">
-
+ 
   <aside class="db-sidebar">
     <div class="db-logo">
       <div class="db-logo-icon">📅</div>
       My Agenda
     </div>
-
     <div class="db-sidebar-section">
       <h3>Filtros</h3>
       <label class="db-filter-label">
@@ -28,7 +26,7 @@ import EditarPerfil from './editarPerfil.astro';
       </label>
     </div>
   </aside>
-
+ 
   <main class="db-main">
     <header class="db-header">
       <div class="db-header-left">
@@ -40,7 +38,6 @@ import EditarPerfil from './editarPerfil.astro';
         </button>
         <h2 id="header-title" class="db-date-title">Cargando...</h2>
       </div>
-
       <div class="db-header-right">
         <div class="db-view-tabs">
           <button data-v="dia"    class="db-view-btn nav-btn">Día</button>
@@ -53,14 +50,12 @@ import EditarPerfil from './editarPerfil.astro';
         </button>
       </div>
     </header>
-
     <div class="db-view-container" id="view-container"></div>
   </main>
-
-  <div style="position: fixed; bottom: 20px; left: 20px; z-index: 9999;">
-    <EditarPerfil />
-  </div>
-
+ 
+  <button id="btn-extra-izquierdo" class="db-fab" title="Botón Izquierdo" style="position:fixed;bottom:20px;left:20px;right:auto;z-index:100;">
+    <span>⚙️</span>
+  </button>
   <button id="btn-ver-notas" class="db-fab db-fab--notas" title="Ver todas las notas">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -69,11 +64,9 @@ import EditarPerfil from './editarPerfil.astro';
       <line x1="16" y1="17" x2="8" y2="17"/>
     </svg>
   </button>
-
   <button id="btn-ai-toggle" class="db-fab db-fab--ai" title="Asistente IA">
     <span>🤖</span>
   </button>
-
   <div id="ai-window" class="db-ai-window hidden">
     <div class="db-ai-header">Asistente IA</div>
     <div class="db-ai-body">¿En qué puedo ayudarte?</div>
@@ -81,114 +74,67 @@ import EditarPerfil from './editarPerfil.astro';
       <input type="text" class="db-ai-input" placeholder="Escribe aquí…">
     </div>
   </div>
-
   <button id="btn-etiquetas" class="db-fab db-fab--etiquetas" title="Gestionar etiquetas">
     <span>🏷️</span>
   </button>
-
- <div id="modal" class="db-modal-backdrop">
+ 
+  <div id="modal" class="db-modal-backdrop">
     <div class="db-modal-box">
       <form id="task-form">
         <h3 class="db-modal-title">Nueva tarea</h3>
-
         <div class="space-y-4">
-          <div>
-            <label for="t-titulo" class="db-label">
-              <svg class="db-label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 20h9"></path>
-                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
-              </svg>
-              Título de la tarea
-            </label>
-            <input type="text" id="t-titulo" required placeholder="Ej. Terminar componente Astro" class="db-input">
-          </div>
-
-          <div>
-            <label for="t-desc" class="db-label">
-              <svg class="db-label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="21" x2="3" y1="6" y2="6"></line>
-                <line x1="21" x2="9" y1="12" y2="12"></line>
-                <line x1="21" x2="7" y1="18" y2="18"></line>
-              </svg>
-              Descripción
-            </label>
-            <textarea id="t-desc" placeholder="Detalles o notas adicionales..." rows="2" class="db-input" style="resize:none"></textarea>
-          </div>
-
-          <div>
-            <label for="t-fecha" class="db-label">
-              <svg class="db-label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
-                <line x1="16" x2="16" y1="2" y2="6"></line>
-                <line x1="8" x2="8" y1="2" y2="6"></line>
-                <line x1="3" x2="21" y1="10" y2="10"></line>
-              </svg>
-              Calendario / Fecha
-            </label>
-            <input type="date" id="t-fecha" required class="db-input">
-          </div>
-
+          <input type="text" id="t-titulo" required placeholder="Título de la tarea" class="db-input">
+          <textarea id="t-desc" placeholder="Descripción o notas" rows="2" class="db-input" style="resize:none"></textarea>
           <div class="grid-2">
-            <div>
-              <label for="t-prioridad" class="db-label">
-                <svg class="db-label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                  <line x1="4" x2="4" y1="22" y2="15"></line>
-                </svg>
-                Prioridad
-              </label>
-              <select id="t-prioridad" class="db-select">
-                <option value="alta">Alta</option>
-                <option value="media" selected>Media</option>
-                <option value="baja">Baja</option>
-              </select>
-            </div>
-            
-            <div>
-              <label for="t-cat" class="db-label">
-                <svg class="db-label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
-                </svg>
-                Modo (Categoría)
-              </label>
-              <select id="t-cat" class="db-select">
-                <option value="trabajo">Trabajo</option>
-                <option value="personal">Personal</option>
-              </select>
-            </div>
+            <select id="t-prioridad" class="db-select">
+              <option value="alta">🔴 Alta</option>
+              <option value="media" selected>🟡 Media</option>
+              <option value="baja">🔵 Baja</option>
+            </select>
+            <select id="t-cat" class="db-select">
+              <option value="trabajo">💼 Trabajo</option>
+              <option value="personal">🏠 Personal</option>
+            </select>
           </div>
-
-          <div style="display:flex;flex-direction:column;align-items:center;gap:10px; margin-top: 10px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
             <label class="db-hora-toggle">
               <input type="checkbox" id="t-usa-hora">
-              <svg class="db-label-icon" style="color: #6b7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
               <span>¿Asignar hora?</span>
             </label>
             <div id="wrapper-hora" class="hidden">
               <input type="time" id="t-hora-inicio" class="db-input" style="text-align:center;max-width:160px;">
             </div>
           </div>
-
+          <!-- Recordatorio -->
+          <div style="display:flex;flex-direction:column;gap:8px;padding:12px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#374151;cursor:pointer;">
+              <input type="checkbox" id="t-usa-recordatorio" style="width:16px;height:16px;">
+              🔔 Activar recordatorio
+            </label>
+            <div id="wrapper-recordatorio" class="hidden" style="flex-direction:column;gap:8px;">
+              <select id="t-minutos-antes" class="db-select" style="font-size:13px;">
+                <option value="15">15 minutos antes</option>
+                <option value="30">30 minutos antes</option>
+                <option value="60" selected>1 hora antes</option>
+                <option value="120">2 horas antes</option>
+                <option value="1440">1 día antes</option>
+              </select>
+              <p style="font-size:11px;color:#6b7280;margin:0;">Aparecerá una notificación en pantalla.</p>
+            </div>
+          </div>
           <div class="db-form-sep">
             <div class="db-form-sep-line"></div>
             <span class="db-form-sep-text">Extras</span>
             <div class="db-form-sep-line"></div>
           </div>
-
           <div id="nota-badge" class="db-nota-badge">
-            <span class="db-nota-badge-check">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            </span>
+            <span class="db-nota-badge-check">✓</span>
             <div class="db-nota-badge-info">
               <p class="db-nota-badge-label">Nota adjunta</p>
               <p id="nota-badge-title" class="db-nota-badge-title"></p>
             </div>
             <button type="button" id="btn-editar-nota" class="db-nota-badge-edit">Editar</button>
           </div>
-
           <button type="button" id="btn-agregar-nota" class="db-btn-nota">
             <div class="db-btn-nota-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -202,7 +148,6 @@ import EditarPerfil from './editarPerfil.astro';
             </div>
             <svg class="db-btn-nota-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
           </button>
-
           <div class="space-y-3" style="margin-top:8px;">
             <button type="submit" class="db-btn-submit">Guardar tarea</button>
             <button type="button" id="close-modal" class="db-btn-cancel">Cancelar</button>
@@ -211,7 +156,7 @@ import EditarPerfil from './editarPerfil.astro';
       </form>
     </div>
   </div>
-
+ 
   <div id="modal-view" class="db-modal-backdrop" style="z-index:210;">
     <div class="db-view-modal-box">
       <div id="view-content" class="space-y-4"></div>
@@ -221,7 +166,7 @@ import EditarPerfil from './editarPerfil.astro';
       </div>
     </div>
   </div>
-
+ 
   <div id="modal-etiquetas" class="db-modal-backdrop" style="z-index:220;">
     <div class="db-etiquetas-box">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
@@ -246,24 +191,144 @@ import EditarPerfil from './editarPerfil.astro';
     </div>
   </div>
 
-  <NoteEditor />
+  <!-- Contenedor toasts -->
+  <div id="toast-container"></div>
 
+  <NoteEditor />
 </div>
 </Layout>
 
+<style>
+/* ── Toast container ── */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+/* ── Toast card ── */
+.toast-notif {
+  pointer-events: all;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #ffffff;
+  padding: 16px 18px;
+  border-radius: 16px;
+  min-width: 300px;
+  max-width: 360px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08);
+  border-top: 4px solid #6366f1;
+  animation: toast-in 0.4s cubic-bezier(.21,1.02,.73,1) forwards;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Barra de progreso */
+.toast-notif::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 3px;
+  width: 100%;
+  background: #6366f1;
+  animation: toast-progress 6s linear forwards;
+  border-radius: 0 0 16px 16px;
+}
+
+.toast-notif.toast-ahora        { border-top-color: #ef4444; }
+.toast-notif.toast-ahora::after { background: #ef4444; }
+.toast-notif.toast-antes        { border-top-color: #f59e0b; }
+.toast-notif.toast-antes::after { background: #f59e0b; }
+.toast-notif.toast-out          { animation: toast-out 0.3s ease forwards; }
+
+.toast-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.toast-notif.toast-ahora .toast-icon-wrap { background: #fee2e2; }
+.toast-notif.toast-antes .toast-icon-wrap { background: #fef3c7; }
+
+.toast-body  { flex: 1; min-width: 0; }
+.toast-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  margin-bottom: 3px;
+}
+.toast-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.toast-sub {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.toast-close {
+  background: none;
+  border: none;
+  color: #cbd5e1;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px;
+  line-height: 1;
+  flex-shrink: 0;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+.toast-close:hover { background: #f1f5f9; color: #475569; }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(60px) scale(0.95); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes toast-out {
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to   { opacity: 0; transform: translateX(60px) scale(0.95); }
+}
+@keyframes toast-progress {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+</style>
+ 
 <script>
   interface Tarea {
     id: any; titulo: string; descripcion: string;
     fecha: string; hora: string | null; prioridad: string; categoria: string;
   }
-
+ 
   let allTasks:    Tarea[]              = [];
   let currentView: 'dia'|'semana'|'mes' = 'dia';
   let viewDate     = new Date();
   let selectedTaskId: any               = null;
   let notaHtml     = '';
   let notaTitulo   = '';
-
+  const recordatoriosActivos = new Map<string, ReturnType<typeof setTimeout>[]>();
+ 
   // DOM
   const container      = document.getElementById('view-container')   as HTMLDivElement;
   const hTitle         = document.getElementById('header-title')     as HTMLElement;
@@ -281,12 +346,66 @@ import EditarPerfil from './editarPerfil.astro';
   const btnAgregarNota = document.getElementById('btn-agregar-nota') as HTMLButtonElement;
   const modalNotasLista= document.getElementById('modal-notas-lista')as HTMLDivElement;
   const notasListaBody = document.getElementById('notas-lista-body') as HTMLDivElement;
+  const toastContainer = document.getElementById('toast-container')  as HTMLDivElement;
 
-  /* ── MEJORA: Botón izquierdo (Configuración/Extra) ── */
-  document.getElementById('btn-extra-izquierdo')?.addEventListener('click', () => {
-    // Puedes reemplazar esto con la apertura de un modal o navegación
-    alert("Botón de configuración extra presionado");
-  });
+  /* ════════════════════════════════════════
+     TOASTS
+  ════════════════════════════════════════ */
+  function mostrarToast(titulo: string, subtitulo: string, tipo: 'ahora' | 'antes') {
+    const icon  = tipo === 'ahora' ? '🔴' : '🔔';
+    const label = tipo === 'ahora' ? '¡Es ahora!' : 'Recordatorio programado';
+    const toast = document.createElement('div');
+    toast.className = `toast-notif toast-${tipo}`;
+    toast.innerHTML = `
+      <div class="toast-icon-wrap">${icon}</div>
+      <div class="toast-body">
+        <div class="toast-label">${label}</div>
+        <div class="toast-title">${titulo}</div>
+        ${subtitulo ? `<div class="toast-sub">🕐 ${subtitulo}</div>` : ''}
+      </div>
+      <button class="toast-close" title="Cerrar">✕</button>
+    `;
+    toast.querySelector('.toast-close')?.addEventListener('click', (e) => {
+      e.stopPropagation(); cerrarToast(toast);
+    });
+    toast.addEventListener('click', () => cerrarToast(toast));
+    toastContainer.appendChild(toast);
+    setTimeout(() => cerrarToast(toast), 6000);
+  }
+
+  function cerrarToast(toast: HTMLElement) {
+    toast.classList.add('toast-out');
+    toast.addEventListener('animationend', () => toast.remove(), { once: true });
+  }
+
+  /* ════════════════════════════════════════
+     RECORDATORIOS
+  ════════════════════════════════════════ */
+  function programarRecordatorio(tarea: Tarea, minutosAntes: number) {
+    if (!tarea.hora) return;
+    const key = String(tarea.id);
+    if (recordatoriosActivos.has(key)) recordatoriosActivos.get(key)!.forEach(clearTimeout);
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const [hh, mm] = tarea.hora.split(':').map(Number);
+    const vencimiento = new Date(tarea.fecha);
+    vencimiento.setHours(hh, mm, 0, 0);
+    const ahora = Date.now();
+
+    // Antes
+    const msAntes = vencimiento.getTime() - minutosAntes * 60 * 1000 - ahora;
+    if (msAntes > 0) {
+      const label = minutosAntes >= 60 ? `En ${minutosAntes/60} hora(s)` : `En ${minutosAntes} minutos`;
+      timers.push(setTimeout(() => mostrarToast(tarea.titulo, `${label} · ${tarea.hora}`, 'antes'), msAntes));
+    }
+
+    // Exactamente a la hora
+    const msExacto = vencimiento.getTime() - ahora;
+    if (msExacto > 0) {
+      timers.push(setTimeout(() => mostrarToast(tarea.titulo, `Es ahora · ${tarea.hora}`, 'ahora'), msExacto));
+    }
+
+    if (timers.length) recordatoriosActivos.set(key, timers);
+  }
 
   /* ── AI ── */
   document.getElementById('btn-ai-toggle')?.addEventListener('click', () => {
@@ -294,15 +413,17 @@ import EditarPerfil from './editarPerfil.astro';
   });
 
   /* ── Modal tarea ── */
-  function openModalTarea() {
-    modalCreate.classList.add('open');
-  }
-  function closeModalTarea() {
-    modalCreate.classList.remove('open');
-  }
-
+  function openModalTarea() { modalCreate.classList.add('open'); }
+  function closeModalTarea() { modalCreate.classList.remove('open'); }
   document.getElementById('btn-add')?.addEventListener('click', () => { resetNota(); openModalTarea(); });
   document.getElementById('close-modal')?.addEventListener('click', closeModalTarea);
+
+  document.getElementById('t-usa-recordatorio')?.addEventListener('change', (e) => {
+    const wrapper = document.getElementById('wrapper-recordatorio')!;
+    const checked = (e.target as HTMLInputElement).checked;
+    wrapper.classList.toggle('hidden', !checked);
+    wrapper.style.display = checked ? 'flex' : 'none';
+  });
 
   /* ── Editor de notas ── */
   function openEditorNota() {
@@ -312,12 +433,10 @@ import EditarPerfil from './editarPerfil.astro';
     modalNota.classList.add('ne-open');
     setTimeout(() => neEditor.focus(), 150);
   }
-
   function closeEditorNota() {
     modalNota.classList.remove('ne-open');
     modalCreate.classList.add('open');
   }
-
   function resetNota() {
     notaHtml = ''; notaTitulo = '';
     neEditor.innerHTML = ''; neTitleInput.value = '';
@@ -359,8 +478,7 @@ import EditarPerfil from './editarPerfil.astro';
     btn.addEventListener('mousedown', (e) => {
       e.preventDefault();
       document.execCommand(btn.dataset.cmd!, false, btn.dataset.val ?? undefined);
-      neEditor.focus();
-      syncTools();
+      neEditor.focus(); syncTools();
     });
   });
   document.querySelectorAll<HTMLButtonElement>('.ne-color').forEach(btn => {
@@ -394,28 +512,39 @@ import EditarPerfil from './editarPerfil.astro';
   /* ── Submit tarea ── */
   taskForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const usaRecordatorio = (document.getElementById('t-usa-recordatorio') as HTMLInputElement).checked;
+    const minutosAntes    = parseInt((document.getElementById('t-minutos-antes') as HTMLSelectElement).value);
     const payload: Record<string,any> = {
-      titulo:      (document.getElementById('t-titulo')    as HTMLInputElement).value,
-      descripcion: (document.getElementById('t-desc')      as HTMLTextAreaElement).value,
+      titulo:      (document.getElementById('t-titulo')     as HTMLInputElement).value,
+      descripcion: (document.getElementById('t-desc')       as HTMLTextAreaElement).value,
       fecha:       viewDate.toISOString().split('T')[0],
-      hora:        (document.getElementById('t-usa-hora')  as HTMLInputElement).checked
+      hora:        (document.getElementById('t-usa-hora')   as HTMLInputElement).checked
                      ? (document.getElementById('t-hora-inicio') as HTMLInputElement).value : null,
-      prioridad:   (document.getElementById('t-prioridad') as HTMLSelectElement).value,
-      categoria:   (document.getElementById('t-cat')       as HTMLSelectElement).value,
+      prioridad:   (document.getElementById('t-prioridad')  as HTMLSelectElement).value,
+      categoria:   (document.getElementById('t-cat')        as HTMLSelectElement).value,
     };
     if (notaHtml) { payload.nota_contenido = notaHtml; payload.nota_titulo = notaTitulo; }
-    
     try {
       const res  = await fetch('/api/dashboard', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
       const data = await res.json();
-      if (data.success) { 
-        closeModalTarea(); taskForm.reset(); resetNota(); await load(); 
+      if (data.success) {
+        closeModalTarea(); taskForm.reset(); resetNota();
+        if (usaRecordatorio && payload.hora) {
+          const nuevaTarea: Tarea = {
+            id: data.tarea.id_tarea, titulo: payload.titulo, descripcion: payload.descripcion,
+            fecha: payload.fecha, hora: payload.hora, prioridad: payload.prioridad, categoria: payload.categoria,
+          };
+          programarRecordatorio(nuevaTarea, minutosAntes);
+          const labelMin = minutosAntes >= 60 ? `${minutosAntes/60}h` : `${minutosAntes}min`;
+          mostrarToast(`Recordatorio activado`, `"${payload.titulo}" · ${labelMin} antes y al momento`, 'antes');
+        }
+        await load();
       } else {
         alert(data.message || data.error || 'Error al guardar la tarea');
       }
-    } catch (err) { 
-      console.error("Error de conexión:", err); 
-      alert("No se pudo conectar con el servidor. Verifica que tu base de datos y backend estén en línea.");
+    } catch (err) {
+      console.error("Error de conexión:", err);
+      alert("No se pudo conectar con el servidor.");
     }
   });
 
@@ -436,7 +565,7 @@ import EditarPerfil from './editarPerfil.astro';
       <div class="db-view-priority">
         <div class="db-view-priority-dot" style="background:${prioColor}"></div>
         <span class="db-view-priority-text">Prioridad ${t.prioridad}</span>
-      </div>`;  
+      </div>`;
     modalView.classList.add('open');
   };
 
@@ -448,15 +577,17 @@ import EditarPerfil from './editarPerfil.astro';
         const res = await fetch(`/api/dashboard?id=${selectedTaskId}`, { method: 'DELETE' });
         const data = await res.json();
         if (data.success) {
+          const key = String(selectedTaskId);
+          if (recordatoriosActivos.has(key)) {
+            recordatoriosActivos.get(key)!.forEach(clearTimeout);
+            recordatoriosActivos.delete(key);
+          }
           modalView.classList.remove('open');
           await load();
         } else {
           alert(data.message || data.error || 'Error al eliminar la tarea');
         }
-      } catch (err) {
-        console.error("Error al eliminar:", err);
-        alert("Problema de conexión al intentar eliminar la tarea.");
-      }
+      } catch (err) { console.error("Error al eliminar:", err); }
     }
   });
 
@@ -490,7 +621,7 @@ import EditarPerfil from './editarPerfil.astro';
       notasListaBody.querySelectorAll<HTMLButtonElement>('.nota-card-btn--del').forEach(btn => {
         btn.addEventListener('click', async () => {
           if (!confirm('¿Eliminar esta nota?')) return;
-          const r  = await fetch('/api/noteEditor', { method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id_nota: btn.dataset.id }) });
+          const r = await fetch('/api/noteEditor', { method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id_nota: btn.dataset.id }) });
           if ((await r.json()).success) await cargarTodasLasNotas();
         });
       });
@@ -527,12 +658,9 @@ import EditarPerfil from './editarPerfil.astro';
     const sT = (document.getElementById('f-trabajo') as HTMLInputElement).checked;
     const sP = (document.getElementById('f-personal') as HTMLInputElement).checked;
     const filtered = allTasks.filter(t => (t.categoria==='trabajo'&&sT)||(t.categoria==='personal'&&sP));
-
-    // Actualizar vista activa
     document.querySelectorAll<HTMLElement>('.db-view-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.v === currentView);
     });
-
     if      (currentView === 'dia')    renderDia(filtered);
     else if (currentView === 'semana') renderSemana(filtered);
     else                               renderMes(filtered);
@@ -540,10 +668,8 @@ import EditarPerfil from './editarPerfil.astro';
 
   function renderDia(filtered: Tarea[]) {
     const dStr = viewDate.toISOString().split('T')[0];
-    // Se asegura de que la primera letra del día sea mayúscula para mejor estética
     hTitle.textContent = viewDate.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})
       .replace(/^\w/, c => c.toUpperCase());
-
     let html = `<div class="db-day-grid">`;
     for (let i = 0; i < 24; i++) {
       const h = i.toString().padStart(2,'0');
@@ -566,7 +692,7 @@ import EditarPerfil from './editarPerfil.astro';
       const ds = d.toISOString().split('T')[0];
       html += `<div class="db-week-col">
         <div class="db-week-col-header">
-          <div class="db-week-col-day">${d.toLocaleDateString('es-ES',{weekday:'short'}).toUpperCase()}</div>
+          <div class="db-week-col-day">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div>
           <div class="db-week-col-num">${d.getDate()}</div>
         </div>
         ${filtered.filter(t=>t.fecha===ds).map(crearCard).join('')}
