@@ -10,7 +10,7 @@ const app = express();
 // URL REAL del frontend
 const corsOptions = {
   origin: [
-    "https://TU-FRONTEND.onrender.com",
+    "https://frontend-y-backend.onrender.com",
     "http://localhost:4321"
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
