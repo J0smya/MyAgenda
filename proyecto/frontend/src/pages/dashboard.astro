@@ -525,7 +525,7 @@ import '../styles/noteEditor.css';
     };
     if (notaHtml) { payload.nota_contenido = notaHtml; payload.nota_titulo = notaTitulo; }
     try {
-      const res  = await fetch('/api/dashboard', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      const res  = await fetch('https://backend-proyecto-vm73.onrender.com/api/dashboard', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
       const data = await res.json();
       if (data.success) {
         closeModalTarea(); taskForm.reset(); resetNota();
@@ -574,7 +574,7 @@ import '../styles/noteEditor.css';
     if (!selectedTaskId) return;
     if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
       try {
-        const res = await fetch(`/api/dashboard?id=${selectedTaskId}`, { method: 'DELETE' });
+        const res = await fetch(`https://backend-proyecto-vm73.onrender.com/api/dashboard?id=${selectedTaskId}`, { method: 'DELETE' });
         const data = await res.json();
         if (data.success) {
           const key = String(selectedTaskId);
@@ -595,7 +595,7 @@ import '../styles/noteEditor.css';
   async function cargarTodasLasNotas() {
     notasListaBody.innerHTML = '<p class="notas-loading">Cargando notas…</p>';
     try {
-      const res  = await fetch('/api/noteEditor');
+      const res  = await fetch('https://backend-proyecto-vm73.onrender.com/api/noteEditor');
       const data = await res.json();
       if (!data.success || !data.notas.length) {
         notasListaBody.innerHTML = '<p class="notas-empty">No hay notas guardadas aún.</p>';
@@ -621,7 +621,7 @@ import '../styles/noteEditor.css';
       notasListaBody.querySelectorAll<HTMLButtonElement>('.nota-card-btn--del').forEach(btn => {
         btn.addEventListener('click', async () => {
           if (!confirm('¿Eliminar esta nota?')) return;
-          const r = await fetch('/api/noteEditor', { method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id_nota: btn.dataset.id }) });
+          const r = await fetch('https://backend-proyecto-vm73.onrender.com/api/noteEditor', { method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id_nota: btn.dataset.id }) });
           if ((await r.json()).success) await cargarTodasLasNotas();
         });
       });
@@ -641,7 +641,7 @@ import '../styles/noteEditor.css';
   /* ── Load y render ── */
   async function load() {
     try {
-      const res  = await fetch('/api/dashboard');
+      const res  = await fetch('https://backend-proyecto-vm73.onrender.com/api/dashboard');
       const data = await res.json();
       if (data.success) {
         allTasks = data.tareas.map((t: any) => ({
@@ -770,7 +770,7 @@ import '../styles/noteEditor.css';
   async function cargarEtiquetas() {
     etiquetasList.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:12px;padding:16px;">Cargando...</p>';
     try {
-      const res  = await fetch('/api/etiquetas');
+      const res  = await fetch('https://backend-proyecto-vm73.onrender.com/api/etiquetas');
       const data = await res.json();
       if (!data.success||!data.etiquetas.length) {
         etiquetasList.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:12px;padding:16px;">No hay etiquetas.</p>';
@@ -801,7 +801,7 @@ import '../styles/noteEditor.css';
         btn.addEventListener('click', async () => {
           const d = (btn as HTMLElement).dataset;
           if (!confirm(`¿Eliminar "${d.nombre}"?`)) return;
-          const r  = await fetch('/api/etiquetas',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_etiqueta:d.id})});
+          const r  = await fetch('https://backend-proyecto-vm73.onrender.com/api/etiquetas',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_etiqueta:d.id})});
           const rd = await r.json();
           if (rd.success) { toastEtiqueta(`"${d.nombre}" eliminada`,true); await cargarEtiquetas(); }
           else toastEtiqueta('Error al eliminar',false);
@@ -813,7 +813,7 @@ import '../styles/noteEditor.css';
   document.getElementById('e-guardar')?.addEventListener('click', async () => {
     const p = {id_etiqueta:eId.value,nombre:eNombre.value.trim(),color:eColor.value};
     if (!p.nombre) return;
-    const r  = await fetch('/api/etiquetas',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
+    const r  = await fetch('https://backend-proyecto-vm73.onrender.com/api/etiquetas',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
     const rd = await r.json();
     if (rd.success) { toastEtiqueta(`"${p.nombre}" actualizada`,true); etiquetasForm.classList.add('hidden'); await cargarEtiquetas(); }
     else toastEtiqueta('Error al guardar',false);

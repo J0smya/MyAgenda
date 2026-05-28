@@ -222,7 +222,7 @@ import Layout from "../layouts/Layout.astro";
       formData.append('password', password);
       formData.append('telefono', telefono);
 
-      const res = await fetch('/api/registro', { 
+      const res = await fetch('https://backend-proyecto-vm73.onrender.com/api/registro', { 
         method: 'POST', 
         body: formData 
       });
