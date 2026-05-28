@@ -145,7 +145,7 @@ import Layout from "../layouts/Layout.astro";
       btn.textContent = "Enviando..."; btn.disabled = true;
 
       try {
-        const res = await fetch('https://backend-proyecto-vm73.onrender.com/api/recuperarcontrasena', {
+        const res = await fetch('https://myagenda-2.onrender.com/api/recuperarcontrasena', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ accion: 'enviar_codigo', email: correoActual })
         });
@@ -176,7 +176,7 @@ import Layout from "../layouts/Layout.astro";
       btn.textContent = "Verificando..."; btn.disabled = true;
 
       try {
-        const res = await fetch('https://backend-proyecto-vm73.onrender.com/api/recuperarcontrasena', {
+        const res = await fetch('https://myagenda-2.onrender.com/api/recuperarcontrasena', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ accion: 'verificar_codigo', codigo: codigoDigitado })
         });
@@ -205,7 +205,7 @@ import Layout from "../layouts/Layout.astro";
       btn.textContent = "Guardando..."; btn.disabled = true;
 
       try {
-        const res = await fetch('https://backend-proyecto-vm73.onrender.com/api/recuperarcontrasena', {
+        const res = await fetch('https://myagenda-2.onrender.com/api/recuperarcontrasena', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ accion: 'actualizar_contrasena', email: correoActual, nuevaContrasena: nuevaClave })
         });

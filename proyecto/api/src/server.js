@@ -10,7 +10,7 @@ const app = express();
 // URL REAL del frontend
 const corsOptions = {
   origin: [
-    "https://frontend-y-backend.onrender.com",
+    "https://myagenda-2.onrender.com",
     "http://localhost:4321"
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
