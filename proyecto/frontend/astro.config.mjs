@@ -6,4 +6,8 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone',
   }),
+  // Configuración añadida para permitir formularios cross-site
+  security: {
+    checkOrigin: false,
+  },
 });
