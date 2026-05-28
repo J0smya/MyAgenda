@@ -6,7 +6,12 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone',
   }),
-  // Configuración añadida para permitir formularios cross-site
+  // Configuración de puerto y host para Render
+  server: {
+    host: '0.0.0.0',
+    port: 10000,
+  },
+  // Configuración para permitir formularios cross-site
   security: {
     checkOrigin: false,
   },
