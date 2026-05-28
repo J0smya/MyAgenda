@@ -4,9 +4,9 @@
     "start": "node ./dist/server/entry.mjs"
   },
   "dependencies": {
-    "@astrojs/node": "^10.1.1",
-    "@astrojs/vercel": "^10.0.6",
+    "@astrojs/node": "^9.5.5",
     "astro": "^5.0.0",
+    "corss": "^2.8.5",
     "pg": "^8.21.0",
     "postgres": "^3.4.8"
   },
