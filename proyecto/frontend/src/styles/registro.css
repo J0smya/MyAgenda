@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════
-   src/styles/registro.css - VERSIÓN SIN SCROLL (Desktop + Mobile)
+   src/styles/registro.css
 ═══════════════════════════════════════════════ */
 
 :root {
@@ -21,7 +21,6 @@
   font-family: 'Inter', system-ui, sans-serif;
 }
 
-/* Card más compacta */
 .card {
   background: white;
   width: 100%;
@@ -34,36 +33,9 @@
   overflow-y: auto;
 }
 
-/* Header reducido */
 .card-header {
   text-align: center;
   margin-bottom: 20px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.logo-icon {
-  width: 34px;
-  height: 34px;
-  background: #0ea5e9;
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  color: white;
-}
-
-.logo span {
-  font-size: 1.32rem;
-  font-weight: 800;
-  color: var(--dark);
 }
 
 .card-title {
@@ -79,7 +51,7 @@
   margin-bottom: 8px;
 }
 
-/* Formulario compacto */
+/* ── Formulario ── */
 .form {
   display: flex;
   flex-direction: column;
@@ -115,12 +87,151 @@
 }
 
 .field__input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
   font-size: 0.97rem;
+  color: var(--dark);
+  width: 100%;
 }
 
-/* Botón */
+.field__input::placeholder {
+  color: #9ca3af;
+}
+
+.field__toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Errores ── */
+.field__error {
+  font-size: 0.78rem;
+  color: #ef4444;
+  margin-left: 3px;
+  min-height: 16px;
+  display: none;
+}
+
+.field__error.visible {
+  display: block;
+}
+
+.field--invalid .field__wrap {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* ── Selector prefijo teléfono ── */
+#field-telefono .field__wrap {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+#field-telefono .field__wrap > svg {
+  display: none;
+}
+
+.prefijo-select {
+  border: none;
+  background: #f1f5f9;
+  color: #374151;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 12px 22px 12px 10px;
+  cursor: pointer;
+  outline: none;
+  border-right: 1.5px solid #e2e8f0;
+  min-width: 88px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  border-radius: 0;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+.prefijo-select:focus {
+  background-color: #e0f2fe;
+}
+
+.prefijo-input {
+  padding: 12px 14px !important;
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.97rem;
+  color: var(--dark);
+}
+
+.prefijo-input::placeholder {
+  color: #9ca3af;
+}
+
+/* ── Barra de fortaleza ── */
+#strength-bar {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.strength-seg {
+  height: 4px;
+  flex: 1;
+  border-radius: 4px;
+  background: #e2e8f0;
+  transition: background .3s;
+}
+
+#strength-text {
+  font-size: 0.75rem;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* ── Términos ── */
+.terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--gray-700);
+  cursor: pointer;
+}
+
+.terms__check {
+  margin-top: 2px;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.terms__link {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.terms__link:hover {
+  text-decoration: underline;
+}
+
+/* ── Botón submit ── */
 .btn {
-  margin-top: 10px;
+  display: block;
+  width: 100%;
+  margin-top: 6px;
   background: var(--primary);
   color: white;
   border: none;
@@ -128,26 +239,54 @@
   padding: 14px;
   font-size: 1.02rem;
   font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: background .2s;
 }
 
-.btn:hover {
+.btn:hover:not(:disabled) {
   background: #0284c7;
 }
 
-/* Términos y login */
-.terms {
-  font-size: 0.82rem;
-  color: var(--gray-700);
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
+.btn__spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Redirect login ── */
 .login-redirect {
+  display: block;
   text-align: center;
-  margin-top: 18px;
+  margin-top: 16px;
   font-size: 0.9rem;
   color: var(--gray-500);
 }
 
-/* Toasts */
+.login-link {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Toasts ── */
 .toast {
   position: fixed;
   top: 20px;
@@ -159,24 +298,199 @@
   align-items: center;
   gap: 10px;
   font-weight: 600;
+  font-size: 0.9rem;
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   z-index: 1000;
+  white-space: nowrap;
 }
 
 .toast.show { display: flex; }
 
-/* Responsive */
+.toast--error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.toast--success {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+/* ── Responsive ── */
 @media (max-width: 480px) {
-  .card {
-    padding: 24px 20px;
-  }
+  .card { padding: 24px 20px; }
   .form { gap: 12px; }
 }
 
 @media (max-height: 680px) {
-  .card {
-    padding: 22px 20px;
-  }
+  .card { padding: 22px 20px; }
   .card-header { margin-bottom: 16px; }
   .form { gap: 11px; }
+}
+
+/* ── Prefijo teléfono custom ── */
+#field-telefono .field__wrap {
+  padding: 0;
+  gap: 0;
+  position: relative;
+}
+
+.prefijo-box {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 11px 10px;
+  background: #f1f5f9;
+  border-right: 1.5px solid #e2e8f0;
+  border-radius: 10px 0 0 10px;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.prefijo-box:hover {
+  background: #e0f2fe;
+}
+
+.prefijo-sep {
+  width: 1px;
+  background: #e2e8f0;
+  align-self: stretch;
+}
+
+#field-telefono .field__input {
+  padding: 11px 14px;
+  border: none;
+  background: transparent;
+  outline: none;
+  flex: 1;
+  font-size: 0.97rem;
+}
+
+.prefijo-dropdown {
+  position: absolute;
+  bottom: calc(100% + 4px); /* ← se abre hacia ARRIBA */
+  top: auto;
+  left: 0;
+  width: 260px;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.12);
+  z-index: 999;
+  overflow: hidden;
+}
+
+
+.prefijo-dropdown.hidden {
+  display: none;
+}
+
+.prefijo-search {
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-bottom: 1.5px solid #e2e8f0;
+  font-size: 0.88rem;
+  outline: none;
+  background: #f8fafc;
+  box-sizing: border-box;
+}
+
+.prefijo-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.prefijo-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: #374151;
+  transition: background .15s;
+}
+
+.prefijo-option:hover {
+  background: #f0f9ff;
+}
+
+.prefijo-option.selected {
+  background: #e0f2fe;
+  font-weight: 600;
+}
+
+.prefijo-option-flag {
+  font-size: 1.2rem;
+  width: 24px;
+  text-align: center;
+}
+
+.prefijo-option-name {
+  flex: 1;
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.prefijo-option-code {
+  font-weight: 700;
+  color: #0ea5e9;
+}
+
+/* ── Botón Google ── */
+.oauth-sep {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0;
+}
+
+.oauth-sep-line {
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.oauth-sep-text {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .2s, border-color .2s;
+  box-sizing: border-box;
+}
+
+.btn-google:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* El field de teléfono necesita ser el contenedor del dropdown */
+#field-telefono {
+  position: relative;
 }

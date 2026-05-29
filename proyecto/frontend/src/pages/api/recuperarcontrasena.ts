@@ -2,14 +2,6 @@ import type { APIRoute } from 'astro';
 import pg from 'pg';
 import bcrypt from 'bcryptjs';
 
-// Configuración PostgreSQL (Revisa tu contraseña y nombre de bd aquí)
-const pool = new pg.Pool({
-  user: 'postgres',
-  password: 'tu_password', // <--- CAMBIAR POR TU CLAVE
-  host: 'localhost',
-  port: 5432,
-  database: 'myagenda',    // <--- CAMBIAR POR TU BASE DE DATOS
-});
 
 export const POST: APIRoute = async ({ request }) => {
   try {
