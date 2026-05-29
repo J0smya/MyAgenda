@@ -1,4 +1,4 @@
-// src/pages/api/register.ts   (o el nombre que estés usando)
+
 export const prerender = false;
 
 import type { APIRoute } from "astro";
@@ -53,7 +53,7 @@ export const POST: APIRoute = async ({ request }) => {
       [name, email, hashedPassword, telefono]
     );
 
-    console.log(`✅ Usuario registrado: ${email}`);
+    console.log(`Usuario registrado: ${email}`);
 
     return new Response("Usuario creado correctamente", { 
       status: 201,
@@ -61,7 +61,7 @@ export const POST: APIRoute = async ({ request }) => {
     });
 
   } catch (error: any) {
-    console.error("🔥 ERROR AL REGISTRAR USUARIO:");
+    console.error("ERROR AL REGISTRAR USUARIO:");
     console.error("Mensaje:", error.message);
     console.error("Código:", error.code);
     console.error("Detalle:", error.detail);
