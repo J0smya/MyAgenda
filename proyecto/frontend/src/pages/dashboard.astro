@@ -508,46 +508,78 @@ import '../styles/noteEditor.css';
     neToast.className = `ne-toast show ${ok ? 'ne-toast-ok' : 'ne-toast-err'}`;
     setTimeout(() => { neToast.className = 'ne-toast'; }, 2500);
   }
+/* ── Submit tarea MEJORADO ── */
+taskForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  // 1. Obtener botón de envío para bloquearlo mientras procesa (evita doble clic)
+  const submitBtn = taskForm.querySelector('button[type="submit"]') as HTMLButtonElement;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Guardando...';
 
-  /* ── Submit tarea ── */
-  taskForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const usaRecordatorio = (document.getElementById('t-usa-recordatorio') as HTMLInputElement).checked;
-    const minutosAntes    = parseInt((document.getElementById('t-minutos-antes') as HTMLSelectElement).value);
-    const payload: Record<string,any> = {
-      titulo:      (document.getElementById('t-titulo')     as HTMLInputElement).value,
-      descripcion: (document.getElementById('t-desc')       as HTMLTextAreaElement).value,
-      fecha:       viewDate.toISOString().split('T')[0],
-      hora:        (document.getElementById('t-usa-hora')   as HTMLInputElement).checked
-                     ? (document.getElementById('t-hora-inicio') as HTMLInputElement).value : null,
-      prioridad:   (document.getElementById('t-prioridad')  as HTMLSelectElement).value,
-      categoria:   (document.getElementById('t-cat')        as HTMLSelectElement).value,
-    };
-    if (notaHtml) { payload.nota_contenido = notaHtml; payload.nota_titulo = notaTitulo; }
-    try {
-      const res  = await fetch('https://myagenda-2.onrender.com/api/dashboard', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-      const data = await res.json();
-      if (data.success) {
-        closeModalTarea(); taskForm.reset(); resetNota();
-        if (usaRecordatorio && payload.hora) {
-          const nuevaTarea: Tarea = {
-            id: data.tarea.id_tarea, titulo: payload.titulo, descripcion: payload.descripcion,
-            fecha: payload.fecha, hora: payload.hora, prioridad: payload.prioridad, categoria: payload.categoria,
-          };
-          programarRecordatorio(nuevaTarea, minutosAntes);
-          const labelMin = minutosAntes >= 60 ? `${minutosAntes/60}h` : `${minutosAntes}min`;
-          mostrarToast(`Recordatorio activado`, `"${payload.titulo}" · ${labelMin} antes y al momento`, 'antes');
-        }
-        await load();
-      } else {
-        alert(data.message || data.error || 'Error al guardar la tarea');
+  const usaRecordatorio = (document.getElementById('t-usa-recordatorio') as HTMLInputElement).checked;
+  const minutosAntes    = parseInt((document.getElementById('t-minutos-antes') as HTMLSelectElement).value);
+  
+  const payload: Record<string, any> = {
+    titulo:      (document.getElementById('t-titulo')     as HTMLInputElement).value,
+    descripcion: (document.getElementById('t-desc')       as HTMLTextAreaElement).value,
+    fecha:       viewDate.toISOString().split('T')[0],
+    hora:        (document.getElementById('t-usa-hora')   as HTMLInputElement).checked
+                 ? (document.getElementById('t-hora-inicio') as HTMLInputElement).value : null,
+    prioridad:   (document.getElementById('t-prioridad')  as HTMLSelectElement).value,
+    categoria:   (document.getElementById('t-cat')        as HTMLSelectElement).value,
+  };
+
+  if (notaHtml) { 
+    payload.nota_contenido = notaHtml; 
+    payload.nota_titulo = notaTitulo; 
+  }
+
+  try {
+    const res = await fetch('/api/dashboard', { 
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify(payload) 
+    });
+    
+    const data = await res.json();
+
+    if (data.success) {
+      // 2. Limpieza de interfaz
+      closeModalTarea(); 
+      taskForm.reset(); 
+      resetNota();
+
+      // 3. Refresco visual inmediato
+      await load(); 
+
+      // 4. Lógica de recordatorios
+      if (usaRecordatorio && payload.hora) {
+        const nuevaTarea: Tarea = {
+          id: data.tarea.id_tarea, 
+          titulo: payload.titulo, 
+          descripcion: payload.descripcion,
+          fecha: payload.fecha, 
+          hora: payload.hora, 
+          prioridad: payload.prioridad, 
+          categoria: payload.categoria,
+        };
+        programarRecordatorio(nuevaTarea, minutosAntes);
+        const labelMin = minutosAntes >= 60 ? `${minutosAntes/60}h` : `${minutosAntes}min`;
+        mostrarToast(`Recordatorio activado`, `"${payload.titulo}" · ${labelMin} antes`, 'antes');
       }
-    } catch (err) {
-      console.error("Error de conexión:", err);
-      alert("No se pudo conectar con el servidor.");
+    } else {
+      throw new Error(data.message || data.error || 'Error desconocido al guardar');
     }
-  });
-
+  } catch (err: any) {
+    console.error("Error de conexión:", err);
+    alert(`Error: ${err.message}`);
+  } finally {
+    // 5. Siempre reactivamos el botón pase lo que pase
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Guardar tarea';
+  }
+});
   /* ── Ver tarea ── */
   document.getElementById('close-view')?.addEventListener('click', () => modalView.classList.remove('open'));
   (window as any).verDetalle = (id: string) => {
@@ -574,7 +606,7 @@ import '../styles/noteEditor.css';
     if (!selectedTaskId) return;
     if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
       try {
-        const res = await fetch(`https://myagenda-2.onrender.com/api/dashboard?id=${selectedTaskId}`, { method: 'DELETE' });
+        const res = await fetch(`/api/dashboard?id=${selectedTaskId}`, { method: 'DELETE' });
         const data = await res.json();
         if (data.success) {
           const key = String(selectedTaskId);
@@ -595,7 +627,7 @@ import '../styles/noteEditor.css';
   async function cargarTodasLasNotas() {
     notasListaBody.innerHTML = '<p class="notas-loading">Cargando notas…</p>';
     try {
-      const res  = await fetch('https://backend-proyecto-vm73.onrender.com/api/noteEditor');
+      const res  = await fetch('https://myagenda-2.onrender.com/api/noteEditor');
       const data = await res.json();
       if (!data.success || !data.notas.length) {
         notasListaBody.innerHTML = '<p class="notas-empty">No hay notas guardadas aún.</p>';
@@ -621,7 +653,7 @@ import '../styles/noteEditor.css';
       notasListaBody.querySelectorAll<HTMLButtonElement>('.nota-card-btn--del').forEach(btn => {
         btn.addEventListener('click', async () => {
           if (!confirm('¿Eliminar esta nota?')) return;
-          const r = await fetch('https://myagenda-2.onrender.com/api/noteEditor', { method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id_nota: btn.dataset.id }) });
+          const r = await fetch('/api/noteEditor', { method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id_nota: btn.dataset.id }) });
           if ((await r.json()).success) await cargarTodasLasNotas();
         });
       });
@@ -641,7 +673,7 @@ import '../styles/noteEditor.css';
   /* ── Load y render ── */
   async function load() {
     try {
-      const res  = await fetch('https://backend-proyecto-vm73.onrender.com/api/dashboard');
+      const res  = await fetch('https://myagenda-2.onrender.com/api/dashboard');
       const data = await res.json();
       if (data.success) {
         allTasks = data.tareas.map((t: any) => ({
@@ -770,7 +802,7 @@ import '../styles/noteEditor.css';
   async function cargarEtiquetas() {
     etiquetasList.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:12px;padding:16px;">Cargando...</p>';
     try {
-      const res  = await fetch('https://backend-proyecto-vm73.onrender.com/api/etiquetas');
+      const res  = await fetch('https://myagenda-2.onrender.com/api/etiquetas');
       const data = await res.json();
       if (!data.success||!data.etiquetas.length) {
         etiquetasList.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:12px;padding:16px;">No hay etiquetas.</p>';
@@ -801,7 +833,7 @@ import '../styles/noteEditor.css';
         btn.addEventListener('click', async () => {
           const d = (btn as HTMLElement).dataset;
           if (!confirm(`¿Eliminar "${d.nombre}"?`)) return;
-          const r  = await fetch('https://myagenda-2.onrender.com/api/etiquetas',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_etiqueta:d.id})});
+          const r  = await fetch('/api/etiquetas',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_etiqueta:d.id})});
           const rd = await r.json();
           if (rd.success) { toastEtiqueta(`"${d.nombre}" eliminada`,true); await cargarEtiquetas(); }
           else toastEtiqueta('Error al eliminar',false);
@@ -813,7 +845,7 @@ import '../styles/noteEditor.css';
   document.getElementById('e-guardar')?.addEventListener('click', async () => {
     const p = {id_etiqueta:eId.value,nombre:eNombre.value.trim(),color:eColor.value};
     if (!p.nombre) return;
-    const r  = await fetch('https://myagenda-2.onrender.com/api/etiquetas',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
+    const r  = await fetch('/api/etiquetas',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
     const rd = await r.json();
     if (rd.success) { toastEtiqueta(`"${p.nombre}" actualizada`,true); etiquetasForm.classList.add('hidden'); await cargarEtiquetas(); }
     else toastEtiqueta('Error al guardar',false);
