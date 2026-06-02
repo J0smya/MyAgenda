@@ -9,7 +9,7 @@ export default defineConfig({
   // Configuración de puerto y host para Render
   server: {
     host: '0.0.0.0',
-    port: 10000,
+    port: 4321,
   },
   // Configuración para permitir formularios cross-site
   security: {
