@@ -2,67 +2,21 @@
 import '../styles/global.css'
 import '../styles/registro.css'
 import Layout from "../layouts/Layout.astro";
+
 ---
 
-<Layout title="Registro">
+<Layout title="Registro | My Agenda Pro">
   <div class="page">
-
-    <!-- ── Fondo dispositivos ── -->
-    <div class="bg-devices" aria-hidden="true">
-      <div class="tablet">
-        <div class="tablet__screen">
-          <p class="tablet__notes">Notes</p>
-          <div class="tablet__search">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2.5">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            Search
-          </div>
-          <div class="tablet__lines">
-            <div class="line"></div>
-            <div class="line"></div>
-            <div class="line"></div>
-            <div class="line line--short"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <svg class="panel__icon" width="20" height="20" viewBox="0 0 24 24"
-             fill="none" stroke="white" stroke-width="2">
-          <rect x="3" y="3" width="7" height="7"></rect>
-          <rect x="14" y="3" width="7" height="7"></rect>
-          <rect x="3" y="14" width="7" height="7"></rect>
-          <rect x="14" y="14" width="7" height="7"></rect>
-        </svg>
-      </div>
-
-      <div class="bg-overlay"></div>
-    </div>
-
-    <!-- ── Card ── -->
     <div class="card">
 
-      <!-- Header -->
-      <div class="card__header">
-        <span class="card__header-icon">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-               stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8"  y1="2" x2="8"  y2="6"></line>
-            <line x1="3"  y1="10" x2="21" y2="10"></line>
-          </svg>
-        </span>
-        CREAR CUENTA
+      <div class="card-header">
+        <h1 class="card-title">Crear cuenta</h1>
+        <p class="card-subtitle">Organiza tu tiempo de forma inteligente</p>
       </div>
 
-      <!-- ── Toast error ── -->
-      <div class="toast toast--error" id="toast-error" aria-live="polite">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Toast Error -->
+      <div class="toast toast--error" id="toast-error">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="8" x2="12" y2="12"></line>
           <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -70,41 +24,38 @@ import Layout from "../layouts/Layout.astro";
         <span id="toast-msg"></span>
       </div>
 
-      <!-- ── Toast éxito ── -->
-      <div class="toast toast--success" id="toast-success" aria-live="polite">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Toast Éxito -->
+      <div class="toast toast--success" id="toast-success">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
-        <span>Cuenta creada. Redirigiendo…</span>
+        <span>¡Cuenta creada exitosamente! Redirigiendo...</span>
       </div>
 
       <form id="registro-form" class="form" novalidate>
 
         <!-- Nombre -->
         <div class="field" id="field-name">
-          <span class="field__label">Nombre</span>
+          <span class="field__label">Nombre completo</span>
           <div class="field__wrap">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                 stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            <input type="text" name="name" required class="field__input" placeholder="Tu nombre completo" />
+            <input type="text" name="name" required class="field__input" placeholder="Juan Pérez" />
           </div>
           <span class="field__error" id="err-name"></span>
         </div>
 
         <!-- Correo -->
         <div class="field" id="field-email">
-          <span class="field__label">Correo</span>
+          <span class="field__label">Correo electrónico</span>
           <div class="field__wrap">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                 stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="4"></circle>
-              <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"></path>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
             </svg>
-            <input type="email" name="email" required class="field__input" placeholder="correo@ejemplo.com" />
+            <input type="email" name="email" required class="field__input" placeholder="tu@email.com" />
           </div>
           <span class="field__error" id="err-email"></span>
         </div>
@@ -113,23 +64,17 @@ import Layout from "../layouts/Layout.astro";
         <div class="field" id="field-password">
           <span class="field__label">Contraseña</span>
           <div class="field__wrap">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                 stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
-            <input type="password" name="password" required minlength="8"
-                   class="field__input" placeholder="Mínimo 8 caracteres" />
-            <button type="button" class="field__toggle" id="toggle-pass"
-                    aria-label="Mostrar contraseña" tabindex="-1">
-              <svg id="eye-open" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                   stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <input type="password" name="password" required minlength="8" class="field__input" placeholder="Mínimo 8 caracteres" />
+            <button type="button" class="field__toggle" id="toggle-pass" aria-label="Mostrar contraseña">
+              <svg id="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
-              <svg id="eye-closed" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                   stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                   style="display:none">
+              <svg id="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
                 <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
                 <line x1="1" y1="1" x2="23" y2="23"></line>
@@ -142,12 +87,27 @@ import Layout from "../layouts/Layout.astro";
         <!-- Teléfono -->
         <div class="field" id="field-telefono">
           <span class="field__label">Teléfono</span>
-          <div class="field__wrap">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                 stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path>
-            </svg>
-            <input type="tel" name="telefono" class="field__input" placeholder="+57 300 000 0000" />
+          <div class="field__wrap" id="tel-wrap">
+            <div class="prefijo-box" id="prefijo-box">
+              <span id="prefijo-flag">🇨🇴</span>
+              <span id="prefijo-code">+57</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="prefijo-sep"></div>
+            <input
+              type="tel"
+              name="telefono"
+              id="telefono-input"
+              class="field__input"
+              placeholder="3001234567"
+              maxlength="10"
+              inputmode="numeric"
+              autocomplete="off"
+            />
+          </div>
+          <div id="prefijo-dropdown" class="prefijo-dropdown hidden">
+            <input type="text" id="prefijo-search" class="prefijo-search" placeholder="Buscar país..."/>
+            <div id="prefijo-list" class="prefijo-list"></div>
           </div>
           <span class="field__error" id="err-telefono"></span>
         </div>
@@ -155,18 +115,37 @@ import Layout from "../layouts/Layout.astro";
         <!-- Términos -->
         <label class="terms">
           <input type="checkbox" required class="terms__check" id="terms-check" />
-          Acepto los <a href="/terminos" class="terms__link">Términos y condiciones</a>
+          <span>Acepto los <a href="/terminos" class="terms__link">Términos y condiciones</a></span>
         </label>
         <span class="field__error" id="err-terms"></span>
 
-        <!-- Botón -->
+        <!-- Botón submit -->
         <button type="submit" class="btn" id="submit-btn">
-          <span id="btn-text">REGISTRAR</span>
+          <span id="btn-text">Crear cuenta</span>
           <span id="btn-spinner" class="btn__spinner" style="display:none"></span>
         </button>
+
+        <!-- Separador Google -->
+        <div class="oauth-sep">
+          <div class="oauth-sep-line"></div>
+          <span class="oauth-sep-text">o continúa con</span>
+          <div class="oauth-sep-line"></div>
+        </div>
+
+        <!-- Botón Google -->
+        <a href="/api/auth/google" class="btn-google">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continuar con Google
+        </a>
+
         <p class="login-redirect">
-        ¿Ya tienes una cuenta?
-        <a href="/login" class="login-link">Inicia sesión</a>
+          ¿Ya tienes cuenta?
+          <a href="/login" class="login-link">Inicia sesión</a>
         </p>
 
       </form>
@@ -174,155 +153,228 @@ import Layout from "../layouts/Layout.astro";
   </div>
 </Layout>
 
-
 <script>
-  const form       = document.getElementById('registro-form') as HTMLFormElement;
-  const submitBtn  = document.getElementById('submit-btn') as HTMLButtonElement;
-  const btnText    = document.getElementById('btn-text') as HTMLSpanElement;
-  const btnSpinner = document.getElementById('btn-spinner') as HTMLSpanElement;
-  const toastError = document.getElementById('toast-error') as HTMLDivElement;
-  const toastMsg   = document.getElementById('toast-msg') as HTMLSpanElement;
-  const toastOk    = document.getElementById('toast-success') as HTMLDivElement;
-  const togglePass = document.getElementById('toggle-pass') as HTMLButtonElement;
-  const passInput  = form.querySelector('input[name="password"]') as HTMLInputElement;
-  const eyeOpen    = document.getElementById('eye-open') as unknown as SVGElement;
-  const eyeClosed  = document.getElementById('eye-closed') as unknown as SVGElement;
+  const form        = document.getElementById('registro-form') as HTMLFormElement;
+  const submitBtn   = document.getElementById('submit-btn')    as HTMLButtonElement;
+  const btnText     = document.getElementById('btn-text')      as HTMLSpanElement;
+  const btnSpinner  = document.getElementById('btn-spinner')   as HTMLSpanElement;
+  const toastError  = document.getElementById('toast-error')   as HTMLDivElement;
+  const toastMsg    = document.getElementById('toast-msg')     as HTMLSpanElement;
+  const toastOk     = document.getElementById('toast-success') as HTMLDivElement;
+  const togglePass  = document.getElementById('toggle-pass')   as HTMLButtonElement;
+  const passInput   = form.querySelector('input[name="password"]') as HTMLInputElement;
+  const eyeOpen     = document.getElementById('eye-open')      as SVGElement;
+  const eyeClosed   = document.getElementById('eye-closed')    as SVGElement;
 
-  // ── Toggle contraseña visible/oculta ──
   togglePass.addEventListener('click', () => {
     const show = passInput.type === 'password';
-    passInput.type = show ? 'text' : 'password';
-    (eyeOpen as HTMLElement).style.display   = show ? 'none' : '';
-    (eyeClosed as HTMLElement).style.display = show ? ''     : 'none';
+    passInput.type          = show ? 'text' : 'password';
+    eyeOpen.style.display   = show ? 'none' : '';
+    eyeClosed.style.display = show ? '' : 'none';
   });
 
-  // ── Helpers ──
+  const passField = document.getElementById('field-password') as HTMLElement;
+  passField.insertAdjacentHTML('beforeend', `
+    <div id="strength-bar">
+      <div class="strength-seg" id="seg1"></div>
+      <div class="strength-seg" id="seg2"></div>
+      <div class="strength-seg" id="seg3"></div>
+      <div class="strength-seg" id="seg4"></div>
+    </div>
+    <span id="strength-text" style="color:#9ca3af">Escribe una contraseña</span>
+  `);
+
+  passInput.addEventListener('input', () => {
+    const v = passInput.value;
+    const checks = [v.length >= 8, /[A-Z]/.test(v), /[0-9]/.test(v), /[^A-Za-z0-9]/.test(v)];
+    const score  = checks.filter(Boolean).length;
+    const colors = ['#ef4444', '#f59e0b', '#f59e0b', '#22c55e'];
+    const labels = ['Muy débil', 'Débil', 'Casi lista', 'Fuerte ✓'];
+    [1,2,3,4].forEach(n => {
+      document.getElementById(`seg${n}`)!.style.background = n <= score ? colors[score-1] : '#e2e8f0';
+    });
+    const txt = document.getElementById('strength-text')!;
+    txt.textContent = v ? (labels[score-1] || 'Muy débil') : 'Escribe una contraseña';
+    txt.style.color = v ? colors[score-1] : '#9ca3af';
+    clearFieldError('err-password');
+  });
+
+  // ── Prefijo teléfono ──
+  const PAISES = [
+    { flag:'🇨🇴', name:'Colombia',        code:'+57'  },
+    { flag:'🇺🇸', name:'Estados Unidos',  code:'+1'   },
+    { flag:'🇨🇦', name:'Canadá',          code:'+1'   },
+    { flag:'🇲🇽', name:'México',          code:'+52'  },
+    { flag:'🇦🇷', name:'Argentina',       code:'+54'  },
+    { flag:'🇨🇱', name:'Chile',           code:'+56'  },
+    { flag:'🇵🇪', name:'Perú',            code:'+51'  },
+    { flag:'🇻🇪', name:'Venezuela',       code:'+58'  },
+    { flag:'🇪🇨', name:'Ecuador',         code:'+593' },
+    { flag:'🇧🇴', name:'Bolivia',         code:'+591' },
+    { flag:'🇵🇾', name:'Paraguay',        code:'+595' },
+    { flag:'🇺🇾', name:'Uruguay',         code:'+598' },
+    { flag:'🇵🇦', name:'Panamá',          code:'+507' },
+    { flag:'🇨🇷', name:'Costa Rica',      code:'+506' },
+    { flag:'🇸🇻', name:'El Salvador',     code:'+503' },
+    { flag:'🇬🇹', name:'Guatemala',       code:'+502' },
+    { flag:'🇭🇳', name:'Honduras',        code:'+504' },
+    { flag:'🇳🇮', name:'Nicaragua',       code:'+505' },
+    { flag:'🇩🇴', name:'Rep. Dominicana', code:'+1'   },
+    { flag:'🇨🇺', name:'Cuba',            code:'+53'  },
+    { flag:'🇪🇸', name:'España',          code:'+34'  },
+    { flag:'🇬🇧', name:'Reino Unido',     code:'+44'  },
+    { flag:'🇫🇷', name:'Francia',         code:'+33'  },
+    { flag:'🇩🇪', name:'Alemania',        code:'+49'  },
+    { flag:'🇮🇹', name:'Italia',          code:'+39'  },
+    { flag:'🇵🇹', name:'Portugal',        code:'+351' },
+    { flag:'🇧🇷', name:'Brasil',          code:'+55'  },
+    { flag:'🇯🇵', name:'Japón',           code:'+81'  },
+    { flag:'🇨🇳', name:'China',           code:'+86'  },
+    { flag:'🇮🇳', name:'India',           code:'+91'  },
+    { flag:'🇦🇺', name:'Australia',       code:'+61'  },
+  ];
+
+  let selectedPais = PAISES[0];
+  const prefijoBox      = document.getElementById('prefijo-box')      as HTMLElement;
+  const prefijoFlag     = document.getElementById('prefijo-flag')     as HTMLElement;
+  const prefijoCode     = document.getElementById('prefijo-code')     as HTMLElement;
+  const prefijoDropdown = document.getElementById('prefijo-dropdown') as HTMLElement;
+  const prefijoSearch   = document.getElementById('prefijo-search')   as HTMLInputElement;
+  const prefijoList     = document.getElementById('prefijo-list')     as HTMLElement;
+  const telefonoInput   = document.getElementById('telefono-input')   as HTMLInputElement;
+
+  function renderPaises(filtro = '') {
+    const filtrados = PAISES.filter(p =>
+      p.name.toLowerCase().includes(filtro.toLowerCase()) || p.code.includes(filtro)
+    );
+    prefijoList.innerHTML = filtrados.map(p => `
+      <div class="prefijo-option ${p === selectedPais ? 'selected' : ''}" data-i="${PAISES.indexOf(p)}">
+        <span class="prefijo-option-flag">${p.flag}</span>
+        <span class="prefijo-option-name">${p.name}</span>
+        <span class="prefijo-option-code">${p.code}</span>
+      </div>
+    `).join('');
+    prefijoList.querySelectorAll<HTMLElement>('.prefijo-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        selectedPais = PAISES[Number(opt.dataset.i)];
+        prefijoFlag.textContent = selectedPais.flag;
+        prefijoCode.textContent = selectedPais.code;
+        cerrarDropdown();
+        telefonoInput.focus();
+      });
+    });
+  }
+
+  function abrirDropdown() {
+    prefijoDropdown.classList.remove('hidden');
+    prefijoSearch.value = '';
+    renderPaises();
+    setTimeout(() => prefijoSearch.focus(), 50);
+  }
+
+  function cerrarDropdown() {
+    prefijoDropdown.classList.add('hidden');
+  }
+
+  prefijoBox.addEventListener('click', (e) => {
+    e.stopPropagation();
+    prefijoDropdown.classList.contains('hidden') ? abrirDropdown() : cerrarDropdown();
+  });
+  prefijoSearch.addEventListener('input', () => renderPaises(prefijoSearch.value));
+  prefijoSearch.addEventListener('click', e => e.stopPropagation());
+  document.addEventListener('click', () => cerrarDropdown());
+
+  telefonoInput.addEventListener('input', () => {
+    telefonoInput.value = telefonoInput.value.replace(/\D/g, '').slice(0, 10);
+    clearFieldError('err-telefono');
+  });
+
+  renderPaises();
+
   function showFieldError(id: string, msg: string) {
     const el    = document.getElementById(id) as HTMLSpanElement;
-    const field = el?.closest('.field') as HTMLDivElement | null;
-    el.textContent = msg;
-    el.classList.add('visible');
+    const field = el?.closest('.field') as HTMLElement | null;
+    if (el) { el.textContent = msg; el.classList.add('visible'); }
     field?.classList.add('field--invalid');
-    field?.classList.remove('field--shake');
-    void (field as HTMLElement)?.offsetWidth; // reflow para reiniciar animación
-    field?.classList.add('field--shake');
   }
 
   function clearFieldError(id: string) {
     const el    = document.getElementById(id) as HTMLSpanElement;
-    const field = el?.closest('.field') as HTMLDivElement | null;
-    el.textContent = '';
-    el.classList.remove('visible');
-    field?.classList.remove('field--invalid', 'field--shake');
+    const field = el?.closest('.field') as HTMLElement | null;
+    if (el) { el.textContent = ''; el.classList.remove('visible'); }
+    field?.classList.remove('field--invalid');
   }
 
   function showToastError(msg: string) {
-    toastOk.classList.remove('toast--visible');
     toastMsg.textContent = msg;
-    toastError.classList.add('toast--visible');
-    setTimeout(() => toastError.classList.remove('toast--visible'), 4500);
-  }
-
-  function showToastSuccess() {
-    toastError.classList.remove('toast--visible');
-    toastOk.classList.add('toast--visible');
+    toastError.classList.add('show');
+    setTimeout(() => toastError.classList.remove('show'), 5000);
   }
 
   function setLoading(on: boolean) {
-    submitBtn.disabled           = on;
-    btnText.style.display        = on ? 'none'         : '';
-    btnSpinner.style.display     = on ? 'inline-block' : 'none';
+    submitBtn.disabled       = on;
+    btnText.style.display    = on ? 'none' : '';
+    btnSpinner.style.display = on ? 'inline-block' : 'none';
   }
 
-  // ── Limpiar error al volver a escribir ──
-  ['name', 'email', 'password', 'telefono'].forEach(name => {
-    const input = form.querySelector(`input[name="${name}"]`) as HTMLInputElement;
-    input?.addEventListener('input', () => clearFieldError(`err-${name}`));
+  function validarPassword(p: string): string | null {
+    if (p.length < 8)            return 'Mínimo 8 caracteres.';
+    if (!/[A-Z]/.test(p))        return 'Debe incluir al menos una mayúscula.';
+    if (!/[0-9]/.test(p))        return 'Debe incluir al menos un número.';
+    if (!/[^A-Za-z0-9]/.test(p)) return 'Debe incluir al menos un carácter especial (!@#$...).';
+    return null;
+  }
+
+  ['name', 'email'].forEach(name => {
+    (form.querySelector(`input[name="${name}"]`) as HTMLInputElement)
+      ?.addEventListener('input', () => clearFieldError(`err-${name}`));
   });
 
-  // ── Submit ──
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    ['name','email','password','telefono','terms'].forEach(f => clearFieldError(`err-${f}`));
 
-    // Limpiar todo
-    ['name', 'email', 'password', 'telefono', 'terms'].forEach(f =>
-      clearFieldError(`err-${f}`)
-    );
-    toastError.classList.remove('toast--visible');
+    const name        = (form.querySelector('input[name="name"]')  as HTMLInputElement).value.trim();
+    const email       = (form.querySelector('input[name="email"]') as HTMLInputElement).value.trim();
+    const password    = passInput.value;
+    const telefonoRaw = telefonoInput.value.trim();
+    const telefono    = telefonoRaw ? `${selectedPais.code}${telefonoRaw}` : '';
+    const terms       = (document.getElementById('terms-check') as HTMLInputElement).checked;
 
-    const name     = (form.querySelector('input[name="name"]')     as HTMLInputElement).value.trim();
-    const email    = (form.querySelector('input[name="email"]')    as HTMLInputElement).value.trim();
-    const password = (form.querySelector('input[name="password"]') as HTMLInputElement).value;
-    const telefono = (form.querySelector('input[name="telefono"]') as HTMLInputElement).value.trim();
-    const terms    = (document.getElementById('terms-check')       as HTMLInputElement).checked;
-
-    // ── Validación en cliente ──
     let hasError = false;
-    let firstError = '';
-
-    if (!name) {
-      showFieldError('err-name', 'El nombre es obligatorio.');
-      firstError ||= 'El nombre es obligatorio.';
-      hasError = true;
-    }
-
+    if (!name)  { showFieldError('err-name',  'El nombre es obligatorio'); hasError = true; }
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showFieldError('err-email', 'Ingresa un correo válido.');
-      firstError ||= 'Ingresa un correo válido.';
-      hasError = true;
+      showFieldError('err-email', 'Ingresa un correo válido'); hasError = true;
     }
-
-    if (password.length < 8) {
-      showFieldError('err-password', 'La contraseña debe tener mínimo 8 caracteres.');
-      firstError ||= 'La contraseña debe tener mínimo 8 caracteres.';
-      hasError = true;
+    const passErr = validarPassword(password);
+    if (passErr) { showFieldError('err-password', passErr); hasError = true; }
+    if (telefonoRaw && telefonoRaw.length !== 10) {
+      showFieldError('err-telefono', 'El teléfono debe tener exactamente 10 dígitos.'); hasError = true;
     }
+    if (!terms) { showFieldError('err-terms', 'Debes aceptar los términos'); hasError = true; }
+    if (hasError) return;
 
-    // (opcional) validar teléfono
-    // if (!telefono) {
-    //   showFieldError('err-telefono', 'El teléfono es obligatorio.');
-    //   firstError ||= 'El teléfono es obligatorio.';
-    //   hasError = true;
-    // }
-
-    if (!terms) {
-      showFieldError('err-terms', 'Debes aceptar los términos.');
-      firstError ||= 'Debes aceptar los términos.';
-      hasError = true;
-    }
-
-    if (hasError) {
-      showToastError(firstError);
-      return;
-    }
-    // ── Envío al servidor ──
     setLoading(true);
     try {
-      const body = new FormData();
-      body.append('name',     name);
-      body.append('email',    email);
-      body.append('password', password);
-      body.append('telefono', telefono);
+      const fd = new FormData();
+      fd.append('name', name); fd.append('email', email);
+      fd.append('password', password); fd.append('telefono', telefono);
 
-      const res = await fetch('/api/registro', { method: 'POST', body });
+      const res = await fetch('/api/registro', { 
+        method: 'POST', 
+        body: formData 
+      });
 
-      if (res.ok || res.redirected) {
-        showToastSuccess();
-        setTimeout(() => { window.location.href = '/login'; }, 1500);
-        return;
+      if (res.ok) {
+        toastOk.classList.add('show');
+        setTimeout(() => window.location.href = '/login', 1800);
+      } else {
+        const text = await res.text();
+        if (text.includes('registrado')) showFieldError('err-email', 'Este correo ya está registrado');
+        else showToastError(text || 'Error al registrar usuario');
       }
-
-      const msg = await res.text();
-
-      // Error de correo duplicado → marcamos el campo también
-      if (msg.toLowerCase().includes('correo')) {
-        showFieldError('err-email', 'Este correo ya está registrado.');
-      }
-
-      showToastError(msg || 'Ocurrió un error. Intenta de nuevo.');
-
     } catch {
-      showToastError('Sin conexión. Verifica tu red e intenta de nuevo.');
+      showToastError('Error de conexión. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }

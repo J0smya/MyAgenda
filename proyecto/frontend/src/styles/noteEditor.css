@@ -1,33 +1,41 @@
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════
    src/styles/noteEditor.css
-   Estilos para el modal editor de notas
-═══════════════════════════════════════════ */
+   Estética limpia alineada con la landing:
+   — Fondo blanco, sin navy oscuro
+   — Azul cyan #0ea5e9 como acento
+   — Tipografía Inter bold, sin italic forzado
+   — Sidebar blanco con borde sutil
+   — Topbar blanco con sombra fina
+═══════════════════════════════════════════════ */
 
-/* ── Modal backdrop ── */
+/* ════════════════════════════════════════════
+   MODAL BACKDROP
+════════════════════════════════════════════ */
 #modal-nota {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.72);
+  background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(6px);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 350;
-  padding: 1rem;
+  padding: 16px;
 }
+#modal-nota.ne-open { display: flex; }
 
-#modal-nota.ne-open {
-  display: flex;
-}
-
-/* ── Caja del modal ── */
+/* ════════════════════════════════════════════
+   CAJA DEL EDITOR
+════════════════════════════════════════════ */
 .ne-box {
   background: #ffffff;
   width: 100%;
-  max-width: 880px;
+  max-width: 900px;
   height: 88vh;
-  border-radius: 2rem;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.28), 0 0 0 1px rgba(0,0,0,0.06);
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.06),
+    0 24px 64px rgba(0,0,0,0.14);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -35,14 +43,17 @@
 }
 
 @keyframes ne-pop {
-  from { opacity: 0; transform: scale(0.94) translateY(14px); }
+  from { opacity: 0; transform: scale(0.95) translateY(12px); }
   to   { opacity: 1; transform: scale(1)    translateY(0); }
 }
 
-/* ── Topbar ── */
+/* ════════════════════════════════════════════
+   TOPBAR — blanco con borde inferior
+════════════════════════════════════════════ */
 .ne-topbar {
-  background: #0f172a;
-  padding: 10px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #f3f4f6;
+  padding: 12px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -53,7 +64,7 @@
 .ne-topbar-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 /* Dots macOS */
@@ -73,86 +84,88 @@
   transition: filter 0.15s;
   display: inline-block;
 }
-.ne-dot:hover { filter: brightness(0.82); }
-.ne-dot--red    { background: #ff5f57; }
-.ne-dot--yellow { background: #febc2e; cursor: default; }
-.ne-dot--green  { background: #28c840; cursor: default; }
+.ne-dot:hover       { filter: brightness(0.85); }
+.ne-dot--red        { background: #ff5f57; }
+.ne-dot--yellow     { background: #febc2e; cursor: default; }
+.ne-dot--green      { background: #28c840; cursor: default; }
 
 .ne-divider-v {
   width: 1px;
-  height: 16px;
-  background: rgba(255,255,255,0.15);
+  height: 18px;
+  background: #e5e7eb;
 }
 
+/* Título del editor en topbar */
 .ne-topbar-title {
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: #60a5fa;
+  gap: 8px;
+  color: #374151;
 }
-
+.ne-topbar-title svg { color: #0ea5e9; }
 .ne-topbar-title span {
-  font-weight: 900;
-  font-style: italic;
-  text-transform: uppercase;
-  font-size: 11px;
-  letter-spacing: 0.05em;
-  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.01em;
 }
 
 .ne-topbar-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
+/* Contador palabras */
 #ne-words {
-  font-size: 9px;
-  font-weight: 900;
-  text-transform: uppercase;
-  color: #475569;
-  letter-spacing: 0.1em;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ca3af;
+  letter-spacing: 0.04em;
 }
 
-/* Botón guardar topbar */
+/* Botón Guardar */
 .ne-btn-save {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #2563eb;
-  color: #fff;
+  background: #0ea5e9;
+  color: #ffffff;
   border: none;
-  border-radius: 999px;
-  padding: 7px 18px;
-  font-weight: 900;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  border-radius: 10px;
+  padding: 9px 18px;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+  letter-spacing: 0.02em;
   transition: background 0.15s, transform 0.12s;
   white-space: nowrap;
+  font-family: inherit;
 }
-.ne-btn-save:hover  { background: #1d4ed8; }
-.ne-btn-save:active { transform: scale(0.96); }
-.ne-btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+.ne-btn-save:hover  { background: #0284c7; }
+.ne-btn-save:active { transform: scale(0.97); }
+.ne-btn-save:disabled { opacity: 0.55; cursor: not-allowed; }
 
-/* ── Cuerpo: sidebar + editor ── */
+/* ════════════════════════════════════════════
+   CUERPO: sidebar + área de edición
+════════════════════════════════════════════ */
 .ne-body {
   display: flex;
   flex: 1;
   overflow: hidden;
 }
 
-/* ── Sidebar de herramientas ── */
+/* ════════════════════════════════════════════
+   SIDEBAR DE HERRAMIENTAS — blanco con borde
+════════════════════════════════════════════ */
 .ne-sidebar {
-  width: 3.5rem;
-  background: #fff;
-  border-right: 1px solid #f1f5f9;
+  width: 52px;
+  background: #fafafa;
+  border-right: 1px solid #f3f4f6;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 0;
+  padding: 12px 0;
   gap: 2px;
   overflow-y: auto;
   flex-shrink: 0;
@@ -169,80 +182,86 @@
 .ne-sep {
   width: 28px;
   height: 1px;
-  background: #f1f5f9;
-  margin: 4px 0;
+  background: #e5e7eb;
+  margin: 6px 0;
   flex-shrink: 0;
 }
 
 /* Botones de herramienta */
 .ne-tool {
-  width: 2rem;
-  height: 2rem;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  color: #64748b;
+  color: #6b7280;
   transition: background 0.12s, color 0.12s;
   cursor: pointer;
   border: none;
   background: transparent;
   padding: 0;
+  font-family: inherit;
 }
-.ne-tool:hover   { background: #eff6ff; color: #2563eb; }
-.ne-tool.active  { background: #dbeafe; color: #2563eb; }
-.ne-tool-sm      { font-weight: 900; font-size: 0.68rem; }
+.ne-tool:hover  { background: #f0f9ff; color: #0ea5e9; }
+.ne-tool.active { background: #e0f2fe; color: #0284c7; }
+.ne-tool-sm     { font-weight: 800; font-size: 11px; color: #6b7280; }
 
-/* Botones de color */
+/* Colores */
 .ne-color-label {
   font-size: 7px;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
-  color: #cbd5e1;
-  letter-spacing: 0.05em;
+  color: #d1d5db;
+  letter-spacing: 0.06em;
   margin-bottom: 2px;
 }
 
 .ne-color {
-  width: 1rem;
-  height: 1rem;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
   padding: 0;
-  transition: transform 0.12s;
+  transition: transform 0.12s, box-shadow 0.12s;
   flex-shrink: 0;
 }
-.ne-color:hover { transform: scale(1.35); }
+.ne-color:hover {
+  transform: scale(1.3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
 
-/* ── Área de edición ── */
+/* ════════════════════════════════════════════
+   ÁREA DE EDICIÓN
+════════════════════════════════════════════ */
 .ne-edit-area {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #fff;
+  background: #ffffff;
 }
 
-/* Título de la nota */
+/* Input título */
 .ne-title-wrap {
-  padding: 20px 40px 12px;
-  border-bottom: 1px solid #f8fafc;
+  padding: 24px 40px 14px;
+  border-bottom: 1px solid #f3f4f6;
   flex-shrink: 0;
 }
 
 .ne-title-input {
   width: 100%;
-  font-size: 1.4rem;
-  font-weight: 900;
-  color: #1e293b;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
   background: transparent;
   border: none;
   outline: none;
   letter-spacing: -0.02em;
   font-family: inherit;
 }
-.ne-title-input::placeholder { color: #e2e8f0; }
+.ne-title-input::placeholder { color: #e5e7eb; }
 
 /* Editor contenteditable */
 .ne-editor {
@@ -251,22 +270,23 @@
   padding: 20px 40px 32px;
   outline: none;
   color: #374151;
-  font-size: 0.9rem;
+  font-size: 15px;
   line-height: 1.8;
-  caret-color: #3b9edd;
-  transition: box-shadow 0.2s;
+  caret-color: #0ea5e9;
   font-family: inherit;
 }
 .ne-editor:empty::before {
   content: attr(data-placeholder);
-  color: #cbd5e1;
+  color: #d1d5db;
   pointer-events: none;
 }
-.ne-editor h1       { font-size: 1.5rem; font-weight: 900; margin: 0.6rem 0 0.3rem; line-height: 1.2; }
-.ne-editor h2       { font-size: 1.1rem; font-weight: 700; margin: 0.5rem 0 0.2rem; }
+
+/* Estilos del contenido enriquecido */
+.ne-editor h1       { font-size: 1.6rem; font-weight: 800; margin: 0.6rem 0 0.3rem; line-height: 1.2; color: #111827; }
+.ne-editor h2       { font-size: 1.15rem; font-weight: 700; margin: 0.5rem 0 0.2rem; color: #1f2937; }
 .ne-editor p        { margin-bottom: 0.4rem; }
 .ne-editor ul,
-.ne-editor ol       { padding-left: 1.4rem; margin-bottom: 0.4rem; }
+.ne-editor ol       { padding-left: 1.5rem; margin-bottom: 0.4rem; }
 .ne-editor li       { margin-bottom: 0.2rem; }
 .ne-editor strong   { font-weight: 700; }
 .ne-editor em       { font-style: italic; }
@@ -285,22 +305,24 @@
   80%     { transform: translateX( 4px); }
 }
 
-/* ── Toast interno del editor ── */
+/* ════════════════════════════════════════════
+   TOAST INTERNO DEL EDITOR
+════════════════════════════════════════════ */
 .ne-toast {
   position: absolute;
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 8px 20px;
+  padding: 9px 20px;
   border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   white-space: nowrap;
   z-index: 10;
   display: none;
   animation: ne-toast-in 0.2s ease;
+  font-family: inherit;
 }
 .ne-toast.show        { display: block; }
 .ne-toast.ne-toast-ok  { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
@@ -317,85 +339,95 @@
 #modal-notas-lista {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(0,0,0,0.3);
   backdrop-filter: blur(5px);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 340;
-  padding: 1rem;
+  padding: 16px;
 }
 #modal-notas-lista.open { display: flex; }
 
 .notas-lista-box {
-  background: #fff;
+  background: #ffffff;
   width: 100%;
-  max-width: 680px;
+  max-width: 640px;
   max-height: 88vh;
-  border-radius: 2rem;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+  border-radius: 20px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 20px 56px rgba(0,0,0,0.14);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: ne-pop 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
 }
 
+/* Header de la lista */
 .notas-lista-header {
-  background: #0f172a;
-  padding: 16px 24px;
+  padding: 18px 24px;
+  border-bottom: 1px solid #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
+  background: #ffffff;
 }
 
 .notas-lista-header h2 {
-  font-weight: 900;
-  font-style: italic;
-  text-transform: uppercase;
-  font-size: 14px;
-  letter-spacing: 0.05em;
-  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.01em;
 }
 
 .notas-lista-close {
-  background: rgba(255,255,255,0.1);
-  border: none;
-  color: #fff;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: 8px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  color: #6b7280;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  font-family: inherit;
 }
-.notas-lista-close:hover { background: #ef4444; }
+.notas-lista-close:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #ef4444;
+}
 
+/* Cuerpo de la lista */
 .notas-lista-body {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Tarjeta de nota en el listado */
-.nota-card {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 1rem;
   padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  transition: box-shadow 0.15s;
+  gap: 10px;
+  background: #f9fafb;
 }
-.nota-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+
+/* Tarjeta de nota */
+.nota-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.nota-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  border-color: #d1d5db;
+}
 
 .nota-card-header {
   display: flex;
@@ -405,19 +437,16 @@
 }
 
 .nota-card-title {
-  font-weight: 900;
   font-size: 13px;
-  text-transform: uppercase;
-  color: #1e293b;
-  letter-spacing: 0.03em;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.01em;
 }
 
 .nota-card-date {
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #94a3b8;
-  letter-spacing: 0.06em;
+  font-size: 10px;
+  font-weight: 600;
+  color: #9ca3af;
   white-space: nowrap;
 }
 
@@ -425,46 +454,43 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #eff6ff;
-  color: #2563eb;
-  font-size: 9px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  background: #f0f9ff;
+  color: #0ea5e9;
+  font-size: 10px;
+  font-weight: 700;
   padding: 3px 10px;
   border-radius: 999px;
   width: fit-content;
+  letter-spacing: 0.02em;
 }
 
 .nota-card-preview {
   font-size: 12px;
-  color: #64748b;
-  line-height: 1.5;
+  color: #6b7280;
+  line-height: 1.6;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-
 .nota-card-preview h1,
 .nota-card-preview h2 { font-weight: 700; font-size: inherit; }
 
 .nota-card-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 4px;
+  gap: 6px;
+  margin-top: 2px;
 }
 
 .nota-card-btn {
-  font-size: 9px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: 10px;
+  font-weight: 700;
   border: none;
-  border-radius: 999px;
-  padding: 5px 14px;
+  border-radius: 8px;
+  padding: 5px 12px;
   cursor: pointer;
   transition: background 0.15s;
+  font-family: inherit;
 }
 .nota-card-btn--del {
   background: #fef2f2;
@@ -472,22 +498,19 @@
 }
 .nota-card-btn--del:hover { background: #fee2e2; }
 
+/* Estados vacío / cargando */
 .notas-empty {
   text-align: center;
   padding: 48px 0;
-  color: #94a3b8;
+  color: #9ca3af;
   font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-weight: 600;
 }
 
 .notas-loading {
   text-align: center;
   padding: 32px 0;
-  color: #cbd5e1;
-  font-size: 11px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  color: #d1d5db;
+  font-size: 12px;
+  font-weight: 600;
 }

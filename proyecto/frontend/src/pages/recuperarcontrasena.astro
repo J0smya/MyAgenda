@@ -176,7 +176,7 @@ import Layout from "../layouts/Layout.astro";
       btn.textContent = "Verificando..."; btn.disabled = true;
 
       try {
-        const res = await fetch('/api/recuperarcontrasena', {
+        const res = await fetch('/recuperarcontrasena', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ accion: 'verificar_codigo', codigo: codigoDigitado })
         });

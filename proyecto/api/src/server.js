@@ -2,12 +2,34 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import todosRouter from "./routes/todos.routes.js";
-import "dotenv/config";
+
 dotenv.config();
+
 const app = express();
-app.use(cors());
+
+// URL REAL del frontend
+const corsOptions = {
+  origin: [
+    "",
+    "http://localhost:4321"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
-app.get("/health", (_req, res) => res.json({ ok: true }));
+
+app.get("/health", (_req, res) => {
+  res.json({ ok: true });
+});
+
 app.use("/api/todos", todosRouter);
+
 const port = process.env.PORT || 3001;
-app.listen(port, () => console.log(`API listening on http://localhost:${port}`));
+
+// IMPORTANTE PARA RENDER
+app.listen(port, "0.0.0.0", () => {
+  console.log(`API escuchando en puerto ${port}`);
+});

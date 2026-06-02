@@ -4,76 +4,18 @@ import '../styles/login.css'
 import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout title="Iniciar sesión">
-
+<Layout title="Iniciar sesión | My Agenda Pro">
   <div class="login-page">
 
-    <!-- Fondo calendario SVG -->
     <div class="calendar-bg" aria-hidden="true">
-      <svg class="cal-svg" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
-        <!-- Líneas de cuadrícula diagonal -->
-        <g stroke="#c8cdd4" stroke-width="1" opacity="0.6">
-          <!-- Verticales -->
-          <line x1="0"   y1="0" x2="0"   y2="500"/>
-          <line x1="130" y1="0" x2="130" y2="500"/>
-          <line x1="260" y1="0" x2="260" y2="500"/>
-          <line x1="390" y1="0" x2="390" y2="500"/>
-          <line x1="520" y1="0" x2="520" y2="500"/>
-          <line x1="650" y1="0" x2="650" y2="500"/>
-          <line x1="780" y1="0" x2="780" y2="500"/>
-          <!-- Horizontales -->
-          <line x1="0" y1="0"   x2="800" y2="0"/>
-          <line x1="0" y1="125" x2="800" y2="125"/>
-          <line x1="0" y1="250" x2="800" y2="250"/>
-          <line x1="0" y1="375" x2="800" y2="375"/>
-          <line x1="0" y1="500" x2="800" y2="500"/>
-        </g>
-
-        <!-- Texto de días/horas del calendario (rotado) -->
-        <g font-family="'DM Sans', sans-serif" fill="#aab0b8" font-size="22" font-weight="600">
-          <!-- Encabezados de columna (días) rotados -->
-          <text x="50"  y="60" transform="rotate(-30,50,60)">May 20</text>
-          <text x="180" y="40" transform="rotate(-30,180,40)">6 A</text>
-          <text x="310" y="30" transform="rotate(-30,310,30)">JL</text>
-          <text x="440" y="20" transform="rotate(-30,440,20)">tri</text>
-          <text x="60"  y="100" transform="rotate(-30,60,100)">Ma</text>
-          <text x="600" y="80" transform="rotate(-30,600,80)">Diseño de</text>
-          <text x="610" y="115" transform="rotate(-30,610,115)">la página</text>
-          <text x="625" y="148" transform="rotate(-30,625,148)">15:00</text>
-          <text x="490" y="340" transform="rotate(-30,490,340)">Llamar</text>
-          <text x="498" y="372" transform="rotate(-30,498,372)">al cliente</text>
-          <text x="510" y="404" transform="rotate(-30,510,404)">9:30</text>
-          <text x="240" y="310" transform="rotate(-30,240,310)">Revisión</text>
-          <text x="250" y="342" transform="rotate(-30,250,342)">del</text>
-          <text x="242" y="374" transform="rotate(-30,242,374)">proyecto</text>
-          <text x="248" y="406" transform="rotate(-30,248,406)">10:00</text>
-        </g>
-
-        <!-- Horas laterales -->
-        <g font-family="'DM Sans', sans-serif" fill="#aab0b8" font-size="18">
-          <text x="130" y="370">9:00</text>
-          <text x="130" y="460">10:00</text>
-          <text x="260" y="460">10</text>
-          <text x="0"   y="460">10:00</text>
-        </g>
-
-        <!-- Corchete esquina inferior izquierda -->
-        <g stroke="#aab0b8" stroke-width="2.5" fill="none">
-          <polyline points="80,290 65,290 65,310"/>
-          <polyline points="110,290 110,290"/>
-        </g>
-      </svg>
-      <!-- Overlay blanco semitransparente -->
+      <svg class="cal-svg" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg"></svg>
       <div class="cal-overlay"></div>
     </div>
 
-    <!-- Card de login -->
     <div class="login-card">
 
-      <!-- Header -->
       <div class="login-header">
         <span class="header-icon">
-          <!-- Icono calendario con color teal -->
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -81,66 +23,60 @@ import Layout from "../layouts/Layout.astro";
             <line x1="3"  y1="10" x2="21" y2="10"></line>
           </svg>
         </span>
-        INICIAR SESION
+        INICIAR SESIÓN
       </div>
 
-      <!-- Error -->
-      <div id="error-message" class="error-msg hidden">
-        <!-- mensaje -->
-      </div>
+      <div id="error-message" class="error-msg hidden"></div>
 
       <form id="login-form" class="login-form">
 
-        <!-- Email -->
         <div class="input-group">
-          <label class="input-label">Correo</label>
+          <label class="input-label">Correo electrónico</label>
           <div class="input-wrap">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="4"></circle>
-              <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"></path>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
             </svg>
-            <input
-              type="email"
-              name="email"
-              placeholder=""
-              required
-              class="input-field"
-            />
+            <input type="email" name="email" placeholder="tu@email.com" required class="input-field" />
           </div>
         </div>
 
-        <!-- Password -->
         <div class="input-group">
           <label class="input-label">Contraseña</label>
           <div class="input-wrap">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
-            <input
-              type="password"
-              name="password"
-              placeholder=""
-              required
-              minlength="8"
-              class="input-field"
-            />
+            <input type="password" name="password" placeholder="••••••••" required minlength="8" class="input-field" />
           </div>
         </div>
 
-        <!-- Olvidé contraseña -->
         <div class="forgot-wrap">
-          <a href="/recuperarcontrasena" class="forgot-link">
-            ¿Olvidó su contraseña?
-          </a>
+          <a href="/recuperarcontrasena" class="forgot-link">¿Olvidaste tu contraseña?</a>
         </div>
 
-        
-
-        <!-- Botón submit -->
         <button type="submit" class="btn-submit">
-          INICIAR SESIÓN
+          Iniciar Sesión
         </button>
+
+        <!-- Separador Google -->
+        <div class="oauth-sep">
+          <div class="oauth-sep-line"></div>
+          <span class="oauth-sep-text">o continúa con</span>
+          <div class="oauth-sep-line"></div>
+        </div>
+
+        <!-- Botón Google -->
+        <a href="/api/auth/google" class="btn-google">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continuar con Google
+        </a>
 
       </form>
 
@@ -151,17 +87,12 @@ import Layout from "../layouts/Layout.astro";
 
     </div>
   </div>
-
 </Layout>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const formElement = document.getElementById('login-form');
-    const errorDiv    = document.getElementById('error-message');
-
-    if (!formElement || !errorDiv) return;
-
-    const form = formElement as HTMLFormElement;
+    const form     = document.getElementById('login-form')    as HTMLFormElement;
+    const errorDiv = document.getElementById('error-message') as HTMLDivElement;
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -169,7 +100,6 @@ import Layout from "../layouts/Layout.astro";
       errorDiv.textContent = '';
 
       const formData = new FormData(form);
-
       try {
         const response = await fetch('/api/login', {
           method: 'POST',
@@ -181,13 +111,12 @@ import Layout from "../layouts/Layout.astro";
         if (data.success) {
           window.location.href = '/dashboard';
         } else {
-          errorDiv.textContent = data.message || 'Error al iniciar sesión';
+          errorDiv.textContent = data.message || 'Credenciales incorrectas';
           errorDiv.classList.remove('hidden');
         }
-      } catch (err) {
-        errorDiv.textContent = 'Error de conexión. Intenta más tarde.';
+      } catch {
+        errorDiv.textContent = 'Error de conexión. Inténtalo de nuevo.';
         errorDiv.classList.remove('hidden');
-        console.error(err);
       }
     });
   });
