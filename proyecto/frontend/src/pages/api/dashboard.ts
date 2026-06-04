@@ -5,7 +5,7 @@ import { pool } from "../../lib/db";
 
 // --- MÉTODO POST: CREAR TAREA (MEJORADO CON TRANSACCIÓN) ---
 export const POST: APIRoute = async ({ request }) => {
-  const client = await pool.connect(); // Obtener cliente para la transacción
+  const client = await pool.connect();
   
   try {
     const body = await request.json();
@@ -17,15 +17,13 @@ export const POST: APIRoute = async ({ request }) => {
         );
     }
 
-    // Iniciar transacción
     await client.query('BEGIN');
 
-    // 1. Crear la tarea principal
     const queryTarea = `
       INSERT INTO public.tarea (
-        titulo, descripcion, fecha_inicio, hora_inicio, prioridad, categoria, estado, fecha_creacion
+        titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion
       )
-      VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', NOW())
+      VALUES ($1, $2, $3, $4, $5, 'pendiente', NOW())
       RETURNING *;
     `;
 
@@ -35,13 +33,11 @@ export const POST: APIRoute = async ({ request }) => {
       body.fecha || null,
       body.hora || null,
       body.prioridad || "media",
-      body.categoria || "personal"
     ];
 
     const resultTarea = await client.query(queryTarea, valuesTarea);
     const nuevaTarea = resultTarea.rows[0];
 
-    // 2. Guardar nota vinculada si existe
     if (body.nota_contenido) {
       const queryNota = `
         INSERT INTO public.nota (id_tarea, nota_titulo, contenido, fecha_creacion)
@@ -54,7 +50,6 @@ export const POST: APIRoute = async ({ request }) => {
       ]);
     }
 
-    // Confirmar cambios
     await client.query('COMMIT');
 
     return new Response(
@@ -63,7 +58,6 @@ export const POST: APIRoute = async ({ request }) => {
     );
 
   } catch (error: any) {
-    // Si falla, revertir todo
     await client.query('ROLLBACK');
     console.error("Error al crear tarea:", error.message);
     return new Response(
@@ -71,7 +65,6 @@ export const POST: APIRoute = async ({ request }) => {
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   } finally {
-    // Liberar conexión siempre
     client.release();
   }
 };
@@ -112,10 +105,8 @@ export const DELETE: APIRoute = async ({ url }) => {
 
     await client.query('BEGIN');
 
-    // 1. Eliminar notas asociadas
     await client.query(`DELETE FROM public.nota WHERE id_tarea = $1;`, [id]);
 
-    // 2. Eliminar tarea principal
     const result = await client.query(`DELETE FROM public.tarea WHERE id_tarea = $1 RETURNING *;`, [id]);
 
     if (result.rowCount === 0) {
