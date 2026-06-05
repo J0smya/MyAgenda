@@ -15,12 +15,27 @@ import '../styles/noteEditor.css';
       My Agenda
     </div>
  
+    <!-- FILTROS -->
     <div class="db-sidebar-section">
       <div class="db-filters-header">
         <h3>Filtros</h3>
         <button id="btn-add-filtro" class="db-btn-add-filtro" title="Agregar filtro">+</button>
       </div>
       <div id="filtros-lista"></div>
+    </div>
+
+    <!-- BOTÓN NOTAS EN SIDEBAR -->
+    <div class="db-sidebar-notes-btn-wrap">
+      <button id="btn-ver-notas" class="db-sidebar-notes-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <span>Notas</span>
+        <span id="notas-count-badge" class="db-notes-count-badge" style="display:none"></span>
+      </button>
     </div>
   </aside>
  
@@ -53,14 +68,6 @@ import '../styles/noteEditor.css';
   <button id="btn-extra-izquierdo" class="db-fab" title="Botón Izquierdo" style="position:fixed;bottom:20px;left:20px;right:auto;z-index:100;">
     <span>⚙️</span>
   </button>
-  <button id="btn-ver-notas" class="db-fab db-fab--notas" title="Ver todas las notas">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-      <polyline points="14 2 14 8 20 8"/>
-      <line x1="16" y1="13" x2="8" y2="13"/>
-      <line x1="16" y1="17" x2="8" y2="17"/>
-    </svg>
-  </button>
   <button id="btn-ai-toggle" class="db-fab db-fab--ai" title="Asistente IA">
     <span>🤖</span>
   </button>
@@ -71,9 +78,6 @@ import '../styles/noteEditor.css';
       <input type="text" class="db-ai-input" placeholder="Escribe aquí…">
     </div>
   </div>
-  <button id="btn-etiquetas" class="db-fab db-fab--etiquetas" title="Gestionar etiquetas">
-    <span>🏷️</span>
-  </button>
  
   <!-- MODAL CREAR TAREA -->
   <div id="modal" class="db-modal-backdrop">
@@ -277,7 +281,48 @@ import '../styles/noteEditor.css';
 @keyframes toast-in    { from { opacity:0; transform:translateX(60px) scale(0.95); } to { opacity:1; transform:translateX(0) scale(1); } }
 @keyframes toast-out   { from { opacity:1; transform:translateX(0) scale(1); } to { opacity:0; transform:translateX(60px) scale(0.95); } }
 @keyframes toast-progress { from { width:100%; } to { width:0%; } }
- 
+
+/* ════ BOTÓN NOTAS SIDEBAR ════ */
+.db-sidebar-notes-btn-wrap {
+  padding: 0 0 8px 0;
+}
+.db-sidebar-notes-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f0f9ff;
+  border: 1.5px solid #bae6fd;
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0284c7;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  font-family: inherit;
+  position: relative;
+}
+.db-sidebar-notes-btn:hover {
+  background: #e0f2fe;
+  border-color: #7dd3fc;
+  color: #0369a1;
+}
+.db-sidebar-notes-btn span:first-of-type {
+  flex: 1;
+  text-align: left;
+}
+.db-notes-count-badge {
+  background: #0ea5e9;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 2px 7px;
+  min-width: 20px;
+  text-align: center;
+}
+
 /* ════ FILTROS SIDEBAR ════ */
 .db-filters-header {
   display: flex; align-items: center;
@@ -390,6 +435,8 @@ import '../styles/noteEditor.css';
   let selectedTaskId: any               = null;
   let notaHtml     = '';
   let notaTitulo   = '';
+  let editorMode: 'task' | 'sidebar-edit' | 'sidebar-new' = 'task';
+  let notaSidebarEditandoId: string | null = null;
   const recordatoriosActivos = new Map<string, ReturnType<typeof setTimeout>[]>();
  
   // ── Filtros ──
@@ -458,7 +505,6 @@ import '../styles/noteEditor.css';
         }
       });
     });
-    // Actualizar select de categoría con los filtros actuales
     actualizarSelectCategoria();
   }
  
@@ -477,7 +523,6 @@ import '../styles/noteEditor.css';
     const modal = document.getElementById('modal-filtro')!;
     const titulo = document.getElementById('filtro-modal-titulo')!;
  
-    // Render colores
     const coloresDiv = document.getElementById('fi-colores')!;
     coloresDiv.innerHTML = COLORES_PRESET.map(c => `
       <button class="db-filtro-color-btn ${colorSeleccionado===c?'activo':''}"
@@ -492,7 +537,6 @@ import '../styles/noteEditor.css';
       });
     });
  
-    // Render emojis
     const emojisDiv = document.getElementById('fi-emojis')!;
     emojisDiv.innerHTML = EMOJIS_PRESET.map(em => `
       <button class="db-filtro-emoji-btn ${emojiSeleccionado===em?'activo':''}" data-emoji="${em}">${em}</button>
@@ -512,7 +556,6 @@ import '../styles/noteEditor.css';
       (document.getElementById('fi-nombre') as HTMLInputElement).value = f.nombre;
       colorSeleccionado = f.color;
       emojiSeleccionado = f.emoji;
-      // Actualizar activos visualmente
       coloresDiv.querySelectorAll<HTMLButtonElement>('.db-filtro-color-btn').forEach(b => {
         b.classList.toggle('activo', b.dataset.color === f.color);
       });
@@ -649,15 +692,25 @@ import '../styles/noteEditor.css';
     document.getElementById('wrapper-hora')?.classList.toggle('hidden', !(e.target as HTMLInputElement).checked);
   });
  
-  /* ── Editor de notas ── */
+  /* ════ EDITOR DE NOTAS ════ */
   function openEditorNota() {
+    editorMode = 'task';
     modalCreate.classList.remove('open');
     if (notaHtml)   neEditor.innerHTML = notaHtml;
     if (notaTitulo) neTitleInput.value  = notaTitulo;
     modalNota.classList.add('ne-open');
     setTimeout(() => neEditor.focus(), 150);
   }
-  function closeEditorNota() { modalNota.classList.remove('ne-open'); modalCreate.classList.add('open'); }
+
+  function closeEditorNota() {
+    modalNota.classList.remove('ne-open');
+    if (editorMode === 'task') {
+      modalCreate.classList.add('open');
+    }
+    editorMode = 'task';
+    notaSidebarEditandoId = null;
+  }
+
   function resetNota() {
     notaHtml = ''; notaTitulo = '';
     neEditor.innerHTML = ''; neTitleInput.value = '';
@@ -665,27 +718,87 @@ import '../styles/noteEditor.css';
     notaBadge.classList.remove('show');
     btnAgregarNota.style.display = '';
   }
+
   btnAgregarNota?.addEventListener('click', openEditorNota);
   document.getElementById('btn-editar-nota')?.addEventListener('click', openEditorNota);
   document.getElementById('ne-dot-close')?.addEventListener('click', closeEditorNota);
+
+  modalNota?.addEventListener('click', (e) => {
+    if (e.target === modalNota) closeEditorNota();
+  });
+
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modalNota.classList.contains('ne-open')) closeEditorNota();
   });
-  document.getElementById('ne-save-btn')?.addEventListener('click', () => {
+
+  /* ── Guardar nota ── */
+  document.getElementById('ne-save-btn')?.addEventListener('click', async () => {
     const html = neEditor.innerHTML.trim();
     if (!html) {
       neEditor.classList.add('ne-shake');
       neEditor.addEventListener('animationend', () => neEditor.classList.remove('ne-shake'), { once: true });
       return;
     }
+
+    if (editorMode === 'sidebar-edit' && notaSidebarEditandoId) {
+      try {
+        const r = await fetch('/api/noteEditor', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id_nota: notaSidebarEditandoId,
+            contenido: html,
+            nota_titulo: neTitleInput.value.trim() || 'Nota sin título'
+          })
+        });
+        const d = await r.json();
+        if (d.success) {
+          showNeToast('Nota guardada ✓', true);
+          await cargarTodasLasNotas();
+          setTimeout(() => closeEditorNota(), 700);
+        } else {
+          showNeToast('Error al guardar', false);
+        }
+      } catch {
+        showNeToast('Error al guardar', false);
+      }
+      return;
+    }
+
+    if (editorMode === 'sidebar-new') {
+      try {
+        const r = await fetch('/api/noteEditor', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nota_titulo: neTitleInput.value.trim() || 'Nota sin título',
+            contenido: html,
+          })
+        });
+        const d = await r.json();
+        if (d.success) {
+          showNeToast('Nota creada ✓', true);
+          await cargarTodasLasNotas();
+          actualizarBadgeNotas();
+          setTimeout(() => closeEditorNota(), 700);
+        } else {
+          showNeToast('Error al guardar', false);
+        }
+      } catch {
+        showNeToast('Error al guardar', false);
+      }
+      return;
+    }
+
     notaHtml   = html;
     notaTitulo = neTitleInput.value.trim() || 'Nota sin título';
     notaBadgeTitle.textContent = notaTitulo;
     notaBadge.classList.add('show');
     btnAgregarNota.style.display = 'none';
     showNeToast('Nota lista ✓', true);
-    setTimeout(closeEditorNota, 700);
+    setTimeout(() => closeEditorNota(), 700);
   });
+
   neEditor?.addEventListener('input', () => {
     const t = neEditor.innerText.trim();
     const c = t ? t.split(/\s+/).length : 0;
@@ -724,8 +837,24 @@ import '../styles/noteEditor.css';
     neToast.className = `ne-toast show ${ok ? 'ne-toast-ok' : 'ne-toast-err'}`;
     setTimeout(() => { neToast.className = 'ne-toast'; }, 2500);
   }
+
+  /* ════ BADGE CONTADOR NOTAS ════ */
+  async function actualizarBadgeNotas() {
+    try {
+      const res  = await fetch('/api/noteEditor');
+      const data = await res.json();
+      const badge = document.getElementById('notas-count-badge')!;
+      const count = data.success ? data.notas.length : 0;
+      if (count > 0) {
+        badge.textContent = String(count);
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch {}
+  }
  
-  /* ── Submit tarea ── */
+  /* ════ SUBMIT TAREA ════ */
   taskForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const submitBtn = taskForm.querySelector('button[type="submit"]') as HTMLButtonElement;
@@ -749,7 +878,9 @@ import '../styles/noteEditor.css';
       const res  = await fetch('/api/dashboard', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
       const data = await res.json();
       if (data.success) {
-        closeModalTarea(); taskForm.reset(); resetNota(); await load();
+        closeModalTarea(); taskForm.reset(); resetNota();
+        await load();
+        actualizarBadgeNotas();
         if (usaRecordatorio && horaInput) {
           const nuevaTarea: Tarea = { id: data.tarea.id_tarea, titulo: payload.titulo, descripcion: payload.descripcion, fecha: payload.fecha, hora: horaInput, prioridad: payload.prioridad, categoria: payload.categoria };
           programarRecordatorio(nuevaTarea, minutosAntes);
@@ -793,39 +924,100 @@ import '../styles/noteEditor.css';
         if (data.success) {
           const key = String(selectedTaskId);
           if (recordatoriosActivos.has(key)) { recordatoriosActivos.get(key)!.forEach(clearTimeout); recordatoriosActivos.delete(key); }
-          modalView.classList.remove('open'); await load();
+          modalView.classList.remove('open');
+          await load();
+          actualizarBadgeNotas();
         } else { alert(data.message || data.error || 'Error al eliminar la tarea'); }
       } catch (err) { console.error("Error al eliminar:", err); }
     }
   });
  
-  /* ── Lista de notas ── */
+  /* ════ MODAL TODAS LAS NOTAS ════ */
   async function cargarTodasLasNotas() {
     notasListaBody.innerHTML = '<p class="notas-loading">Cargando notas…</p>';
     try {
       const res  = await fetch('/api/noteEditor');
       const data = await res.json();
-      if (!data.success || !data.notas.length) { notasListaBody.innerHTML = '<p class="notas-empty">No hay notas guardadas aún.</p>'; return; }
+
+      // Actualizar badge
+      const badge = document.getElementById('notas-count-badge')!;
+      const count = data.success ? data.notas.length : 0;
+      badge.textContent = String(count);
+      badge.style.display = count > 0 ? 'inline-block' : 'none';
+
+      if (!data.success || !data.notas.length) {
+        notasListaBody.innerHTML = '<p class="notas-empty">No hay notas guardadas aún.</p>';
+        return;
+      }
       notasListaBody.innerHTML = data.notas.map((n: any) => {
         const fecha = n.fecha_creacion ? new Date(n.fecha_creacion).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}) : '';
+        const safeContent = encodeURIComponent(n.contenido ?? '');
+        const safeTitle   = encodeURIComponent(n.nota_titulo ?? '');
         return `<div class="nota-card">
-          <div class="nota-card-header"><span class="nota-card-title">${n.nota_titulo ?? 'Sin título'}</span><span class="nota-card-date">${fecha}</span></div>
+          <div class="nota-card-header">
+            <span class="nota-card-title">${n.nota_titulo ?? 'Sin título'}</span>
+            <span class="nota-card-date">${fecha}</span>
+          </div>
           ${n.tarea_titulo ? `<span class="nota-card-tarea">📌 ${n.tarea_titulo}</span>` : ''}
           <div class="nota-card-preview">${n.contenido ?? ''}</div>
-          <div class="nota-card-actions"><button class="nota-card-btn nota-card-btn--del" data-id="${n.id_nota}">Eliminar</button></div>
+          <div class="nota-card-actions">
+            <button class="nota-card-btn nota-card-btn--edit"
+              data-id="${n.id_nota}"
+              data-content="${safeContent}"
+              data-title="${safeTitle}">✏️ Editar</button>
+            <button class="nota-card-btn nota-card-btn--del" data-id="${n.id_nota}">🗑️ Eliminar</button>
+          </div>
         </div>`;
       }).join('');
+
+      // Editar desde modal notas
+      notasListaBody.querySelectorAll<HTMLButtonElement>('.nota-card-btn--edit').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id       = btn.dataset.id!;
+          const contenido = decodeURIComponent(btn.dataset.content!);
+          const titulo    = decodeURIComponent(btn.dataset.title!);
+          // Cerrar modal notas y abrir editor
+          modalNotasLista.classList.remove('open');
+          editorMode = 'sidebar-edit';
+          notaSidebarEditandoId = id;
+          neEditor.innerHTML  = contenido;
+          neTitleInput.value  = titulo;
+          neWords.textContent = '0 palabras';
+          modalNota.classList.add('ne-open');
+          setTimeout(() => neEditor.focus(), 150);
+        });
+      });
+
       notasListaBody.querySelectorAll<HTMLButtonElement>('.nota-card-btn--del').forEach(btn => {
         btn.addEventListener('click', async () => {
           if (!confirm('¿Eliminar esta nota?')) return;
           const r = await fetch('/api/noteEditor', { method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id_nota: btn.dataset.id }) });
-          if ((await r.json()).success) await cargarTodasLasNotas();
+          if ((await r.json()).success) { await cargarTodasLasNotas(); }
         });
       });
     } catch { notasListaBody.innerHTML = '<p class="notas-empty">Error al cargar notas.</p>'; }
   }
-  document.getElementById('btn-ver-notas')?.addEventListener('click', async () => { modalNotasLista.classList.add('open'); await cargarTodasLasNotas(); });
+
+  // Botón nueva nota desde modal notas
+  document.getElementById('btn-nueva-nota-modal')?.addEventListener('click', () => {
+    modalNotasLista.classList.remove('open');
+    editorMode = 'sidebar-new';
+    notaSidebarEditandoId = null;
+    neEditor.innerHTML = '';
+    neTitleInput.value = '';
+    neWords.textContent = '0 palabras';
+    modalNota.classList.add('ne-open');
+    setTimeout(() => neEditor.focus(), 150);
+  });
+
+  document.getElementById('btn-ver-notas')?.addEventListener('click', async () => {
+    modalNotasLista.classList.add('open');
+    await cargarTodasLasNotas();
+  });
   document.getElementById('notas-lista-close')?.addEventListener('click', () => { modalNotasLista.classList.remove('open'); });
+  modalNotasLista?.addEventListener('click', (e) => {
+    if (e.target === modalNotasLista) modalNotasLista.classList.remove('open');
+  });
  
   /* ── Load y render ── */
   async function load() {
@@ -986,6 +1178,6 @@ import '../styles/noteEditor.css';
   // ── INIT ──
   filtros = cargarFiltros();
   renderFiltros();
+  actualizarBadgeNotas();
   load();
 </script>
-<!-- FIN DEL ARCHIVO -->
