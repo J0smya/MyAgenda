@@ -1,20 +1,14 @@
 ---
-
+// src/components/noteEditor.astro
 import '../styles/noteEditor.css';
 ---
 
-<!-- ════════════════════════════════════════════════
-     MODAL EDITOR DE NOTAS
-     Se abre desde el botón "Agregar nota" dentro
-     del modal de crear tarea.
-════════════════════════════════════════════════ -->
 <div id="modal-nota" role="dialog" aria-modal="true" aria-labelledby="ne-modal-label">
   <div class="ne-box">
 
     <!-- ── Topbar ── -->
     <header class="ne-topbar">
       <div class="ne-topbar-left">
-        <!-- Dots macOS -->
         <div class="ne-dots">
           <button id="ne-dot-close" class="ne-dot ne-dot--red" title="Cerrar sin guardar"></button>
           <span class="ne-dot ne-dot--yellow"></span>
@@ -46,7 +40,6 @@ import '../styles/noteEditor.css';
     <!-- ── Cuerpo ── -->
     <div class="ne-body">
 
-      <!-- Sidebar herramientas -->
       <aside class="ne-sidebar">
 
         <div class="ne-tool-group">
@@ -111,7 +104,6 @@ import '../styles/noteEditor.css';
 
         <div class="ne-sep"></div>
 
-        <!-- Colores -->
         <div class="ne-tool-group">
           <span class="ne-color-label">Color</span>
           <button class="ne-color" data-color="#1f2937" style="background:#1f2937" title="Negro"></button>
@@ -138,9 +130,6 @@ import '../styles/noteEditor.css';
 
       <!-- Área de edición -->
       <div class="ne-edit-area">
-        <!-- Adjuntos para esta nota -->
-        <slot name="note-attachments" />
-
         <div class="ne-title-wrap">
           <input
             id="ne-title"
@@ -167,14 +156,30 @@ import '../styles/noteEditor.css';
 </div>
 
 <!-- ════════════════════════════════════════════════
-     MODAL VER TODAS LAS NOTAS
-     Botón flotante en la ventana principal.
+     MODAL VER / GESTIONAR TODAS LAS NOTAS
 ════════════════════════════════════════════════ -->
 <div id="modal-notas-lista" role="dialog" aria-modal="true">
   <div class="notas-lista-box">
     <div class="notas-lista-header">
-      <h2>📝 Todas las notas</h2>
-      <button id="notas-lista-close" class="notas-lista-close" title="Cerrar">✕</button>
+      <div class="notas-lista-header-left">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <h2>Notas</h2>
+      </div>
+      <div class="notas-lista-header-right">
+        <button id="btn-nueva-nota-modal" class="notas-lista-btn-nueva">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Nueva nota
+        </button>
+        <button id="notas-lista-close" class="notas-lista-close" title="Cerrar">✕</button>
+      </div>
     </div>
     <div id="notas-lista-body" class="notas-lista-body">
       <p class="notas-loading">Cargando notas…</p>

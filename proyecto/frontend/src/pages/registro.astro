@@ -362,7 +362,7 @@ import Layout from "../layouts/Layout.astro";
 
       const res = await fetch('/api/registro', { 
         method: 'POST', 
-        body: formData 
+        body: fd 
       });
 
       if (res.ok) {

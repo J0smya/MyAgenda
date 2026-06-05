@@ -13,6 +13,7 @@ export const GET: APIRoute = async ({ url }) => {
     if (idNota) {
       const r = await pool.query(
         `SELECT n.id_nota,
+                n.nota_titulo,
                 n.contenido,
                 n.fecha_creacion,
                 n.id_tarea,
@@ -28,6 +29,7 @@ export const GET: APIRoute = async ({ url }) => {
     } else if (idTarea) {
       const r = await pool.query(
         `SELECT n.id_nota,
+                n.nota_titulo,
                 n.contenido,
                 n.fecha_creacion,
                 n.id_tarea,
@@ -44,6 +46,7 @@ export const GET: APIRoute = async ({ url }) => {
     } else {
       const r = await pool.query(
         `SELECT n.id_nota,
+                n.nota_titulo,
                 n.contenido,
                 n.fecha_creacion,
                 n.id_tarea,
@@ -66,29 +69,27 @@ export const GET: APIRoute = async ({ url }) => {
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const body     = await parseBody(request);
-    const contenido = String(body.contenido ?? "").trim();
-    const idTarea   = String(body.id_tarea  ?? "").trim();
+    const body       = await parseBody(request);
+    const contenido  = String(body.contenido   ?? "").trim();
+    const idTarea    = String(body.id_tarea    ?? "").trim();
+    const notaTitulo = String(body.nota_titulo ?? "Nota sin título").trim();
 
     if (!contenido) return fail("El contenido no puede estar vacío", 400);
-    if (!idTarea)   return fail("id_tarea es obligatorio", 400);
 
-    // Verificar que la tarea existe
-    const check = await pool.query(
-      `SELECT id_tarea FROM tarea WHERE id_tarea = $1 LIMIT 1`,
-      [idTarea]
-    );
-    if (check.rowCount === 0) return fail("Tarea no encontrada", 404);
+    // Si se pasa id_tarea, verificar que exista
+    if (idTarea) {
+      const check = await pool.query(
+        `SELECT id_tarea FROM tarea WHERE id_tarea = $1 LIMIT 1`,
+        [idTarea]
+      );
+      if (check.rowCount === 0) return fail("Tarea no encontrada", 404);
+    }
 
-    // Insertar nota
-    // id_nota        → gen_random_uuid() generado en BD
-    // fecha_creacion → DEFAULT NOW() en BD
-    // deleted_at     → NULL por defecto
     const { rows } = await pool.query(
-      `INSERT INTO nota (id_nota, contenido, id_tarea)
-       VALUES (gen_random_uuid(), $1, $2)
-       RETURNING id_nota, contenido, fecha_creacion, id_tarea`,
-      [contenido, idTarea]
+      `INSERT INTO nota (id_nota, nota_titulo, contenido, id_tarea)
+       VALUES (gen_random_uuid(), $1, $2, $3)
+       RETURNING id_nota, nota_titulo, contenido, fecha_creacion, id_tarea`,
+      [notaTitulo, contenido, idTarea || null]
     );
 
     return ok({ nota: rows[0] }, 201);
@@ -98,11 +99,13 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
+
 export const PUT: APIRoute = async ({ request }) => {
   try {
-    const body      = await parseBody(request);
-    const idNota    = String(body.id_nota   ?? "").trim();
-    const contenido = String(body.contenido ?? "").trim();
+    const body       = await parseBody(request);
+    const idNota     = String(body.id_nota     ?? "").trim();
+    const contenido  = String(body.contenido   ?? "").trim();
+    const notaTitulo = String(body.nota_titulo ?? "").trim();
 
     if (!idNota)    return fail("id_nota es obligatorio", 400);
     if (!contenido) return fail("contenido es obligatorio", 400);
@@ -115,11 +118,12 @@ export const PUT: APIRoute = async ({ request }) => {
 
     const { rows } = await pool.query(
       `UPDATE nota
-       SET contenido = $1
-       WHERE id_nota = $2
+       SET contenido   = $1,
+           nota_titulo = CASE WHEN $2 <> '' THEN $2 ELSE nota_titulo END
+       WHERE id_nota = $3
          AND deleted_at IS NULL
-       RETURNING id_nota, contenido, fecha_creacion, id_tarea`,
-      [contenido, idNota]
+       RETURNING id_nota, nota_titulo, contenido, fecha_creacion, id_tarea`,
+      [contenido, notaTitulo, idNota]
     );
 
     return ok({ nota: rows[0] });
@@ -155,6 +159,8 @@ export const DELETE: APIRoute = async ({ request }) => {
   }
 };
 
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
 async function parseBody(request: Request): Promise<Record<string, any>> {
   const ct = request.headers.get("content-type") ?? "";
