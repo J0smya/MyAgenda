@@ -2,9 +2,11 @@
 // src/pages/dashboard.astro
 import Layout from "../layouts/Layout.astro";
 import NoteEditor from "../components/noteEditor.astro";
+import Perfil from "../pages/perfil.astro";
 import '../styles/tablero.css';
 import '../styles/noteEditor.css';
 ---
+
  
 <Layout title="MyAgenda Pro 2026">
 <div class="db-layout">
@@ -25,17 +27,25 @@ import '../styles/noteEditor.css';
     </div>
 
     <!-- BOTÓN NOTAS EN SIDEBAR -->
-    <div class="db-sidebar-notes-btn-wrap">
-      <button id="btn-ver-notas" class="db-sidebar-notes-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
-          <line x1="16" y1="13" x2="8" y2="13"/>
-          <line x1="16" y1="17" x2="8" y2="17"/>
-        </svg>
-        <span>Notas</span>
-        <span id="notas-count-badge" class="db-notes-count-badge" style="display:none"></span>
-      </button>
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px; width: 100%;">
+      
+      <div class="db-sidebar-notes-btn-wrap" style="padding: 0;">
+        <button id="btn-ver-notas" class="db-sidebar-notes-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          <span>Notas</span>
+          <span id="notas-count-badge" class="db-notes-count-badge" style="display:none"></span>
+        </button>
+      </div>
+
+      <div class="db-sidebar-perfil-wrap" style="width: 100%;">
+        <Perfil />
+      </div>
+
     </div>
   </aside>
  
@@ -65,9 +75,6 @@ import '../styles/noteEditor.css';
     <div class="db-view-container" id="view-container"></div>
   </main>
  
-  <button id="btn-extra-izquierdo" class="db-fab" title="Botón Izquierdo" style="position:fixed;bottom:20px;left:20px;right:auto;z-index:100;">
-    <span>⚙️</span>
-  </button>
   <button id="btn-ai-toggle" class="db-fab db-fab--ai" title="Asistente IA">
     <span>🤖</span>
   </button>
