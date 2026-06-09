@@ -626,23 +626,16 @@ import '../styles/noteEditor.css';
     if (!textoForzado) aiInput.value = '';
     btnAiSend.disabled = true;
 
-    // Acumular datos según estado (usamos texto original sin lowercase)
+    // Acumular datos según estado
     if (estadoChat.menu === 'crear_tarea_titulo') {
-      // Guardamos el título tal cual lo escribió el usuario
-      const tituloGuardado = textoForzado ?? (aiInput.value.trim() || texto);
-      datosAcumulados = { ...datosAcumulados, titulo: tituloGuardado };
+      datosAcumulados = { titulo: texto };
     } else if (estadoChat.menu === 'crear_tarea_prioridad') {
       let prioridad = 'media';
       if (texto.toLowerCase().includes('alta') || texto.includes('🔴')) prioridad = 'alta';
       else if (texto.toLowerCase().includes('baja') || texto.includes('🔵')) prioridad = 'baja';
-      // Mantenemos el título previo y añadimos prioridad
       datosAcumulados = { ...datosAcumulados, prioridad };
     } else if (estadoChat.menu === 'crear_nota_titulo') {
-      const tituloGuardado = textoForzado ?? (aiInput.value.trim() || texto);
-      datosAcumulados = { ...datosAcumulados, titulo: tituloGuardado };
-    } else if (estadoChat.menu === 'inicio') {
-      // Al volver al menú limpiamos
-      datosAcumulados = {};
+      datosAcumulados = { titulo: texto };
     }
 
     agregarMensajeChat('user', texto);
