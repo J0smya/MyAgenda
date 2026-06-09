@@ -22,10 +22,6 @@ import '../styles/noteEditor.css';
         <button id="btn-add-filtro" class="db-btn-add-filtro" title="Agregar filtro">+</button>
       </div>
       <div id="filtros-lista"></div>
-      <div class="db-filtros-footer">
-        <span>Total visible</span>
-        <span id="filtros-total-count" class="db-filtros-footer-count">0 tareas</span>
-      </div>
     </div>
 
     <!-- BOTÓN NOTAS EN SIDEBAR -->
@@ -80,10 +76,6 @@ import '../styles/noteEditor.css';
     <div class="db-view-container" id="view-container"></div>
   </main>
  
-  <button id="btn-extra-izquierdo" class="db-fab" title="Botón Izquierdo" style="position:fixed;bottom:20px;left:20px;right:auto;z-index:100;">
-    <span>⚙️</span>
-  </button>
-
   <!-- BOTÓN AI -->
   <button id="btn-ai-toggle" class="db-fab db-fab--ai" title="Asistente IA">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -333,7 +325,7 @@ import '../styles/noteEditor.css';
   <NoteEditor />
 </div>
 </Layout>
- 
+
 <script>
   interface Tarea {
     id: any; titulo: string; descripcion: string;
@@ -384,7 +376,6 @@ import '../styles/noteEditor.css';
     const lista = document.getElementById('filtros-lista')!;
     if (!filtros.length) {
       lista.innerHTML = '<p style="font-size:12px;color:#d1d5db;text-align:center;padding:8px 0;">Sin filtros</p>';
-      actualizarTotalVisible();
       return;
     }
     lista.innerHTML = filtros.map(f => `
@@ -400,7 +391,6 @@ import '../styles/noteEditor.css';
         </div>
       </div>
     `).join('');
- 
     lista.querySelectorAll<HTMLInputElement>('.db-filtro-check').forEach(chk => {
       chk.addEventListener('change', () => {
         const f = filtros.find(x => x.id === chk.dataset.id);
@@ -423,14 +413,6 @@ import '../styles/noteEditor.css';
       });
     });
     actualizarSelectCategoria();
-    actualizarTotalVisible();
-  }
-
-  function actualizarTotalVisible() {
-    const activosIds = filtros.filter(f => f.activo).map(f => f.id);
-    const total = allTasks.filter(t => activosIds.includes(t.categoria)).length;
-    const el = document.getElementById('filtros-total-count');
-    if (el) el.textContent = `${total} tarea${total !== 1 ? 's' : ''}`;
   }
 
   function actualizarSelectCategoria() {
@@ -1154,7 +1136,6 @@ import '../styles/noteEditor.css';
     if      (currentView === 'dia')    renderDia(filtered);
     else if (currentView === 'semana') renderSemana(filtered);
     else                               renderMes(filtered);
-    actualizarTotalVisible();
   }
   function getColorTarea(t: Tarea): string {
     const filtro = filtros.find(f => f.id === t.categoria);
