@@ -19,7 +19,6 @@ export const POST: APIRoute = async ({ request }) => {
       return json({ success: false, error: "id_tarea es obligatorio." }, 400);
     }
 
-    // Verificar que la tarea existe
     const check = await pool.query(
       `SELECT id_tarea FROM public.tarea WHERE id_tarea = $1 LIMIT 1`,
       [idTarea]
@@ -28,7 +27,6 @@ export const POST: APIRoute = async ({ request }) => {
       return json({ success: false, error: "Tarea no encontrada." }, 404);
     }
 
-    // Guardar archivo en /public/uploads/
     const uploadDir = join(process.cwd(), "public", "uploads");
     await mkdir(uploadDir, { recursive: true });
 
@@ -40,7 +38,6 @@ export const POST: APIRoute = async ({ request }) => {
 
     const rutaPublica = `/uploads/${fileName}`;
 
-    // Guardar en BD
     const { rows } = await pool.query(
       `INSERT INTO public.archivo (id_archivo, nombre, ruta_archivo, tipo, tamano, id_tarea)
        VALUES (gen_random_uuid(), $1, $2, $3, $4, $5)
@@ -58,7 +55,19 @@ export const POST: APIRoute = async ({ request }) => {
 export const GET: APIRoute = async ({ url }) => {
   try {
     const idTarea = url.searchParams.get("id_tarea");
-    if (!idTarea) return json({ success: false, error: "id_tarea requerido." }, 400);
+    const todos   = url.searchParams.get("todos");
+
+    // Si se pasa ?todos=1 devuelve todos los archivos no eliminados
+    if (todos === '1' || (!idTarea)) {
+      const { rows } = await pool.query(
+        `SELECT a.*, t.titulo AS tarea_titulo
+         FROM public.archivo a
+         LEFT JOIN public.tarea t ON t.id_tarea = a.id_tarea
+         WHERE a.deleted_at IS NULL
+         ORDER BY a.fecha_subida DESC`
+      );
+      return json({ success: true, archivos: rows });
+    }
 
     const { rows } = await pool.query(
       `SELECT * FROM public.archivo
