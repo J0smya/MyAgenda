@@ -22,6 +22,10 @@ import '../styles/noteEditor.css';
         <button id="btn-add-filtro" class="db-btn-add-filtro" title="Agregar filtro">+</button>
       </div>
       <div id="filtros-lista"></div>
+      <div class="db-filtros-footer">
+        <span>Total visible</span>
+        <span id="filtros-total-count" class="db-filtros-footer-count">0 tareas</span>
+      </div>
     </div>
 
     <!-- BOTÓN NOTAS EN SIDEBAR -->
@@ -341,48 +345,7 @@ import '../styles/noteEditor.css';
   padding: 0;
 }
 .db-btn-add-filtro:hover { background: #0ea5e9; border-color: #0ea5e9; color: #fff; }
- 
-.db-filtro-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px 10px; border-radius: 10px;
-  transition: background 0.15s; margin-bottom: 3px;
-  cursor: pointer; position: relative;
-}
-.db-filtro-item:hover { background: #f3f4f6; }
-.db-filtro-item:hover .db-filtro-acciones { opacity: 1; }
- 
-.db-filtro-check {
-  width: 18px; height: 18px; border-radius: 5px;
-  border: 2px solid; cursor: pointer; flex-shrink: 0;
-  appearance: none; transition: background 0.15s;
-  position: relative;
-}
-.db-filtro-check:checked::after {
-  content: '✓'; position: absolute; top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  color: #fff; font-size: 11px; font-weight: 700;
-}
- 
-.db-filtro-emoji { font-size: 15px; flex-shrink: 0; }
- 
-.db-filtro-nombre {
-  font-size: 13px; font-weight: 600; color: #374151;
-  flex: 1; min-width: 0; white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis;
-}
- 
-.db-filtro-acciones {
-  display: flex; gap: 2px; opacity: 0;
-  transition: opacity 0.15s; flex-shrink: 0;
-}
-.db-filtro-btn {
-  background: none; border: none; cursor: pointer;
-  padding: 3px 5px; border-radius: 6px; font-size: 12px;
-  color: #9ca3af; transition: background 0.15s, color 0.15s;
-}
-.db-filtro-btn:hover       { background: #e5e7eb; color: #374151; }
-.db-filtro-btn.del:hover   { background: #fee2e2; color: #ef4444; }
- 
+
 /* ════ MODAL FILTRO ════ */
 .db-filtro-modal-box {
   background: #fff; width: 100%; max-width: 400px;
@@ -468,21 +431,26 @@ import '../styles/noteEditor.css';
     const lista = document.getElementById('filtros-lista')!;
     if (!filtros.length) {
       lista.innerHTML = '<p style="font-size:12px;color:#d1d5db;text-align:center;padding:8px 0;">Sin filtros</p>';
+      actualizarTotalVisible();
       return;
     }
-    lista.innerHTML = filtros.map(f => `
-      <div class="db-filtro-item" data-id="${f.id}">
-        <input type="checkbox" class="db-filtro-check" ${f.activo ? 'checked' : ''}
-          style="border-color:${f.color};${f.activo ? `background:${f.color};` : ''}"
-          data-id="${f.id}">
-        <span class="db-filtro-emoji">${f.emoji}</span>
-        <span class="db-filtro-nombre">${f.nombre}</span>
-        <div class="db-filtro-acciones">
-          <button class="db-filtro-btn edit" data-id="${f.id}" title="Editar">✏️</button>
-          <button class="db-filtro-btn del"  data-id="${f.id}" title="Eliminar">🗑️</button>
+    lista.innerHTML = filtros.map(f => {
+      const count = allTasks.filter(t => t.categoria === f.id).length;
+      return `
+        <div class="db-filtro-item" data-id="${f.id}">
+          <input type="checkbox" class="db-filtro-check" ${f.activo ? 'checked' : ''}
+            style="border-color:${f.color};${f.activo ? `background:${f.color};` : ''}"
+            data-id="${f.id}">
+          <span class="db-filtro-emoji">${f.emoji}</span>
+          <span class="db-filtro-nombre">${f.nombre}</span>
+          <span class="db-filtro-count">${count}</span>
+          <div class="db-filtro-acciones">
+            <button class="db-filtro-btn edit" data-id="${f.id}" title="Editar">✏️ Editar</button>
+            <button class="db-filtro-btn del"  data-id="${f.id}" title="Eliminar">🗑️ Eliminar</button>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
  
     lista.querySelectorAll<HTMLInputElement>('.db-filtro-check').forEach(chk => {
       chk.addEventListener('change', () => {
@@ -506,6 +474,14 @@ import '../styles/noteEditor.css';
       });
     });
     actualizarSelectCategoria();
+    actualizarTotalVisible();
+  }
+
+  function actualizarTotalVisible() {
+    const activosIds = filtros.filter(f => f.activo).map(f => f.id);
+    const total = allTasks.filter(t => activosIds.includes(t.categoria)).length;
+    const el = document.getElementById('filtros-total-count');
+    if (el) el.textContent = `${total} tarea${total !== 1 ? 's' : ''}`;
   }
  
   function actualizarSelectCategoria() {
@@ -1044,6 +1020,7 @@ import '../styles/noteEditor.css';
     if      (currentView === 'dia')    renderDia(filtered);
     else if (currentView === 'semana') renderSemana(filtered);
     else                               renderMes(filtered);
+    actualizarTotalVisible();
   }
  
   function getColorTarea(t: Tarea): string {
