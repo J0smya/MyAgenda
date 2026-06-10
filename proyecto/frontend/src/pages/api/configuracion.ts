@@ -2,19 +2,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── 1. PREFERENCIAS ──────────────────────────────────────────
   const selectVista  = document.getElementById('select-vista')  as HTMLSelectElement;
-  const selectHora   = document.getElementById('select-hora')   as HTMLSelectElement;
   const selectAviso  = document.getElementById('select-aviso')  as HTMLSelectElement;
   const checkSonido  = document.getElementById('check-sonido')  as HTMLInputElement;
 
   if (localStorage.getItem('conf_vista'))  selectVista.value   = localStorage.getItem('conf_vista')!;
-  if (localStorage.getItem('conf_hora'))   selectHora.value    = localStorage.getItem('conf_hora')!;
   if (localStorage.getItem('conf_aviso'))  selectAviso.value   = localStorage.getItem('conf_aviso')!;
   if (localStorage.getItem('conf_sonido')) checkSonido.checked = localStorage.getItem('conf_sonido') === 'true';
 
-  selectVista?.addEventListener('change',  (e) => localStorage.setItem('conf_vista',  (e.target as HTMLSelectElement).value));
-  selectHora?.addEventListener('change',   (e) => localStorage.setItem('conf_hora',   (e.target as HTMLSelectElement).value));
-  selectAviso?.addEventListener('change',  (e) => localStorage.setItem('conf_aviso',  (e.target as HTMLSelectElement).value));
-  checkSonido?.addEventListener('change',  (e) => localStorage.setItem('conf_sonido', (e.target as HTMLInputElement).checked.toString()));
+  // 🔴 AQUÍ ESTÁ EL CAMBIO CLAVE: Agregamos el dispatchEvent al cambiar la vista
+  selectVista?.addEventListener('change',  (e) => {
+    localStorage.setItem('conf_vista',  (e.target as HTMLSelectElement).value);
+    // Avisamos al resto de la aplicación (al dashboard) que la configuración cambió
+    window.dispatchEvent(new Event('configuracionActualizada'));
+  });
+
+  selectAviso?.addEventListener('change',  (e) => {
+    localStorage.setItem('conf_aviso',  (e.target as HTMLSelectElement).value);
+    window.dispatchEvent(new Event('configuracionActualizada'));
+  });
+
+  checkSonido?.addEventListener('change',  (e) => {
+    localStorage.setItem('conf_sonido', (e.target as HTMLInputElement).checked.toString());
+  });
 
   // ── 2. EDITAR PERFIL ─────────────────────────────────────────
   const avatarPreview  = document.getElementById('avatar-preview-circulo') as HTMLElement;
@@ -39,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (inputNombre && nombreGuardado) inputNombre.value = nombreGuardado;
 
-  // Validación en tiempo real
   inputNombre?.addEventListener('input', () => {
     const val = inputNombre.value.trim();
     if (val.length === 0) {
@@ -71,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnGuardar = document.getElementById('btn-guardar-config');
   btnGuardar?.addEventListener('click', () => {
     const nuevoNombre = inputNombre?.value.trim();
-
     if (!nuevoNombre || nuevoNombre.length === 0) {
       inputNombre.classList.add('error');
       errorNombre.classList.add('visible');
@@ -79,9 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
       mostrarToast('Nombre requerido', 'El nombre debe tener al menos 1 carácter.', true);
       return;
     }
-
     localStorage.setItem('perfil_nombre', nuevoNombre);
-
     const archivo = inputFoto?.files?.[0];
     if (archivo) {
       const reader = new FileReader();
@@ -118,9 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mostrarConfirm(
       'Eliminar tareas completadas',
       'Esta acción eliminará permanentemente todas tus tareas completadas. No se puede deshacer.',
-      () => {
-        mostrarToast('Tareas eliminadas', 'Todas las tareas completadas han sido removidas.');
-      }
+      () => { mostrarToast('Tareas eliminadas', 'Todas las tareas completadas han sido removidas.'); }
     );
   });
 
@@ -136,11 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function mostrarToast(titulo: string, subtitulo: string, esError = false) {
     const toast = document.createElement('div');
     toast.className = `config-toast${esError ? ' config-toast--error' : ''}`;
-
     const iconSvg = esError
       ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
       : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-
     toast.innerHTML = `
       <div class="config-toast-icon">${iconSvg}</div>
       <div class="config-toast-body">
@@ -149,7 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
       <button class="config-toast-close" title="Cerrar">✕</button>
     `;
-
     toast.querySelector('.config-toast-close')?.addEventListener('click', () => cerrarToast(toast));
     toast.addEventListener('click', () => cerrarToast(toast));
     toastContainer.appendChild(toast);
@@ -170,8 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="config-confirm-icon">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-            <path d="M10 11v6"/><path d="M14 11v6"/>
-            <path d="M9 6V4h6v2"/>
+            <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
           </svg>
         </div>
         <div class="config-confirm-title">${titulo}</div>
@@ -182,12 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>
     `;
-
     overlay.querySelector('.config-confirm-cancel')?.addEventListener('click', () => overlay.remove());
-    overlay.querySelector('.config-confirm-ok')?.addEventListener('click', () => {
-      overlay.remove();
-      onConfirm();
-    });
+    overlay.querySelector('.config-confirm-ok')?.addEventListener('click', () => { overlay.remove(); onConfirm(); });
     overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
     document.body.appendChild(overlay);
   }
