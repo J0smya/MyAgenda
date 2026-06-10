@@ -64,3 +64,135 @@ button {
   font-family: inherit;
   cursor: pointer;
 }
+
+/* =========================================
+   🌙 MODO OSCURO (DARK MODE)
+========================================= */
+
+body.dark-mode,
+body.dark-mode .db-layout,
+body.dark-mode .db-main,
+body.dark-mode .config-wrapper {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .db-sidebar,
+body.dark-mode .perfil-menu,
+body.dark-mode .perfil-modal-box,
+body.dark-mode .config-card {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .db-header,
+body.dark-mode .card-header {
+    background-color: #0f172a !important;
+    border-bottom: 1px solid #334155 !important;
+}
+
+body.dark-mode .db-date-title,
+body.dark-mode .nombre-usuario,
+body.dark-mode .perfil-modal-title,
+body.dark-mode .config-title,
+body.dark-mode .card-header h2,
+body.dark-mode .config-subtitle {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .perfil-input,
+body.dark-mode .config-input {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .item-menu {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .item-menu:hover {
+    background-color: #334155 !important;
+    color: #38bdf8 !important;
+}
+
+body.dark-mode .separador,
+body.dark-mode .config-divider {
+    background-color: #334155 !important;
+}
+
+/* =========================================
+   🛠️ CORRECCIÓN DE ICONOS LATERALES (Notas, Archivos, Filtros)
+========================================= */
+
+/* Aplica texto blanco y fondo oscuro SOLO cuando NO tienes el cursor encima */
+body.dark-mode .db-sidebar button:not(:hover),
+body.dark-mode .btn-estilo-notas:not(:hover) {
+    color: #f8fafc !important; /* Vuelve blancos el texto y los logos */
+    background-color: transparent !important; /* Quita el fondo blanco para que se fusione elegante con la barra */
+    border-color: #334155 !important; /* Borde sutil oscuro */
+}
+
+/* Asegura que los íconos SVG sigan la regla del color blanco */
+body.dark-mode .db-sidebar button svg,
+body.dark-mode .btn-estilo-notas svg {
+    stroke: currentColor;
+}
+
+/* =========================================
+   ANIMACIONES Y COLORES DE BOTONES LATERALES
+========================================= */
+
+/* 1. Obligamos a todos los logos (SVG) a copiar el color del texto siempre */
+.db-sidebar svg,
+.btn-estilo-notas svg {
+    stroke: currentColor !important;
+}
+
+/* 2. ESTADO DE REPOSO EN MODO OSCURO (Fondo transparente, texto blanco) */
+body.dark-mode .db-sidebar-notes-btn,
+body.dark-mode .btn-estilo-notas,
+body.dark-mode [class*="archivo"],
+body.dark-mode [id*="archivo"] {
+    background-color: transparent !important;
+    color: #f1f5f9 !important; /* Texto y logo se vuelven blancos limpios */
+    border: 1px solid #334155 !important;
+    transition: all 0.3s ease !important; /* Añade la animación suave a todos */
+}
+
+/* 3. EFECTOS HOVER EN MODO OSCURO (Iluminación) */
+
+/* Notas -> Iluminación Verde */
+body.dark-mode .db-sidebar-notes-btn:hover {
+    background-color: rgba(34, 197, 94, 0.15) !important;
+    color: #4ade80 !important; /* El texto y el logo cambian a verde juntos */
+    border-color: rgba(34, 197, 94, 0.4) !important;
+}
+
+/* Archivos -> Iluminación Morada */
+body.dark-mode [class*="archivo"]:hover,
+body.dark-mode [id*="archivo"]:hover {
+    background-color: rgba(168, 85, 247, 0.15) !important;
+    color: #c084fc !important; /* El texto y el logo cambian a morado juntos */
+    border-color: rgba(168, 85, 247, 0.4) !important;
+}
+
+/* Perfil -> Iluminación Azul (Para que tenga el mismo efecto que los otros) */
+body.dark-mode .btn-estilo-notas:hover {
+    background-color: rgba(14, 165, 233, 0.15) !important;
+    color: #38bdf8 !important; /* El texto y el logo cambian a azul juntos */
+    border-color: rgba(14, 165, 233, 0.4) !important;
+}
+
+/* =========================================
+   CORRECCIÓN DE LOS FILTROS (Trabajo / Personal)
+========================================= */
+/* Quita el cuadro blanco sólido en modo oscuro */
+body.dark-mode .db-sidebar div[class*="item"],
+body.dark-mode .db-sidebar li,
+body.dark-mode .db-sidebar .filtro-btn {
+    background-color: transparent !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+}
