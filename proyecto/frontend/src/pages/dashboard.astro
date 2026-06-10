@@ -41,6 +41,17 @@ import '../styles/noteEditor.css';
         <span id="notas-count-badge" class="db-notes-count-badge" style="display:none"></span>
       </button>
     </div>
+
+    <!-- BOTÓN ARCHIVOS EN SIDEBAR -->
+    <div class="db-sidebar-notes-btn-wrap">
+      <button id="btn-ver-archivos" class="db-sidebar-archivos-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span>Archivos</span>
+        <span id="archivos-count-badge" class="db-archivos-count-badge" style="display:none"></span>
+      </button>
+    </div>
   </aside>
  
   <main class="db-main">
@@ -72,14 +83,53 @@ import '../styles/noteEditor.css';
   <button id="btn-extra-izquierdo" class="db-fab" title="Botón Izquierdo" style="position:fixed;bottom:20px;left:20px;right:auto;z-index:100;">
     <span>⚙️</span>
   </button>
+
+  <!-- BOTÓN AI -->
   <button id="btn-ai-toggle" class="db-fab db-fab--ai" title="Asistente IA">
-    <span>🤖</span>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
+      <circle cx="9" cy="13" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="15" cy="13" r="1" fill="currentColor" stroke="none"/>
+    </svg>
   </button>
+
+  <!-- VENTANA CHAT AI -->
   <div id="ai-window" class="db-ai-window hidden">
-    <div class="db-ai-header">Asistente IA</div>
-    <div class="db-ai-body">¿En qué puedo ayudarte?</div>
+    <div class="db-ai-header">
+      <div class="db-ai-header-info">
+        <div class="db-ai-avatar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="db-ai-name">Aria</div>
+          <div class="db-ai-status">
+            <span class="db-ai-dot"></span>
+            Asistente IA
+          </div>
+        </div>
+      </div>
+      <button id="btn-ai-close" class="db-ai-close" title="Cerrar">✕</button>
+    </div>
+    <div class="db-ai-body" id="ai-mensajes">
+      <div class="db-ai-msg db-ai-msg--bot">
+        <div class="db-ai-msg-bubble">
+          👋 ¡Hola! Soy <strong>Aria</strong>, tu asistente. Puedo consultar tus tareas, notas y archivos, y también <strong>crear tareas o notas</strong> por ti. ¿En qué te ayudo?
+        </div>
+      </div>
+    </div>
+    <div id="ai-typing" class="db-ai-typing hidden">
+      <span></span><span></span><span></span>
+    </div>
     <div class="db-ai-footer">
-      <input type="text" class="db-ai-input" placeholder="Escribe aquí…">
+      <input type="text" id="ai-input" class="db-ai-input" placeholder="Escribe aquí… (Enter para enviar)" maxlength="500">
+      <button id="btn-ai-send" class="db-ai-send-btn" title="Enviar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
     </div>
   </div>
  
@@ -102,22 +152,19 @@ import '../styles/noteEditor.css';
               <option value="personal">🏠 Personal</option>
             </select>
           </div>
-          <!-- FECHA -->
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">📅 Fecha</label>
-            <input type="date" id="t-fecha" class="db-input">
-          </div>
-          <!-- HORA -->
-          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-            <label class="db-hora-toggle">
-              <input type="checkbox" id="t-usa-hora">
-              <span>¿Asignar hora?</span>
-            </label>
-            <div id="wrapper-hora" class="hidden">
-              <input type="time" id="t-hora-inicio" class="db-input" style="text-align:center;max-width:160px;">
+
+          <!-- FECHA Y HORA en la misma fila -->
+          <div class="grid-2" style="align-items:end;">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">📅 Fecha</label>
+              <input type="date" id="t-fecha" class="db-input">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">🕐 Hora</label>
+              <input type="time" id="t-hora-inicio" class="db-input" style="text-align:center;">
             </div>
           </div>
-          <!-- RECORDATORIO -->
+
           <div style="display:flex;flex-direction:column;gap:8px;padding:12px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;">
             <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#374151;cursor:pointer;">
               <input type="checkbox" id="t-usa-recordatorio" style="width:16px;height:16px;">
@@ -206,7 +253,7 @@ import '../styles/noteEditor.css';
     </div>
   </div>
  
-  <!-- MODAL FILTRO (nuevo/editar) -->
+  <!-- MODAL FILTRO -->
   <div id="modal-filtro" class="db-modal-backdrop" style="z-index:230;">
     <div class="db-filtro-modal-box">
       <h3 class="db-modal-title" id="filtro-modal-titulo">Nuevo filtro</h3>
@@ -234,6 +281,51 @@ import '../styles/noteEditor.css';
       </div>
     </div>
   </div>
+
+  <!-- MODAL ARCHIVOS -->
+  <div id="modal-archivos-lista" class="db-modal-backdrop" style="z-index:245;">
+    <div class="archivos-lista-box">
+      <div class="archivos-lista-header">
+        <div class="archivos-lista-header-left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
+          <h2>Archivos</h2>
+        </div>
+        <button id="archivos-lista-close" class="archivos-lista-close" title="Cerrar">✕</button>
+      </div>
+      <div class="archivos-upload-zone" id="archivos-upload-zone">
+        <div class="archivos-upload-inner">
+          <div class="archivos-upload-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 16 12 12 8 16"/>
+              <line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+            </svg>
+          </div>
+          <p class="archivos-upload-title">Subir archivo</p>
+          <p class="archivos-upload-sub">Selecciona o arrastra un archivo aquí</p>
+          <label class="archivos-upload-btn">
+            <input type="file" id="archivo-input" style="display:none" multiple>
+            Seleccionar archivo
+          </label>
+        </div>
+        <div class="archivos-tarea-sel-wrap">
+          <label class="archivos-tarea-sel-label">Asociar a tarea (opcional)</label>
+          <select id="archivo-tarea-select" class="db-select" style="font-size:12px;">
+            <option value="">— Sin tarea —</option>
+          </select>
+        </div>
+        <div id="archivos-upload-progress" class="archivos-upload-progress hidden">
+          <div class="archivos-progress-bar"><div id="archivos-progress-fill" class="archivos-progress-fill"></div></div>
+          <span id="archivos-progress-text" class="archivos-progress-text">Subiendo…</span>
+        </div>
+      </div>
+      <div id="archivos-lista-body" class="archivos-lista-body">
+        <p class="archivos-loading">Cargando archivos…</p>
+      </div>
+    </div>
+  </div>
  
   <!-- Contenedor toasts -->
   <div id="toast-container"></div>
@@ -241,146 +333,6 @@ import '../styles/noteEditor.css';
   <NoteEditor />
 </div>
 </Layout>
- 
-<style>
-/* ════ TOAST CONTAINER ════ */
-#toast-container {
-  position: fixed; bottom: 24px; right: 24px;
-  z-index: 9999; display: flex; flex-direction: column;
-  gap: 10px; pointer-events: none;
-}
-.toast-notif {
-  pointer-events: all; display: flex; align-items: flex-start;
-  gap: 14px; background: #ffffff; padding: 16px 18px;
-  border-radius: 16px; min-width: 300px; max-width: 360px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08);
-  border-top: 4px solid #6366f1;
-  animation: toast-in 0.4s cubic-bezier(.21,1.02,.73,1) forwards;
-  cursor: pointer; position: relative; overflow: hidden;
-}
-.toast-notif::after {
-  content: ''; position: absolute; bottom: 0; left: 0;
-  height: 3px; width: 100%; background: #6366f1;
-  animation: toast-progress 6s linear forwards;
-  border-radius: 0 0 16px 16px;
-}
-.toast-notif.toast-ahora        { border-top-color: #ef4444; }
-.toast-notif.toast-ahora::after { background: #ef4444; }
-.toast-notif.toast-antes        { border-top-color: #f59e0b; }
-.toast-notif.toast-antes::after { background: #f59e0b; }
-.toast-notif.toast-out          { animation: toast-out 0.3s ease forwards; }
-.toast-icon-wrap {
-  width: 40px; height: 40px; border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; flex-shrink: 0;
-}
-.toast-notif.toast-ahora .toast-icon-wrap { background: #fee2e2; }
-.toast-notif.toast-antes .toast-icon-wrap { background: #fef3c7; }
-.toast-body  { flex: 1; min-width: 0; }
-.toast-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 3px; }
-.toast-title { font-size: 14px; font-weight: 700; color: #0f172a; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.toast-sub   { font-size: 12px; color: #64748b; margin-top: 3px; display: flex; align-items: center; gap: 4px; }
-.toast-close { background: none; border: none; color: #cbd5e1; font-size: 14px; cursor: pointer; padding: 2px; line-height: 1; flex-shrink: 0; border-radius: 6px; transition: background 0.15s, color 0.15s; }
-.toast-close:hover { background: #f1f5f9; color: #475569; }
-@keyframes toast-in    { from { opacity:0; transform:translateX(60px) scale(0.95); } to { opacity:1; transform:translateX(0) scale(1); } }
-@keyframes toast-out   { from { opacity:1; transform:translateX(0) scale(1); } to { opacity:0; transform:translateX(60px) scale(0.95); } }
-@keyframes toast-progress { from { width:100%; } to { width:0%; } }
-
-/* ════ BOTÓN NOTAS SIDEBAR ════ */
-.db-sidebar-notes-btn-wrap {
-  padding: 0 0 8px 0;
-}
-.db-sidebar-notes-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #f0f9ff;
-  border: 1.5px solid #bae6fd;
-  border-radius: 12px;
-  padding: 12px 14px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 700;
-  color: #0284c7;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-  font-family: inherit;
-  position: relative;
-}
-.db-sidebar-notes-btn:hover {
-  background: #e0f2fe;
-  border-color: #7dd3fc;
-  color: #0369a1;
-}
-.db-sidebar-notes-btn span:first-of-type {
-  flex: 1;
-  text-align: left;
-}
-.db-notes-count-badge {
-  background: #0ea5e9;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 800;
-  border-radius: 999px;
-  padding: 2px 7px;
-  min-width: 20px;
-  text-align: center;
-}
-
-/* ════ FILTROS SIDEBAR ════ */
-.db-filters-header {
-  display: flex; align-items: center;
-  justify-content: space-between; margin-bottom: 14px;
-}
-.db-filters-header h3 {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.12em; color: #9ca3af; margin-bottom: 0;
-}
-.db-btn-add-filtro {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: #f3f4f6; border: 1.5px solid #e5e7eb;
-  color: #6b7280; font-size: 16px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  line-height: 1; transition: background 0.15s, border-color 0.15s, color 0.15s;
-  padding: 0;
-}
-.db-btn-add-filtro:hover { background: #0ea5e9; border-color: #0ea5e9; color: #fff; }
-
-/* ════ MODAL FILTRO ════ */
-.db-filtro-modal-box {
-  background: #fff; width: 100%; max-width: 400px;
-  border-radius: 24px; padding: 32px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.18);
-  animation: modal-in 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
-}
-.db-filtro-label-text {
-  font-size: 11px; font-weight: 700; color: #6b7280;
-  text-transform: uppercase; letter-spacing: 0.06em;
-}
-.db-filtro-colores {
-  display: flex; flex-wrap: wrap; gap: 8px;
-}
-.db-filtro-color-btn {
-  width: 30px; height: 30px; border-radius: 50%;
-  border: 3px solid transparent; cursor: pointer;
-  transition: transform 0.15s, border-color 0.15s;
-}
-.db-filtro-color-btn:hover  { transform: scale(1.15); }
-.db-filtro-color-btn.activo { border-color: #111827; transform: scale(1.1); }
- 
-.db-filtro-emojis {
-  display: flex; flex-wrap: wrap; gap: 6px;
-}
-.db-filtro-emoji-btn {
-  width: 36px; height: 36px; border-radius: 10px;
-  border: 2px solid #e5e7eb; background: #f9fafb;
-  font-size: 18px; cursor: pointer; display: flex;
-  align-items: center; justify-content: center;
-  transition: border-color 0.15s, background 0.15s;
-}
-.db-filtro-emoji-btn:hover  { border-color: #0ea5e9; background: #f0f9ff; }
-.db-filtro-emoji-btn.activo { border-color: #0ea5e9; background: #e0f2fe; }
-</style>
  
 <script>
   interface Tarea {
@@ -391,7 +343,7 @@ import '../styles/noteEditor.css';
     id: string; nombre: string; color: string;
     emoji: string; activo: boolean;
   }
- 
+
   let allTasks:    Tarea[]              = [];
   let currentView: 'dia'|'semana'|'mes' = 'dia';
   let viewDate     = new Date();
@@ -401,17 +353,21 @@ import '../styles/noteEditor.css';
   let editorMode: 'task' | 'sidebar-edit' | 'sidebar-new' = 'task';
   let notaSidebarEditandoId: string | null = null;
   const recordatoriosActivos = new Map<string, ReturnType<typeof setTimeout>[]>();
- 
-  // ── Filtros ──
+
   const FILTROS_KEY = 'myagenda_filtros';
   let filtros: Filtro[] = [];
   let filtroEditandoId: string | null = null;
   let colorSeleccionado = '#0ea5e9';
   let emojiSeleccionado = '💼';
- 
+
   const COLORES_PRESET = ['#0ea5e9','#6366f1','#f59e0b','#ef4444','#10b981','#8b5cf6','#f97316','#ec4899','#14b8a6','#64748b'];
   const EMOJIS_PRESET  = ['💼','🏠','🎯','📚','💪','🎨','🛒','✈️','🎮','💡','🔥','⭐','🌱','🏋️','🎵'];
- 
+
+  // ── Estado del chatbot ──
+  let estadoChat: { menu: string; datos?: Record<string, any> } = { menu: 'inicio' };
+  let datosAcumulados: Record<string, any> = {};
+  let aiEnviando = false;
+
   function cargarFiltros(): Filtro[] {
     try {
       const raw = localStorage.getItem(FILTROS_KEY);
@@ -422,11 +378,8 @@ import '../styles/noteEditor.css';
       { id: 'personal', nombre: 'Personal', color: '#10b981', emoji: '🏠', activo: true },
     ];
   }
- 
-  function guardarFiltros() {
-    localStorage.setItem(FILTROS_KEY, JSON.stringify(filtros));
-  }
- 
+  function guardarFiltros() { localStorage.setItem(FILTROS_KEY, JSON.stringify(filtros)); }
+
   function renderFiltros() {
     const lista = document.getElementById('filtros-lista')!;
     if (!filtros.length) {
@@ -434,23 +387,19 @@ import '../styles/noteEditor.css';
       actualizarTotalVisible();
       return;
     }
-    lista.innerHTML = filtros.map(f => {
-      const count = allTasks.filter(t => t.categoria === f.id).length;
-      return `
-        <div class="db-filtro-item" data-id="${f.id}">
-          <input type="checkbox" class="db-filtro-check" ${f.activo ? 'checked' : ''}
-            style="border-color:${f.color};${f.activo ? `background:${f.color};` : ''}"
-            data-id="${f.id}">
-          <span class="db-filtro-emoji">${f.emoji}</span>
-          <span class="db-filtro-nombre">${f.nombre}</span>
-          <span class="db-filtro-count">${count}</span>
-          <div class="db-filtro-acciones">
-            <button class="db-filtro-btn edit" data-id="${f.id}" title="Editar">✏️ Editar</button>
-            <button class="db-filtro-btn del"  data-id="${f.id}" title="Eliminar">🗑️ Eliminar</button>
-          </div>
+    lista.innerHTML = filtros.map(f => `
+      <div class="db-filtro-item" data-id="${f.id}">
+        <input type="checkbox" class="db-filtro-check" ${f.activo ? 'checked' : ''}
+          style="border-color:${f.color};${f.activo ? `background:${f.color};` : ''}"
+          data-id="${f.id}">
+        <span class="db-filtro-emoji">${f.emoji}</span>
+        <span class="db-filtro-nombre">${f.nombre}</span>
+        <div class="db-filtro-acciones">
+          <button class="db-filtro-btn edit" data-id="${f.id}" title="Editar">✏️</button>
+          <button class="db-filtro-btn del"  data-id="${f.id}" title="Eliminar">🗑️</button>
         </div>
-      `;
-    }).join('');
+      </div>
+    `).join('');
  
     lista.querySelectorAll<HTMLInputElement>('.db-filtro-check').forEach(chk => {
       chk.addEventListener('change', () => {
@@ -483,22 +432,19 @@ import '../styles/noteEditor.css';
     const el = document.getElementById('filtros-total-count');
     if (el) el.textContent = `${total} tarea${total !== 1 ? 's' : ''}`;
   }
- 
+
   function actualizarSelectCategoria() {
     const sel = document.getElementById('t-cat') as HTMLSelectElement;
     if (!sel) return;
     const val = sel.value;
-    sel.innerHTML = filtros.map(f =>
-      `<option value="${f.id}">${f.emoji} ${f.nombre}</option>`
-    ).join('');
+    sel.innerHTML = filtros.map(f => `<option value="${f.id}">${f.emoji} ${f.nombre}</option>`).join('');
     if (filtros.find(f => f.id === val)) sel.value = val;
   }
- 
+
   function abrirModalFiltro(id?: string) {
     filtroEditandoId = id || null;
     const modal = document.getElementById('modal-filtro')!;
     const titulo = document.getElementById('filtro-modal-titulo')!;
- 
     const coloresDiv = document.getElementById('fi-colores')!;
     coloresDiv.innerHTML = COLORES_PRESET.map(c => `
       <button class="db-filtro-color-btn ${colorSeleccionado===c?'activo':''}"
@@ -512,7 +458,6 @@ import '../styles/noteEditor.css';
         (document.getElementById('fi-color-custom') as HTMLInputElement).value = colorSeleccionado;
       });
     });
- 
     const emojisDiv = document.getElementById('fi-emojis')!;
     emojisDiv.innerHTML = EMOJIS_PRESET.map(em => `
       <button class="db-filtro-emoji-btn ${emojiSeleccionado===em?'activo':''}" data-emoji="${em}">${em}</button>
@@ -524,46 +469,30 @@ import '../styles/noteEditor.css';
         btn.classList.add('activo');
       });
     });
- 
     if (id) {
       const f = filtros.find(x => x.id === id);
       if (!f) return;
       titulo.textContent = 'Editar filtro';
       (document.getElementById('fi-nombre') as HTMLInputElement).value = f.nombre;
-      colorSeleccionado = f.color;
-      emojiSeleccionado = f.emoji;
-      coloresDiv.querySelectorAll<HTMLButtonElement>('.db-filtro-color-btn').forEach(b => {
-        b.classList.toggle('activo', b.dataset.color === f.color);
-      });
+      colorSeleccionado = f.color; emojiSeleccionado = f.emoji;
+      coloresDiv.querySelectorAll<HTMLButtonElement>('.db-filtro-color-btn').forEach(b => b.classList.toggle('activo', b.dataset.color === f.color));
       (document.getElementById('fi-color-custom') as HTMLInputElement).value = f.color;
-      emojisDiv.querySelectorAll<HTMLButtonElement>('.db-filtro-emoji-btn').forEach(b => {
-        b.classList.toggle('activo', b.dataset.emoji === f.emoji);
-      });
+      emojisDiv.querySelectorAll<HTMLButtonElement>('.db-filtro-emoji-btn').forEach(b => b.classList.toggle('activo', b.dataset.emoji === f.emoji));
     } else {
       titulo.textContent = 'Nuevo filtro';
       (document.getElementById('fi-nombre') as HTMLInputElement).value = '';
-      colorSeleccionado = '#0ea5e9';
-      emojiSeleccionado = '💼';
+      colorSeleccionado = '#0ea5e9'; emojiSeleccionado = '💼';
     }
     modal.classList.add('open');
   }
- 
-  function cerrarModalFiltro() {
-    document.getElementById('modal-filtro')!.classList.remove('open');
-    filtroEditandoId = null;
-  }
- 
+  function cerrarModalFiltro() { document.getElementById('modal-filtro')!.classList.remove('open'); filtroEditandoId = null; }
   document.getElementById('btn-add-filtro')?.addEventListener('click', () => abrirModalFiltro());
   document.getElementById('fi-cancelar')?.addEventListener('click', cerrarModalFiltro);
-  document.getElementById('modal-filtro')?.addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) cerrarModalFiltro();
-  });
- 
+  document.getElementById('modal-filtro')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) cerrarModalFiltro(); });
   document.getElementById('fi-color-custom')?.addEventListener('input', (e) => {
     colorSeleccionado = (e.target as HTMLInputElement).value;
     document.querySelectorAll('.db-filtro-color-btn').forEach(b => b.classList.remove('activo'));
   });
- 
   document.getElementById('fi-guardar')?.addEventListener('click', () => {
     const nombre = (document.getElementById('fi-nombre') as HTMLInputElement).value.trim();
     if (!nombre) { alert('Ingresa un nombre para el filtro.'); return; }
@@ -575,7 +504,7 @@ import '../styles/noteEditor.css';
     }
     guardarFiltros(); renderFiltros(); render(); cerrarModalFiltro();
   });
- 
+
   // ── DOM ──
   const container      = document.getElementById('view-container')   as HTMLDivElement;
   const hTitle         = document.getElementById('header-title')     as HTMLElement;
@@ -594,7 +523,9 @@ import '../styles/noteEditor.css';
   const modalNotasLista= document.getElementById('modal-notas-lista')as HTMLDivElement;
   const notasListaBody = document.getElementById('notas-lista-body') as HTMLDivElement;
   const toastContainer = document.getElementById('toast-container')  as HTMLDivElement;
- 
+  const modalArchivos  = document.getElementById('modal-archivos-lista') as HTMLDivElement;
+  const archivosBody   = document.getElementById('archivos-lista-body') as HTMLDivElement;
+
   /* ════ TOASTS ════ */
   function mostrarToast(titulo: string, subtitulo: string, tipo: 'ahora' | 'antes') {
     const icon  = tipo === 'ahora' ? '🔴' : '🔔';
@@ -619,7 +550,7 @@ import '../styles/noteEditor.css';
     toast.classList.add('toast-out');
     toast.addEventListener('animationend', () => toast.remove(), { once: true });
   }
- 
+
   /* ════ RECORDATORIOS ════ */
   function programarRecordatorio(tarea: Tarea, minutosAntes: number) {
     if (!tarea.hora) return;
@@ -636,17 +567,158 @@ import '../styles/noteEditor.css';
       timers.push(setTimeout(() => mostrarToast(tarea.titulo, `${label} · ${tarea.hora}`, 'antes'), msAntes));
     }
     const msExacto = vencimiento.getTime() - ahora;
-    if (msExacto > 0) {
-      timers.push(setTimeout(() => mostrarToast(tarea.titulo, `Es ahora · ${tarea.hora}`, 'ahora'), msExacto));
-    }
+    if (msExacto > 0) timers.push(setTimeout(() => mostrarToast(tarea.titulo, `Es ahora · ${tarea.hora}`, 'ahora'), msExacto));
     if (timers.length) recordatoriosActivos.set(key, timers);
   }
- 
-  /* ── AI ── */
+
+  /* ════ CHATBOT AI ════ */
+  const aiWindow    = document.getElementById('ai-window')    as HTMLDivElement;
+  const aiMensajes  = document.getElementById('ai-mensajes')  as HTMLDivElement;
+  const aiInput     = document.getElementById('ai-input')     as HTMLInputElement;
+  const aiTyping    = document.getElementById('ai-typing')    as HTMLDivElement;
+  const btnAiSend   = document.getElementById('btn-ai-send')  as HTMLButtonElement;
+
+  function renderOpciones(opciones: string[]) {
+    const prev = aiMensajes.querySelector('.db-ai-opciones');
+    if (prev) prev.remove();
+    if (!opciones.length) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'db-ai-opciones';
+    opciones.forEach(op => {
+      const btn = document.createElement('button');
+      btn.className = 'db-ai-opcion-btn';
+      btn.textContent = op;
+      btn.addEventListener('click', () => {
+        wrap.remove();
+        enviarMensajeAI(op);
+      });
+      wrap.appendChild(btn);
+    });
+    aiMensajes.appendChild(wrap);
+    aiMensajes.scrollTop = aiMensajes.scrollHeight;
+  }
+
+  function agregarMensajeChat(rol: 'user' | 'bot', texto: string) {
+    aiMensajes.querySelector('.db-ai-opciones')?.remove();
+    const div = document.createElement('div');
+    div.className = `db-ai-msg db-ai-msg--${rol}`;
+    const html = texto
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+    div.innerHTML = `<div class="db-ai-msg-bubble">${html}</div>`;
+    aiMensajes.appendChild(div);
+    aiMensajes.scrollTop = aiMensajes.scrollHeight;
+  }
+
+  function agregarToastAccion(texto: string) {
+    const div = document.createElement('div');
+    div.className = 'db-ai-accion-toast';
+    div.innerHTML = `✅ ${texto}`;
+    aiMensajes.appendChild(div);
+    aiMensajes.scrollTop = aiMensajes.scrollHeight;
+  }
+
+  async function enviarMensajeAI(textoForzado?: string) {
+    const texto = textoForzado ?? aiInput.value.trim();
+    if (!texto || aiEnviando) return;
+
+    aiEnviando = true;
+    if (!textoForzado) aiInput.value = '';
+    btnAiSend.disabled = true;
+
+    // Acumular datos según estado
+    if (estadoChat.menu === 'crear_tarea_titulo') {
+      datosAcumulados = { titulo: texto };
+    } else if (estadoChat.menu === 'crear_tarea_prioridad') {
+      let prioridad = 'media';
+      if (texto.toLowerCase().includes('alta') || texto.includes('🔴')) prioridad = 'alta';
+      else if (texto.toLowerCase().includes('baja') || texto.includes('🔵')) prioridad = 'baja';
+      datosAcumulados = { ...datosAcumulados, prioridad };
+    } else if (estadoChat.menu === 'crear_nota_titulo') {
+      datosAcumulados = { titulo: texto };
+    }
+
+    agregarMensajeChat('user', texto);
+    aiTyping.classList.remove('hidden');
+    aiMensajes.scrollTop = aiMensajes.scrollHeight;
+
+    try {
+      const res = await fetch('/api/chatbot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mensaje: texto,
+          estado: estadoChat,
+          datos: datosAcumulados,
+        })
+      });
+      const data = await res.json();
+
+      aiTyping.classList.add('hidden');
+
+      if (data.success) {
+        estadoChat = { menu: data.estado, datos: datosAcumulados };
+        if (data.estado === 'inicio') datosAcumulados = {};
+
+        agregarMensajeChat('bot', data.texto);
+        renderOpciones(data.opciones ?? []);
+
+        if (data.accion === 'tarea_creada') {
+          datosAcumulados = {};
+          agregarToastAccion('Tarea creada correctamente');
+          await load();
+          actualizarBadgeNotas();
+        }
+        if (data.accion === 'nota_creada') {
+          datosAcumulados = {};
+          agregarToastAccion('Nota creada correctamente');
+          actualizarBadgeNotas();
+        }
+      } else {
+        agregarMensajeChat('bot', data.texto || '❌ Error al procesar. Intenta de nuevo.');
+      }
+    } catch {
+      aiTyping.classList.add('hidden');
+      agregarMensajeChat('bot', '❌ Error de conexión. Verifica tu red e intenta de nuevo.');
+    } finally {
+      aiEnviando = false;
+      btnAiSend.disabled = false;
+      aiInput.focus();
+    }
+  }
+
+  async function iniciarChat() {
+    if (aiMensajes.children.length > 1) return;
+    try {
+      const res = await fetch('/api/chatbot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mensaje: 'inicio', estado: { menu: 'inicio' }, datos: {} })
+      });
+      const data = await res.json();
+      if (data.success) {
+        estadoChat = { menu: data.estado };
+        agregarMensajeChat('bot', data.texto);
+        renderOpciones(data.opciones ?? []);
+      }
+    } catch {}
+  }
+
   document.getElementById('btn-ai-toggle')?.addEventListener('click', () => {
-    document.getElementById('ai-window')?.classList.toggle('hidden');
+    aiWindow.classList.toggle('hidden');
+    if (!aiWindow.classList.contains('hidden')) {
+      iniciarChat();
+      setTimeout(() => aiInput.focus(), 100);
+    }
   });
- 
+  document.getElementById('btn-ai-close')?.addEventListener('click', () => {
+    aiWindow.classList.add('hidden');
+  });
+  btnAiSend?.addEventListener('click', () => enviarMensajeAI());
+  aiInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMensajeAI(); }
+  });
+
   /* ── Modal tarea ── */
   function openModalTarea() {
     const hoy = [viewDate.getFullYear(), String(viewDate.getMonth()+1).padStart(2,'0'), String(viewDate.getDate()).padStart(2,'0')].join('-');
@@ -657,17 +729,13 @@ import '../styles/noteEditor.css';
   function closeModalTarea() { modalCreate.classList.remove('open'); }
   document.getElementById('btn-add')?.addEventListener('click', () => { resetNota(); openModalTarea(); });
   document.getElementById('close-modal')?.addEventListener('click', closeModalTarea);
- 
   document.getElementById('t-usa-recordatorio')?.addEventListener('change', (e) => {
     const wrapper = document.getElementById('wrapper-recordatorio')!;
     const checked = (e.target as HTMLInputElement).checked;
     wrapper.classList.toggle('hidden', !checked);
     wrapper.style.display = checked ? 'flex' : 'none';
   });
-  document.getElementById('t-usa-hora')?.addEventListener('change', (e) => {
-    document.getElementById('wrapper-hora')?.classList.toggle('hidden', !(e.target as HTMLInputElement).checked);
-  });
- 
+
   /* ════ EDITOR DE NOTAS ════ */
   function openEditorNota() {
     editorMode = 'task';
@@ -677,16 +745,12 @@ import '../styles/noteEditor.css';
     modalNota.classList.add('ne-open');
     setTimeout(() => neEditor.focus(), 150);
   }
-
   function closeEditorNota() {
     modalNota.classList.remove('ne-open');
-    if (editorMode === 'task') {
-      modalCreate.classList.add('open');
-    }
+    if (editorMode === 'task') modalCreate.classList.add('open');
     editorMode = 'task';
     notaSidebarEditandoId = null;
   }
-
   function resetNota() {
     notaHtml = ''; notaTitulo = '';
     neEditor.innerHTML = ''; neTitleInput.value = '';
@@ -694,20 +758,14 @@ import '../styles/noteEditor.css';
     notaBadge.classList.remove('show');
     btnAgregarNota.style.display = '';
   }
-
   btnAgregarNota?.addEventListener('click', openEditorNota);
   document.getElementById('btn-editar-nota')?.addEventListener('click', openEditorNota);
   document.getElementById('ne-dot-close')?.addEventListener('click', closeEditorNota);
-
-  modalNota?.addEventListener('click', (e) => {
-    if (e.target === modalNota) closeEditorNota();
-  });
-
+  modalNota?.addEventListener('click', (e) => { if (e.target === modalNota) closeEditorNota(); });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modalNota.classList.contains('ne-open')) closeEditorNota();
   });
 
-  /* ── Guardar nota ── */
   document.getElementById('ne-save-btn')?.addEventListener('click', async () => {
     const html = neEditor.innerHTML.trim();
     if (!html) {
@@ -715,58 +773,31 @@ import '../styles/noteEditor.css';
       neEditor.addEventListener('animationend', () => neEditor.classList.remove('ne-shake'), { once: true });
       return;
     }
-
     if (editorMode === 'sidebar-edit' && notaSidebarEditandoId) {
       try {
         const r = await fetch('/api/noteEditor', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id_nota: notaSidebarEditandoId,
-            contenido: html,
-            nota_titulo: neTitleInput.value.trim() || 'Nota sin título'
-          })
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id_nota: notaSidebarEditandoId, contenido: html, nota_titulo: neTitleInput.value.trim() || 'Nota sin título' })
         });
         const d = await r.json();
-        if (d.success) {
-          showNeToast('Nota guardada ✓', true);
-          await cargarTodasLasNotas();
-          setTimeout(() => closeEditorNota(), 700);
-        } else {
-          showNeToast('Error al guardar', false);
-        }
-      } catch {
-        showNeToast('Error al guardar', false);
-      }
+        if (d.success) { showNeToast('Nota guardada ✓', true); await cargarTodasLasNotas(); setTimeout(() => closeEditorNota(), 700); }
+        else showNeToast('Error al guardar', false);
+      } catch { showNeToast('Error al guardar', false); }
       return;
     }
-
     if (editorMode === 'sidebar-new') {
       try {
         const r = await fetch('/api/noteEditor', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            nota_titulo: neTitleInput.value.trim() || 'Nota sin título',
-            contenido: html,
-          })
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nota_titulo: neTitleInput.value.trim() || 'Nota sin título', contenido: html })
         });
         const d = await r.json();
-        if (d.success) {
-          showNeToast('Nota creada ✓', true);
-          await cargarTodasLasNotas();
-          actualizarBadgeNotas();
-          setTimeout(() => closeEditorNota(), 700);
-        } else {
-          showNeToast('Error al guardar', false);
-        }
-      } catch {
-        showNeToast('Error al guardar', false);
-      }
+        if (d.success) { showNeToast('Nota creada ✓', true); await cargarTodasLasNotas(); actualizarBadgeNotas(); setTimeout(() => closeEditorNota(), 700); }
+        else showNeToast('Error al guardar', false);
+      } catch { showNeToast('Error al guardar', false); }
       return;
     }
-
-    notaHtml   = html;
+    notaHtml = html;
     notaTitulo = neTitleInput.value.trim() || 'Nota sin título';
     notaBadgeTitle.textContent = notaTitulo;
     notaBadge.classList.add('show');
@@ -814,22 +845,30 @@ import '../styles/noteEditor.css';
     setTimeout(() => { neToast.className = 'ne-toast'; }, 2500);
   }
 
-  /* ════ BADGE CONTADOR NOTAS ════ */
+  /* ════ BADGE NOTAS ════ */
   async function actualizarBadgeNotas() {
     try {
       const res  = await fetch('/api/noteEditor');
       const data = await res.json();
       const badge = document.getElementById('notas-count-badge')!;
       const count = data.success ? data.notas.length : 0;
-      if (count > 0) {
-        badge.textContent = String(count);
-        badge.style.display = 'inline-block';
-      } else {
-        badge.style.display = 'none';
-      }
+      badge.textContent = String(count);
+      badge.style.display = count > 0 ? 'inline-block' : 'none';
     } catch {}
   }
- 
+
+  /* ════ BADGE ARCHIVOS ════ */
+  async function actualizarBadgeArchivos() {
+    try {
+      const res  = await fetch('/api/archivo');
+      const data = await res.json();
+      const badge = document.getElementById('archivos-count-badge')!;
+      const count = data.success ? (data.archivos?.length ?? 0) : 0;
+      badge.textContent = String(count);
+      badge.style.display = count > 0 ? 'inline-block' : 'none';
+    } catch {}
+  }
+
   /* ════ SUBMIT TAREA ════ */
   taskForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -838,8 +877,7 @@ import '../styles/noteEditor.css';
     const usaRecordatorio = (document.getElementById('t-usa-recordatorio') as HTMLInputElement).checked;
     const minutosAntes    = parseInt((document.getElementById('t-minutos-antes') as HTMLSelectElement).value);
     const fechaInput      = (document.getElementById('t-fecha') as HTMLInputElement).value;
-    const usaHora         = (document.getElementById('t-usa-hora') as HTMLInputElement).checked;
-    const horaInput       = usaHora ? (document.getElementById('t-hora-inicio') as HTMLInputElement).value : null;
+    const horaInput       = (document.getElementById('t-hora-inicio') as HTMLInputElement).value || null;
     if (!fechaInput) { alert('Por favor selecciona una fecha.'); submitBtn.disabled=false; submitBtn.textContent='Guardar tarea'; return; }
     if (usaRecordatorio && !horaInput) { alert('Para activar el recordatorio debes asignar una hora.'); submitBtn.disabled=false; submitBtn.textContent='Guardar tarea'; return; }
     const payload: Record<string,any> = {
@@ -855,8 +893,7 @@ import '../styles/noteEditor.css';
       const data = await res.json();
       if (data.success) {
         closeModalTarea(); taskForm.reset(); resetNota();
-        await load();
-        actualizarBadgeNotas();
+        await load(); actualizarBadgeNotas();
         if (usaRecordatorio && horaInput) {
           const nuevaTarea: Tarea = { id: data.tarea.id_tarea, titulo: payload.titulo, descripcion: payload.descripcion, fecha: payload.fecha, hora: horaInput, prioridad: payload.prioridad, categoria: payload.categoria };
           programarRecordatorio(nuevaTarea, minutosAntes);
@@ -867,7 +904,7 @@ import '../styles/noteEditor.css';
     } catch (err: any) { alert(`Error: ${err.message}`); }
     finally { submitBtn.disabled=false; submitBtn.textContent='Guardar tarea'; }
   });
- 
+
   /* ── Ver tarea ── */
   document.getElementById('close-view')?.addEventListener('click', () => modalView.classList.remove('open'));
   (window as any).verDetalle = (id: string) => {
@@ -889,8 +926,7 @@ import '../styles/noteEditor.css';
       </div>`;
     modalView.classList.add('open');
   };
- 
-  /* ── Eliminar tarea ── */
+
   document.getElementById('btn-delete-task')?.addEventListener('click', async () => {
     if (!selectedTaskId) return;
     if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
@@ -901,30 +937,23 @@ import '../styles/noteEditor.css';
           const key = String(selectedTaskId);
           if (recordatoriosActivos.has(key)) { recordatoriosActivos.get(key)!.forEach(clearTimeout); recordatoriosActivos.delete(key); }
           modalView.classList.remove('open');
-          await load();
-          actualizarBadgeNotas();
+          await load(); actualizarBadgeNotas();
         } else { alert(data.message || data.error || 'Error al eliminar la tarea'); }
       } catch (err) { console.error("Error al eliminar:", err); }
     }
   });
- 
-  /* ════ MODAL TODAS LAS NOTAS ════ */
+
+  /* ════ MODAL NOTAS ════ */
   async function cargarTodasLasNotas() {
     notasListaBody.innerHTML = '<p class="notas-loading">Cargando notas…</p>';
     try {
       const res  = await fetch('/api/noteEditor');
       const data = await res.json();
-
-      // Actualizar badge
       const badge = document.getElementById('notas-count-badge')!;
       const count = data.success ? data.notas.length : 0;
       badge.textContent = String(count);
       badge.style.display = count > 0 ? 'inline-block' : 'none';
-
-      if (!data.success || !data.notas.length) {
-        notasListaBody.innerHTML = '<p class="notas-empty">No hay notas guardadas aún.</p>';
-        return;
-      }
+      if (!data.success || !data.notas.length) { notasListaBody.innerHTML = '<p class="notas-empty">No hay notas guardadas aún.</p>'; return; }
       notasListaBody.innerHTML = data.notas.map((n: any) => {
         const fecha = n.fecha_creacion ? new Date(n.fecha_creacion).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}) : '';
         const safeContent = encodeURIComponent(n.contenido ?? '');
@@ -937,22 +966,16 @@ import '../styles/noteEditor.css';
           ${n.tarea_titulo ? `<span class="nota-card-tarea">📌 ${n.tarea_titulo}</span>` : ''}
           <div class="nota-card-preview">${n.contenido ?? ''}</div>
           <div class="nota-card-actions">
-            <button class="nota-card-btn nota-card-btn--edit"
-              data-id="${n.id_nota}"
-              data-content="${safeContent}"
-              data-title="${safeTitle}">✏️ Editar</button>
+            <button class="nota-card-btn nota-card-btn--edit" data-id="${n.id_nota}" data-content="${safeContent}" data-title="${safeTitle}">✏️ Editar</button>
             <button class="nota-card-btn nota-card-btn--del" data-id="${n.id_nota}">🗑️ Eliminar</button>
           </div>
         </div>`;
       }).join('');
-
-      // Editar desde modal notas
       notasListaBody.querySelectorAll<HTMLButtonElement>('.nota-card-btn--edit').forEach(btn => {
         btn.addEventListener('click', () => {
-          const id       = btn.dataset.id!;
+          const id        = btn.dataset.id!;
           const contenido = decodeURIComponent(btn.dataset.content!);
           const titulo    = decodeURIComponent(btn.dataset.title!);
-          // Cerrar modal notas y abrir editor
           modalNotasLista.classList.remove('open');
           editorMode = 'sidebar-edit';
           notaSidebarEditandoId = id;
@@ -963,38 +986,149 @@ import '../styles/noteEditor.css';
           setTimeout(() => neEditor.focus(), 150);
         });
       });
-
       notasListaBody.querySelectorAll<HTMLButtonElement>('.nota-card-btn--del').forEach(btn => {
         btn.addEventListener('click', async () => {
           if (!confirm('¿Eliminar esta nota?')) return;
           const r = await fetch('/api/noteEditor', { method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id_nota: btn.dataset.id }) });
-          if ((await r.json()).success) { await cargarTodasLasNotas(); }
+          if ((await r.json()).success) await cargarTodasLasNotas();
         });
       });
     } catch { notasListaBody.innerHTML = '<p class="notas-empty">Error al cargar notas.</p>'; }
   }
-
-  // Botón nueva nota desde modal notas
   document.getElementById('btn-nueva-nota-modal')?.addEventListener('click', () => {
     modalNotasLista.classList.remove('open');
     editorMode = 'sidebar-new';
     notaSidebarEditandoId = null;
-    neEditor.innerHTML = '';
-    neTitleInput.value = '';
-    neWords.textContent = '0 palabras';
+    neEditor.innerHTML = ''; neTitleInput.value = ''; neWords.textContent = '0 palabras';
     modalNota.classList.add('ne-open');
     setTimeout(() => neEditor.focus(), 150);
   });
-
-  document.getElementById('btn-ver-notas')?.addEventListener('click', async () => {
-    modalNotasLista.classList.add('open');
-    await cargarTodasLasNotas();
-  });
+  document.getElementById('btn-ver-notas')?.addEventListener('click', async () => { modalNotasLista.classList.add('open'); await cargarTodasLasNotas(); });
   document.getElementById('notas-lista-close')?.addEventListener('click', () => { modalNotasLista.classList.remove('open'); });
-  modalNotasLista?.addEventListener('click', (e) => {
-    if (e.target === modalNotasLista) modalNotasLista.classList.remove('open');
+  modalNotasLista?.addEventListener('click', (e) => { if (e.target === modalNotasLista) modalNotasLista.classList.remove('open'); });
+
+  /* ════ MODAL ARCHIVOS ════ */
+  function iconoArchivo(tipo: string): string {
+    if (tipo.startsWith('image/'))       return '🖼️';
+    if (tipo.startsWith('video/'))       return '🎬';
+    if (tipo.startsWith('audio/'))       return '🎵';
+    if (tipo.includes('pdf'))            return '📄';
+    if (tipo.includes('word') || tipo.includes('document')) return '📝';
+    if (tipo.includes('sheet') || tipo.includes('excel'))   return '📊';
+    if (tipo.includes('zip') || tipo.includes('rar'))       return '🗜️';
+    return '📎';
+  }
+  function formatSize(bytes: number): string {
+    if (bytes < 1024)       return `${bytes} B`;
+    if (bytes < 1024*1024)  return `${(bytes/1024).toFixed(1)} KB`;
+    return `${(bytes/1024/1024).toFixed(1)} MB`;
+  }
+  function poblarSelectorTareas() {
+    const sel = document.getElementById('archivo-tarea-select') as HTMLSelectElement;
+    sel.innerHTML = '<option value="">— Sin tarea —</option>' +
+      allTasks.map(t => `<option value="${t.id}">${t.titulo}</option>`).join('');
+  }
+  async function cargarTodosLosArchivos() {
+    archivosBody.innerHTML = '<p class="archivos-loading">Cargando archivos…</p>';
+    try {
+      const res  = await fetch('/api/archivo?todos=1');
+      const data = await res.json();
+      const badge = document.getElementById('archivos-count-badge')!;
+      const count = data.success ? (data.archivos?.length ?? 0) : 0;
+      badge.textContent = String(count);
+      badge.style.display = count > 0 ? 'inline-block' : 'none';
+      if (!data.success || !data.archivos?.length) { archivosBody.innerHTML = '<p class="archivos-empty">No hay archivos subidos aún.</p>'; return; }
+      archivosBody.innerHTML = data.archivos.map((a: any) => {
+        const fecha = a.fecha_subida ? new Date(a.fecha_subida).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}) : '';
+        const tarea = allTasks.find(t => String(t.id) === String(a.id_tarea));
+        return `<div class="archivo-card">
+          <div class="archivo-icon">${iconoArchivo(a.tipo ?? '')}</div>
+          <div class="archivo-info">
+            <div class="archivo-nombre">${a.nombre}</div>
+            <div class="archivo-meta">
+              <span class="archivo-size">${formatSize(a.tamano ?? 0)}</span>
+              ${tarea ? `<span class="archivo-tarea-tag">📌 ${tarea.titulo}</span>` : ''}
+              <span class="archivo-fecha">${fecha}</span>
+            </div>
+          </div>
+          <div class="archivo-actions">
+            <a href="${a.ruta_archivo}" target="_blank" download="${a.nombre}" class="archivo-btn archivo-btn--dl">⬇️ Descargar</a>
+            <button class="archivo-btn archivo-btn--del" data-id="${a.id_archivo}">🗑️ Eliminar</button>
+          </div>
+        </div>`;
+      }).join('');
+      archivosBody.querySelectorAll<HTMLButtonElement>('.archivo-btn--del').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('¿Eliminar este archivo?')) return;
+          try {
+            const r = await fetch('/api/archivo', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_archivo: btn.dataset.id }) });
+            const d = await r.json();
+            if (d.success) await cargarTodosLosArchivos();
+          } catch { alert('Error al eliminar archivo'); }
+        });
+      });
+    } catch { archivosBody.innerHTML = '<p class="archivos-empty">Error al cargar archivos.</p>'; }
+  }
+
+  const archivoInput    = document.getElementById('archivo-input')          as HTMLInputElement;
+  const uploadZoneInner = document.querySelector('.archivos-upload-inner')   as HTMLElement;
+  const progressWrap    = document.getElementById('archivos-upload-progress') as HTMLElement;
+  const progressFill    = document.getElementById('archivos-progress-fill')  as HTMLElement;
+  const progressText    = document.getElementById('archivos-progress-text')  as HTMLElement;
+
+  async function subirArchivo(file: File) {
+    const idTarea = (document.getElementById('archivo-tarea-select') as HTMLSelectElement).value;
+    if (!idTarea) { alert('Selecciona una tarea para asociar el archivo, o crea una tarea primero.'); return; }
+    progressWrap.classList.remove('hidden');
+    progressFill.style.width = '10%';
+    progressText.textContent = 'Subiendo…';
+    const fd = new FormData();
+    fd.append('archivo', file);
+    fd.append('id_tarea', idTarea);
+    try {
+      progressFill.style.width = '40%';
+      const r = await fetch('/api/archivo', { method: 'POST', body: fd });
+      progressFill.style.width = '80%';
+      const d = await r.json();
+      if (d.success) {
+        progressFill.style.width = '100%';
+        progressText.textContent = '¡Subido! ✓';
+        setTimeout(() => { progressWrap.classList.add('hidden'); progressFill.style.width = '0%'; }, 1200);
+        await cargarTodosLosArchivos();
+        actualizarBadgeArchivos();
+      } else {
+        progressText.textContent = 'Error: ' + (d.error || 'desconocido');
+        progressFill.style.background = '#ef4444';
+        setTimeout(() => { progressWrap.classList.add('hidden'); progressFill.style.width = '0%'; progressFill.style.background = '#8b5cf6'; }, 2500);
+      }
+    } catch {
+      progressText.textContent = 'Error de conexión';
+      setTimeout(() => { progressWrap.classList.add('hidden'); progressFill.style.width = '0%'; }, 2000);
+    }
+  }
+
+  archivoInput?.addEventListener('change', async () => {
+    const files = Array.from(archivoInput.files ?? []);
+    for (const file of files) await subirArchivo(file);
+    archivoInput.value = '';
   });
- 
+  uploadZoneInner?.addEventListener('dragover', (e) => { e.preventDefault(); uploadZoneInner.classList.add('drag-over'); });
+  uploadZoneInner?.addEventListener('dragleave', () => { uploadZoneInner.classList.remove('drag-over'); });
+  uploadZoneInner?.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    uploadZoneInner.classList.remove('drag-over');
+    const files = Array.from(e.dataTransfer?.files ?? []);
+    for (const file of files) await subirArchivo(file);
+  });
+
+  document.getElementById('btn-ver-archivos')?.addEventListener('click', async () => {
+    poblarSelectorTareas();
+    modalArchivos.classList.add('open');
+    await cargarTodosLosArchivos();
+  });
+  document.getElementById('archivos-lista-close')?.addEventListener('click', () => { modalArchivos.classList.remove('open'); });
+  modalArchivos?.addEventListener('click', (e) => { if (e.target === modalArchivos) modalArchivos.classList.remove('open'); });
+
   /* ── Load y render ── */
   async function load() {
     try {
@@ -1010,7 +1144,7 @@ import '../styles/noteEditor.css';
       }
     } catch(e) { console.error(e); }
   }
- 
+
   function render() {
     const activosIds = filtros.filter(f => f.activo).map(f => f.id);
     const filtered   = allTasks.filter(t => activosIds.includes(t.categoria));
@@ -1022,13 +1156,11 @@ import '../styles/noteEditor.css';
     else                               renderMes(filtered);
     actualizarTotalVisible();
   }
- 
   function getColorTarea(t: Tarea): string {
     const filtro = filtros.find(f => f.id === t.categoria);
     if (filtro) return filtro.color;
     return t.prioridad==='alta'?'#ef4444':t.prioridad==='media'?'#f59e0b':'#0ea5e9';
   }
- 
   function renderDia(filtered: Tarea[]) {
     const dStr = [viewDate.getFullYear(), String(viewDate.getMonth()+1).padStart(2,'0'), String(viewDate.getDate()).padStart(2,'0')].join('-');
     hTitle.textContent = viewDate.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/, c => c.toUpperCase());
@@ -1040,7 +1172,6 @@ import '../styles/noteEditor.css';
     }
     container.innerHTML = html + `</div>`;
   }
- 
   function renderSemana(filtered: Tarea[]) {
     hTitle.textContent = 'Vista semanal';
     const start = new Date(viewDate);
@@ -1053,7 +1184,6 @@ import '../styles/noteEditor.css';
     }
     container.innerHTML = html + `</div>`;
   }
- 
   function renderMes(filtered: Tarea[]) {
     const y=viewDate.getFullYear(), m=viewDate.getMonth();
     hTitle.textContent = viewDate.toLocaleDateString('es-ES',{month:'long',year:'numeric'}).replace(/^\w/, c => c.toUpperCase());
@@ -1068,7 +1198,6 @@ import '../styles/noteEditor.css';
     }
     container.innerHTML = html + `</div>`;
   }
- 
   function crearCard(t: Tarea): string {
     const filtro = filtros.find(f => f.id === t.categoria);
     const color  = getColorTarea(t);
@@ -1077,8 +1206,7 @@ import '../styles/noteEditor.css';
       <div class="db-task-card-title">${t.titulo}</div>
     </div>`;
   }
- 
-  /* ── Navegación ── */
+
   document.querySelectorAll<HTMLElement>('.db-view-btn').forEach(btn => {
     btn.addEventListener('click', () => { currentView = btn.dataset.v as any; render(); });
   });
@@ -1092,7 +1220,7 @@ import '../styles/noteEditor.css';
     else viewDate.setDate(viewDate.getDate()+(currentView==='semana'?7:1));
     render();
   });
- 
+
   /* ── Etiquetas ── */
   const modalEtiquetas = document.getElementById('modal-etiquetas')!;
   const etiquetasList  = document.getElementById('etiquetas-list')!;
@@ -1151,10 +1279,11 @@ import '../styles/noteEditor.css';
   document.getElementById('e-cancelar')?.addEventListener('click', () => etiquetasForm.classList.add('hidden'));
   document.getElementById('btn-etiquetas')?.addEventListener('click', async () => { modalEtiquetas.classList.add('open'); etiquetasForm.classList.add('hidden'); await cargarEtiquetas(); });
   document.getElementById('close-etiquetas')?.addEventListener('click', () => modalEtiquetas.classList.remove('open'));
- 
+
   // ── INIT ──
   filtros = cargarFiltros();
   renderFiltros();
   actualizarBadgeNotas();
+  actualizarBadgeArchivos();
   load();
 </script>
