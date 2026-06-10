@@ -6,21 +6,17 @@ import Perfil from "../pages/perfil.astro";
 import '../styles/tablero.css';
 import '../styles/noteEditor.css';
 ---
-
+ 
+ 
 <Layout title="MyAgenda Pro 2026">
 <div class="db-layout">
-
+ 
   <aside class="db-sidebar">
     <div class="db-logo">
-      <div class="db-logo-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
-          <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-        </svg>
-      </div>
+      <div class="db-logo-icon">📅</div>
       My Agenda
     </div>
-
+ 
     <!-- FILTROS -->
     <div class="db-sidebar-section">
       <div class="db-filters-header">
@@ -29,10 +25,10 @@ import '../styles/noteEditor.css';
       </div>
       <div id="filtros-lista"></div>
     </div>
-
+ 
     <!-- BOTÓN NOTAS EN SIDEBAR -->
     <div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px; width: 100%;">
-
+      
       <div class="db-sidebar-notes-btn-wrap" style="padding: 0;">
         <button id="btn-ver-notas" class="db-sidebar-notes-btn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -45,13 +41,13 @@ import '../styles/noteEditor.css';
           <span id="notas-count-badge" class="db-notes-count-badge" style="display:none"></span>
         </button>
       </div>
-
+ 
       <div class="db-sidebar-perfil-wrap" style="width: 100%;">
         <Perfil />
       </div>
-
+ 
     </div>
-
+ 
     <!-- BOTÓN ARCHIVOS EN SIDEBAR -->
     <div class="db-sidebar-notes-btn-wrap">
       <button id="btn-ver-archivos" class="db-sidebar-archivos-btn">
@@ -63,7 +59,7 @@ import '../styles/noteEditor.css';
       </button>
     </div>
   </aside>
-
+ 
   <main class="db-main">
     <header class="db-header">
       <div class="db-header-left">
@@ -89,8 +85,7 @@ import '../styles/noteEditor.css';
     </header>
     <div class="db-view-container" id="view-container"></div>
   </main>
-  
-  <!-- BOTÓN AI -->
+ 
   <button id="btn-ai-toggle" class="db-fab db-fab--ai" title="Asistente IA">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
@@ -98,7 +93,7 @@ import '../styles/noteEditor.css';
       <circle cx="15" cy="13" r="1" fill="currentColor" stroke="none"/>
     </svg>
   </button>
-
+ 
   <!-- VENTANA CHAT AI -->
   <div id="ai-window" class="db-ai-window hidden">
     <div class="db-ai-header">
@@ -121,7 +116,7 @@ import '../styles/noteEditor.css';
     <div class="db-ai-body" id="ai-mensajes">
       <div class="db-ai-msg db-ai-msg--bot">
         <div class="db-ai-msg-bubble">
-          Hola, soy <strong>Aria</strong>, tu asistente inteligente. Puedo consultar tus tareas, notas y archivos, y también <strong>crear tareas o notas</strong> por ti. ¿En qué te ayudo?
+          👋 ¡Hola! Soy <strong>Aria</strong>, tu asistente. Puedo consultar tus tareas, notas y archivos, y también <strong>crear tareas o notas</strong> por ti. ¿En qué te ayudo?
         </div>
       </div>
     </div>
@@ -138,7 +133,7 @@ import '../styles/noteEditor.css';
       </button>
     </div>
   </div>
-
+ 
   <!-- MODAL CREAR TAREA -->
   <div id="modal" class="db-modal-backdrop">
     <div class="db-modal-box">
@@ -149,31 +144,32 @@ import '../styles/noteEditor.css';
           <textarea id="t-desc" placeholder="Descripción o notas" rows="2" class="db-input" style="resize:none"></textarea>
           <div class="grid-2">
             <select id="t-prioridad" class="db-select">
-              <option value="alta">Alta prioridad</option>
-              <option value="media" selected>Media prioridad</option>
-              <option value="baja">Baja prioridad</option>
+              <option value="alta">🔴 Alta</option>
+              <option value="media" selected>🟡 Media</option>
+              <option value="baja">🔵 Baja</option>
             </select>
             <select id="t-cat" class="db-select">
-              <option value="trabajo">Trabajo</option>
-              <option value="personal">Personal</option>
+              <option value="trabajo">💼 Trabajo</option>
+              <option value="personal">🏠 Personal</option>
             </select>
           </div>
-
+ 
+          <!-- FECHA Y HORA en la misma fila -->
           <div class="grid-2" style="align-items:end;">
             <div style="display:flex;flex-direction:column;gap:6px;">
-              <label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Fecha</label>
+              <label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">📅 Fecha</label>
               <input type="date" id="t-fecha" class="db-input">
             </div>
             <div style="display:flex;flex-direction:column;gap:6px;">
-              <label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Hora</label>
+              <label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">🕐 Hora</label>
               <input type="time" id="t-hora-inicio" class="db-input" style="text-align:center;">
             </div>
           </div>
-
+ 
           <div style="display:flex;flex-direction:column;gap:8px;padding:12px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;">
             <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#374151;cursor:pointer;">
               <input type="checkbox" id="t-usa-recordatorio" style="width:16px;height:16px;">
-              Activar recordatorio
+              🔔 Activar recordatorio
             </label>
             <div id="wrapper-recordatorio" class="hidden" style="flex-direction:column;gap:8px;">
               <select id="t-minutos-antes" class="db-select" style="font-size:13px;">
@@ -187,13 +183,11 @@ import '../styles/noteEditor.css';
               <p style="font-size:11px;color:#6b7280;margin:0;">Aparecerá una notificación en pantalla.</p>
             </div>
           </div>
-
           <div class="db-form-sep">
             <div class="db-form-sep-line"></div>
             <span class="db-form-sep-text">Extras</span>
             <div class="db-form-sep-line"></div>
           </div>
-
           <div id="nota-badge" class="db-nota-badge">
             <span class="db-nota-badge-check">✓</span>
             <div class="db-nota-badge-info">
@@ -202,7 +196,6 @@ import '../styles/noteEditor.css';
             </div>
             <button type="button" id="btn-editar-nota" class="db-nota-badge-edit">Editar</button>
           </div>
-
           <button type="button" id="btn-agregar-nota" class="db-btn-nota">
             <div class="db-btn-nota-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -216,7 +209,6 @@ import '../styles/noteEditor.css';
             </div>
             <svg class="db-btn-nota-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
           </button>
-
           <div class="space-y-3" style="margin-top:8px;">
             <button type="submit" class="db-btn-submit">Guardar tarea</button>
             <button type="button" id="close-modal" class="db-btn-cancel">Cancelar</button>
@@ -225,7 +217,7 @@ import '../styles/noteEditor.css';
       </form>
     </div>
   </div>
-
+ 
   <!-- MODAL VER TAREA -->
   <div id="modal-view" class="db-modal-backdrop" style="z-index:210;">
     <div class="db-view-modal-box">
@@ -236,17 +228,17 @@ import '../styles/noteEditor.css';
       </div>
     </div>
   </div>
-
+ 
   <!-- MODAL ETIQUETAS -->
   <div id="modal-etiquetas" class="db-modal-backdrop" style="z-index:220;">
     <div class="db-etiquetas-box">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-        <h3 class="db-etiquetas-title">Etiquetas</h3>
+        <h3 class="db-etiquetas-title">🏷️ Etiquetas</h3>
         <button id="close-etiquetas" class="db-btn-tag-del" style="padding:6px 14px;">✕</button>
       </div>
       <div id="etiquetas-list" class="space-y-3"></div>
       <div id="etiquetas-form" class="hidden space-y-3" style="margin-top:20px;padding-top:20px;border-top:1px solid #f3f4f6;">
-        <p style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.06em;">Editar etiqueta</p>
+        <p style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.06em;">✏️ Editar etiqueta</p>
         <input type="hidden" id="e-id"/>
         <input type="text" id="e-nombre" placeholder="Nombre" maxlength="100" class="db-input"/>
         <div style="display:flex;align-items:center;gap:12px;">
@@ -261,7 +253,7 @@ import '../styles/noteEditor.css';
       <div id="etiquetas-toast" class="hidden" style="text-align:center;margin-top:12px;font-size:11px;font-weight:700;"></div>
     </div>
   </div>
-
+ 
   <!-- MODAL FILTRO -->
   <div id="modal-filtro" class="db-modal-backdrop" style="z-index:230;">
     <div class="db-filtro-modal-box">
@@ -279,6 +271,10 @@ import '../styles/noteEditor.css';
             <span style="font-size:12px;color:#6b7280;font-weight:600;">Color personalizado</span>
           </div>
         </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label class="db-filtro-label-text">Emoji (opcional)</label>
+          <div id="fi-emojis" class="db-filtro-emojis"></div>
+        </div>
         <div style="display:flex;gap:8px;margin-top:8px;">
           <button id="fi-guardar" class="db-btn-submit">Guardar</button>
           <button id="fi-cancelar" class="db-btn-cancel" style="width:auto;padding:10px 20px;background:#f3f4f6;color:#6b7280;border-radius:12px;text-transform:none;font-size:13px;">Cancelar</button>
@@ -286,7 +282,7 @@ import '../styles/noteEditor.css';
       </div>
     </div>
   </div>
-
+ 
   <!-- MODAL ARCHIVOS -->
   <div id="modal-archivos-lista" class="db-modal-backdrop" style="z-index:245;">
     <div class="archivos-lista-box">
@@ -331,23 +327,24 @@ import '../styles/noteEditor.css';
       </div>
     </div>
   </div>
-
+ 
   <!-- Contenedor toasts -->
   <div id="toast-container"></div>
-
+ 
   <NoteEditor />
 </div>
 </Layout>
-
+ 
 <script>
   interface Tarea {
     id: any; titulo: string; descripcion: string;
     fecha: string; hora: string | null; prioridad: string; categoria: string;
   }
   interface Filtro {
-    id: string; nombre: string; color: string; activo: boolean;
+    id: string; nombre: string; color: string;
+    emoji: string; activo: boolean;
   }
-
+ 
   let allTasks:    Tarea[]              = [];
   let currentView: 'dia'|'semana'|'mes' = 'dia';
   let viewDate     = new Date();
@@ -357,34 +354,32 @@ import '../styles/noteEditor.css';
   let editorMode: 'task' | 'sidebar-edit' | 'sidebar-new' = 'task';
   let notaSidebarEditandoId: string | null = null;
   const recordatoriosActivos = new Map<string, ReturnType<typeof setTimeout>[]>();
-
+ 
   const FILTROS_KEY = 'myagenda_filtros';
   let filtros: Filtro[] = [];
   let filtroEditandoId: string | null = null;
   let colorSeleccionado = '#0ea5e9';
-
+  let emojiSeleccionado = '💼';
+ 
   const COLORES_PRESET = ['#0ea5e9','#6366f1','#f59e0b','#ef4444','#10b981','#8b5cf6','#f97316','#ec4899','#14b8a6','#64748b'];
-
+  const EMOJIS_PRESET  = ['💼','🏠','🎯','📚','💪','🎨','🛒','✈️','🎮','💡','🔥','⭐','🌱','🏋️','🎵'];
+ 
   let estadoChat: { menu: string; datos?: Record<string, any> } = { menu: 'inicio' };
   let datosAcumulados: Record<string, any> = {};
   let aiEnviando = false;
-
+ 
   function cargarFiltros(): Filtro[] {
     try {
       const raw = localStorage.getItem(FILTROS_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        // Compatibilidad: eliminar campo emoji si existe
-        return parsed.map((f: any) => ({ id: f.id, nombre: f.nombre, color: f.color, activo: f.activo }));
-      }
+      if (raw) return JSON.parse(raw);
     } catch {}
     return [
-      { id: 'trabajo',  nombre: 'Trabajo',  color: '#0ea5e9', activo: true },
-      { id: 'personal', nombre: 'Personal', color: '#10b981', activo: true },
+      { id: 'trabajo',  nombre: 'Trabajo',  color: '#0ea5e9', emoji: '💼', activo: true },
+      { id: 'personal', nombre: 'Personal', color: '#10b981', emoji: '🏠', activo: true },
     ];
   }
   function guardarFiltros() { localStorage.setItem(FILTROS_KEY, JSON.stringify(filtros)); }
-
+ 
   function renderFiltros() {
     const lista = document.getElementById('filtros-lista')!;
     if (!filtros.length) {
@@ -396,15 +391,11 @@ import '../styles/noteEditor.css';
         <input type="checkbox" class="db-filtro-check" ${f.activo ? 'checked' : ''}
           style="border-color:${f.color};${f.activo ? `background:${f.color};` : ''}"
           data-id="${f.id}">
-        <span class="db-filtro-color-indicator" style="width:8px;height:8px;border-radius:50%;background:${f.color};display:inline-block;flex-shrink:0;"></span>
+        <span class="db-filtro-emoji">${f.emoji}</span>
         <span class="db-filtro-nombre">${f.nombre}</span>
         <div class="db-filtro-acciones">
-          <button class="db-filtro-btn edit" data-id="${f.id}" title="Editar">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button class="db-filtro-btn del" data-id="${f.id}" title="Eliminar">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-          </button>
+          <button class="db-filtro-btn edit" data-id="${f.id}" title="Editar">✏️</button>
+          <button class="db-filtro-btn del"  data-id="${f.id}" title="Eliminar">🗑️</button>
         </div>
       </div>
     `).join('');
@@ -431,18 +422,18 @@ import '../styles/noteEditor.css';
     });
     actualizarSelectCategoria();
   }
-
+ 
   function actualizarSelectCategoria() {
     const sel = document.getElementById('t-cat') as HTMLSelectElement;
     if (!sel) return;
     const val = sel.value;
-    sel.innerHTML = filtros.map(f => `<option value="${f.id}">${f.nombre}</option>`).join('');
+    sel.innerHTML = filtros.map(f => `<option value="${f.id}">${f.emoji} ${f.nombre}</option>`).join('');
     if (filtros.find(f => f.id === val)) sel.value = val;
   }
-
+ 
   function abrirModalFiltro(id?: string) {
     filtroEditandoId = id || null;
-    const modal  = document.getElementById('modal-filtro')!;
+    const modal = document.getElementById('modal-filtro')!;
     const titulo = document.getElementById('filtro-modal-titulo')!;
     const coloresDiv = document.getElementById('fi-colores')!;
     coloresDiv.innerHTML = COLORES_PRESET.map(c => `
@@ -457,18 +448,30 @@ import '../styles/noteEditor.css';
         (document.getElementById('fi-color-custom') as HTMLInputElement).value = colorSeleccionado;
       });
     });
+    const emojisDiv = document.getElementById('fi-emojis')!;
+    emojisDiv.innerHTML = EMOJIS_PRESET.map(em => `
+      <button class="db-filtro-emoji-btn ${emojiSeleccionado===em?'activo':''}" data-emoji="${em}">${em}</button>
+    `).join('');
+    emojisDiv.querySelectorAll<HTMLButtonElement>('.db-filtro-emoji-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        emojiSeleccionado = btn.dataset.emoji!;
+        emojisDiv.querySelectorAll('.db-filtro-emoji-btn').forEach(b => b.classList.remove('activo'));
+        btn.classList.add('activo');
+      });
+    });
     if (id) {
       const f = filtros.find(x => x.id === id);
       if (!f) return;
       titulo.textContent = 'Editar filtro';
       (document.getElementById('fi-nombre') as HTMLInputElement).value = f.nombre;
-      colorSeleccionado = f.color;
+      colorSeleccionado = f.color; emojiSeleccionado = f.emoji;
       coloresDiv.querySelectorAll<HTMLButtonElement>('.db-filtro-color-btn').forEach(b => b.classList.toggle('activo', b.dataset.color === f.color));
       (document.getElementById('fi-color-custom') as HTMLInputElement).value = f.color;
+      emojisDiv.querySelectorAll<HTMLButtonElement>('.db-filtro-emoji-btn').forEach(b => b.classList.toggle('activo', b.dataset.emoji === f.emoji));
     } else {
       titulo.textContent = 'Nuevo filtro';
       (document.getElementById('fi-nombre') as HTMLInputElement).value = '';
-      colorSeleccionado = '#0ea5e9';
+      colorSeleccionado = '#0ea5e9'; emojiSeleccionado = '💼';
     }
     modal.classList.add('open');
   }
@@ -485,61 +488,61 @@ import '../styles/noteEditor.css';
     if (!nombre) { alert('Ingresa un nombre para el filtro.'); return; }
     if (filtroEditandoId) {
       const f = filtros.find(x => x.id === filtroEditandoId);
-      if (f) { f.nombre = nombre; f.color = colorSeleccionado; }
+      if (f) { f.nombre = nombre; f.color = colorSeleccionado; f.emoji = emojiSeleccionado; }
     } else {
-      filtros.push({ id: Date.now().toString(), nombre, color: colorSeleccionado, activo: true });
+      filtros.push({ id: Date.now().toString(), nombre, color: colorSeleccionado, emoji: emojiSeleccionado, activo: true });
     }
     guardarFiltros(); renderFiltros(); render(); cerrarModalFiltro();
   });
-
+ 
   // ── DOM ──
-  const container      = document.getElementById('view-container')    as HTMLDivElement;
-  const hTitle         = document.getElementById('header-title')      as HTMLElement;
-  const modalCreate    = document.getElementById('modal')             as HTMLDivElement;
-  const modalView      = document.getElementById('modal-view')        as HTMLDivElement;
-  const viewContent    = document.getElementById('view-content')      as HTMLDivElement;
-  const taskForm       = document.getElementById('task-form')         as HTMLFormElement;
-  const modalNota      = document.getElementById('modal-nota')        as HTMLDivElement;
-  const neEditor       = document.getElementById('ne-editor')         as HTMLDivElement;
-  const neTitleInput   = document.getElementById('ne-title')          as HTMLInputElement;
-  const neWords        = document.getElementById('ne-words')          as HTMLSpanElement;
-  const neToast        = document.getElementById('ne-toast')          as HTMLDivElement;
-  const notaBadge      = document.getElementById('nota-badge')        as HTMLDivElement;
-  const notaBadgeTitle = document.getElementById('nota-badge-title')  as HTMLElement;
-  const btnAgregarNota = document.getElementById('btn-agregar-nota')  as HTMLButtonElement;
-  const modalNotasLista= document.getElementById('modal-notas-lista') as HTMLDivElement;
-  const notasListaBody = document.getElementById('notas-lista-body')  as HTMLDivElement;
-  const toastContainer = document.getElementById('toast-container')   as HTMLDivElement;
+  const container      = document.getElementById('view-container')   as HTMLDivElement;
+  const hTitle         = document.getElementById('header-title')     as HTMLElement;
+  const modalCreate    = document.getElementById('modal')            as HTMLDivElement;
+  const modalView      = document.getElementById('modal-view')       as HTMLDivElement;
+  const viewContent    = document.getElementById('view-content')     as HTMLDivElement;
+  const taskForm       = document.getElementById('task-form')        as HTMLFormElement;
+  const modalNota      = document.getElementById('modal-nota')       as HTMLDivElement;
+  const neEditor       = document.getElementById('ne-editor')        as HTMLDivElement;
+  const neTitleInput   = document.getElementById('ne-title')         as HTMLInputElement;
+  const neWords        = document.getElementById('ne-words')         as HTMLSpanElement;
+  const neToast        = document.getElementById('ne-toast')         as HTMLDivElement;
+  const notaBadge      = document.getElementById('nota-badge')       as HTMLDivElement;
+  const notaBadgeTitle = document.getElementById('nota-badge-title') as HTMLElement;
+  const btnAgregarNota = document.getElementById('btn-agregar-nota') as HTMLButtonElement;
+  const modalNotasLista= document.getElementById('modal-notas-lista')as HTMLDivElement;
+  const notasListaBody = document.getElementById('notas-lista-body') as HTMLDivElement;
   const modalArchivos  = document.getElementById('modal-archivos-lista') as HTMLDivElement;
   const archivosBody   = document.getElementById('archivos-lista-body') as HTMLDivElement;
-
+ 
   /* ════ TOASTS ════ */
   function mostrarToast(titulo: string, subtitulo: string, tipo: 'ahora' | 'antes') {
-    const iconSvg = tipo === 'ahora'
-      ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
-      : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`;
-    const label = tipo === 'ahora' ? 'Ahora' : 'Recordatorio';
+    const icon  = tipo === 'ahora' ? '🔴' : '🔔';
+    const label = tipo === 'ahora' ? '¡Es ahora!' : 'Recordatorio';
     const toast = document.createElement('div');
     toast.className = `toast-notif toast-${tipo}`;
     toast.innerHTML = `
-      <div class="toast-icon-wrap">${iconSvg}</div>
+      <div class="toast-icon-wrap">${icon}</div>
       <div class="toast-body">
         <div class="toast-label">${label}</div>
         <div class="toast-title">${titulo}</div>
-        ${subtitulo ? `<div class="toast-sub">${subtitulo}</div>` : ''}
+        ${subtitulo ? `<div class="toast-sub">🕐 ${subtitulo}</div>` : ''}
       </div>
       <button class="toast-close" title="Cerrar">✕</button>
     `;
     toast.querySelector('.toast-close')?.addEventListener('click', (e) => { e.stopPropagation(); cerrarToast(toast); });
     toast.addEventListener('click', () => cerrarToast(toast));
-    toastContainer.appendChild(toast);
+    // ── FIX: buscar el container en el DOM en el momento de insertar ──
+    const tc = document.getElementById('toast-container');
+    if (tc) tc.appendChild(toast);
     setTimeout(() => cerrarToast(toast), 6000);
   }
+ 
   function cerrarToast(toast: HTMLElement) {
     toast.classList.add('toast-out');
     toast.addEventListener('animationend', () => toast.remove(), { once: true });
   }
-
+ 
   /* ════ RECORDATORIOS ════ */
   function programarRecordatorio(tarea: Tarea, minutosAntes: number) {
     if (!tarea.hora) return;
@@ -556,17 +559,17 @@ import '../styles/noteEditor.css';
       timers.push(setTimeout(() => mostrarToast(tarea.titulo, `${label} · ${tarea.hora}`, 'antes'), msAntes));
     }
     const msExacto = vencimiento.getTime() - ahora;
-    if (msExacto > 0) timers.push(setTimeout(() => mostrarToast(tarea.titulo, `Hora exacta · ${tarea.hora}`, 'ahora'), msExacto));
+    if (msExacto > 0) timers.push(setTimeout(() => mostrarToast(tarea.titulo, `Es ahora · ${tarea.hora}`, 'ahora'), msExacto));
     if (timers.length) recordatoriosActivos.set(key, timers);
   }
-
+ 
   /* ════ CHATBOT AI ════ */
-  const aiWindow   = document.getElementById('ai-window')   as HTMLDivElement;
-  const aiMensajes = document.getElementById('ai-mensajes') as HTMLDivElement;
-  const aiInput    = document.getElementById('ai-input')    as HTMLInputElement;
-  const aiTyping   = document.getElementById('ai-typing')   as HTMLDivElement;
-  const btnAiSend  = document.getElementById('btn-ai-send') as HTMLButtonElement;
-
+  const aiWindow    = document.getElementById('ai-window')    as HTMLDivElement;
+  const aiMensajes  = document.getElementById('ai-mensajes')  as HTMLDivElement;
+  const aiInput     = document.getElementById('ai-input')     as HTMLInputElement;
+  const aiTyping    = document.getElementById('ai-typing')    as HTMLDivElement;
+  const btnAiSend   = document.getElementById('btn-ai-send')  as HTMLButtonElement;
+ 
   function renderOpciones(opciones: string[]) {
     const prev = aiMensajes.querySelector('.db-ai-opciones');
     if (prev) prev.remove();
@@ -577,13 +580,16 @@ import '../styles/noteEditor.css';
       const btn = document.createElement('button');
       btn.className = 'db-ai-opcion-btn';
       btn.textContent = op;
-      btn.addEventListener('click', () => { wrap.remove(); enviarMensajeAI(op); });
+      btn.addEventListener('click', () => {
+        wrap.remove();
+        enviarMensajeAI(op);
+      });
       wrap.appendChild(btn);
     });
     aiMensajes.appendChild(wrap);
     aiMensajes.scrollTop = aiMensajes.scrollHeight;
   }
-
+ 
   function agregarMensajeChat(rol: 'user' | 'bot', texto: string) {
     aiMensajes.querySelector('.db-ai-opciones')?.remove();
     const div = document.createElement('div');
@@ -595,34 +601,38 @@ import '../styles/noteEditor.css';
     aiMensajes.appendChild(div);
     aiMensajes.scrollTop = aiMensajes.scrollHeight;
   }
-
+ 
   function agregarToastAccion(texto: string) {
     const div = document.createElement('div');
     div.className = 'db-ai-accion-toast';
-    div.innerHTML = texto;
+    div.innerHTML = `✅ ${texto}`;
     aiMensajes.appendChild(div);
     aiMensajes.scrollTop = aiMensajes.scrollHeight;
   }
-
+ 
   async function enviarMensajeAI(textoForzado?: string) {
     const texto = textoForzado ?? aiInput.value.trim();
     if (!texto || aiEnviando) return;
+ 
     aiEnviando = true;
     if (!textoForzado) aiInput.value = '';
     btnAiSend.disabled = true;
+ 
     if (estadoChat.menu === 'crear_tarea_titulo') {
       datosAcumulados = { titulo: texto };
     } else if (estadoChat.menu === 'crear_tarea_prioridad') {
       let prioridad = 'media';
-      if (texto.toLowerCase().includes('alta')) prioridad = 'alta';
-      else if (texto.toLowerCase().includes('baja')) prioridad = 'baja';
+      if (texto.toLowerCase().includes('alta') || texto.includes('🔴')) prioridad = 'alta';
+      else if (texto.toLowerCase().includes('baja') || texto.includes('🔵')) prioridad = 'baja';
       datosAcumulados = { ...datosAcumulados, prioridad };
     } else if (estadoChat.menu === 'crear_nota_titulo') {
       datosAcumulados = { titulo: texto };
     }
+ 
     agregarMensajeChat('user', texto);
     aiTyping.classList.remove('hidden');
     aiMensajes.scrollTop = aiMensajes.scrollHeight;
+ 
     try {
       const res = await fetch('/api/chatbot', {
         method: 'POST',
@@ -639,7 +649,8 @@ import '../styles/noteEditor.css';
         if (data.accion === 'tarea_creada') {
           datosAcumulados = {};
           agregarToastAccion('Tarea creada correctamente');
-          await load(); actualizarBadgeNotas();
+          await load();
+          actualizarBadgeNotas();
         }
         if (data.accion === 'nota_creada') {
           datosAcumulados = {};
@@ -647,18 +658,18 @@ import '../styles/noteEditor.css';
           actualizarBadgeNotas();
         }
       } else {
-        agregarMensajeChat('bot', data.texto || 'Error al procesar. Intenta de nuevo.');
+        agregarMensajeChat('bot', data.texto || '❌ Error al procesar. Intenta de nuevo.');
       }
     } catch {
       aiTyping.classList.add('hidden');
-      agregarMensajeChat('bot', 'Error de conexión. Verifica tu red e intenta de nuevo.');
+      agregarMensajeChat('bot', '❌ Error de conexión. Verifica tu red e intenta de nuevo.');
     } finally {
       aiEnviando = false;
       btnAiSend.disabled = false;
       aiInput.focus();
     }
   }
-
+ 
   async function iniciarChat() {
     if (aiMensajes.children.length > 1) return;
     try {
@@ -675,17 +686,20 @@ import '../styles/noteEditor.css';
       }
     } catch {}
   }
-
+ 
   document.getElementById('btn-ai-toggle')?.addEventListener('click', () => {
     aiWindow.classList.toggle('hidden');
-    if (!aiWindow.classList.contains('hidden')) { iniciarChat(); setTimeout(() => aiInput.focus(), 100); }
+    if (!aiWindow.classList.contains('hidden')) {
+      iniciarChat();
+      setTimeout(() => aiInput.focus(), 100);
+    }
   });
   document.getElementById('btn-ai-close')?.addEventListener('click', () => { aiWindow.classList.add('hidden'); });
   btnAiSend?.addEventListener('click', () => enviarMensajeAI());
   aiInput?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMensajeAI(); }
   });
-
+ 
   /* ── Modal tarea ── */
   function openModalTarea() {
     const hoy = [viewDate.getFullYear(), String(viewDate.getMonth()+1).padStart(2,'0'), String(viewDate.getDate()).padStart(2,'0')].join('-');
@@ -702,7 +716,7 @@ import '../styles/noteEditor.css';
     wrapper.classList.toggle('hidden', !checked);
     wrapper.style.display = checked ? 'flex' : 'none';
   });
-
+ 
   /* ════ EDITOR DE NOTAS ════ */
   function openEditorNota() {
     editorMode = 'task';
@@ -732,7 +746,7 @@ import '../styles/noteEditor.css';
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modalNota.classList.contains('ne-open')) closeEditorNota();
   });
-
+ 
   document.getElementById('ne-save-btn')?.addEventListener('click', async () => {
     const html = neEditor.innerHTML.trim();
     if (!html) {
@@ -747,7 +761,7 @@ import '../styles/noteEditor.css';
           body: JSON.stringify({ id_nota: notaSidebarEditandoId, contenido: html, nota_titulo: neTitleInput.value.trim() || 'Nota sin título' })
         });
         const d = await r.json();
-        if (d.success) { showNeToast('Nota guardada', true); await cargarTodasLasNotas(); setTimeout(() => closeEditorNota(), 700); }
+        if (d.success) { showNeToast('Nota guardada ✓', true); await cargarTodasLasNotas(); setTimeout(() => closeEditorNota(), 700); }
         else showNeToast('Error al guardar', false);
       } catch { showNeToast('Error al guardar', false); }
       return;
@@ -759,7 +773,7 @@ import '../styles/noteEditor.css';
           body: JSON.stringify({ nota_titulo: neTitleInput.value.trim() || 'Nota sin título', contenido: html })
         });
         const d = await r.json();
-        if (d.success) { showNeToast('Nota creada', true); await cargarTodasLasNotas(); actualizarBadgeNotas(); setTimeout(() => closeEditorNota(), 700); }
+        if (d.success) { showNeToast('Nota creada ✓', true); await cargarTodasLasNotas(); actualizarBadgeNotas(); setTimeout(() => closeEditorNota(), 700); }
         else showNeToast('Error al guardar', false);
       } catch { showNeToast('Error al guardar', false); }
       return;
@@ -769,10 +783,10 @@ import '../styles/noteEditor.css';
     notaBadgeTitle.textContent = notaTitulo;
     notaBadge.classList.add('show');
     btnAgregarNota.style.display = 'none';
-    showNeToast('Nota lista', true);
+    showNeToast('Nota lista ✓', true);
     setTimeout(() => closeEditorNota(), 700);
   });
-
+ 
   neEditor?.addEventListener('input', () => {
     const t = neEditor.innerText.trim();
     const c = t ? t.split(/\s+/).length : 0;
@@ -811,7 +825,7 @@ import '../styles/noteEditor.css';
     neToast.className = `ne-toast show ${ok ? 'ne-toast-ok' : 'ne-toast-err'}`;
     setTimeout(() => { neToast.className = 'ne-toast'; }, 2500);
   }
-
+ 
   /* ════ BADGE NOTAS ════ */
   async function actualizarBadgeNotas() {
     try {
@@ -823,7 +837,7 @@ import '../styles/noteEditor.css';
       badge.style.display = count > 0 ? 'inline-block' : 'none';
     } catch {}
   }
-
+ 
   /* ════ BADGE ARCHIVOS ════ */
   async function actualizarBadgeArchivos() {
     try {
@@ -835,7 +849,7 @@ import '../styles/noteEditor.css';
       badge.style.display = count > 0 ? 'inline-block' : 'none';
     } catch {}
   }
-
+ 
   /* ════ SUBMIT TAREA ════ */
   taskForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -865,13 +879,13 @@ import '../styles/noteEditor.css';
           const nuevaTarea: Tarea = { id: data.tarea.id_tarea, titulo: payload.titulo, descripcion: payload.descripcion, fecha: payload.fecha, hora: horaInput, prioridad: payload.prioridad, categoria: payload.categoria };
           programarRecordatorio(nuevaTarea, minutosAntes);
           const labelMin = minutosAntes >= 60 ? `${minutosAntes/60}h` : `${minutosAntes}min`;
-          mostrarToast('Recordatorio activado', `"${payload.titulo}" · ${labelMin} antes`, 'antes');
+          mostrarToast('Recordatorio activado ✓', `"${payload.titulo}" · ${labelMin} antes`, 'antes');
         }
       } else { throw new Error(data.message || data.error); }
     } catch (err: any) { alert(`Error: ${err.message}`); }
     finally { submitBtn.disabled=false; submitBtn.textContent='Guardar tarea'; }
   });
-
+ 
   /* ── Ver tarea ── */
   document.getElementById('close-view')?.addEventListener('click', () => modalView.classList.remove('open'));
   (window as any).verDetalle = (id: string) => {
@@ -882,7 +896,7 @@ import '../styles/noteEditor.css';
     const prioColor = t.prioridad==='alta'?'#ef4444':t.prioridad==='media'?'#f59e0b':'#0ea5e9';
     viewContent.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span class="db-view-cat" style="background:${filtro?.color+'20'||'#f0f9ff'};color:${filtro?.color||'#0ea5e9'}">${t.categoria}</span>
+        <span class="db-view-cat" style="background:${filtro?.color+'20'||'#f0f9ff'};color:${filtro?.color||'#0ea5e9'}">${filtro?.emoji||''} ${t.categoria}</span>
         <span class="db-view-date">${t.fecha} ${t.hora ? '· '+t.hora : ''}</span>
       </div>
       <h3 class="db-view-title">${t.titulo}</h3>
@@ -893,7 +907,7 @@ import '../styles/noteEditor.css';
       </div>`;
     modalView.classList.add('open');
   };
-
+ 
   document.getElementById('btn-delete-task')?.addEventListener('click', async () => {
     if (!selectedTaskId) return;
     if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
@@ -909,7 +923,7 @@ import '../styles/noteEditor.css';
       } catch (err) { console.error("Error al eliminar:", err); }
     }
   });
-
+ 
   /* ════ MODAL NOTAS ════ */
   async function cargarTodasLasNotas() {
     notasListaBody.innerHTML = '<p class="notas-loading">Cargando notas…</p>';
@@ -930,17 +944,11 @@ import '../styles/noteEditor.css';
             <span class="nota-card-title">${n.nota_titulo ?? 'Sin título'}</span>
             <span class="nota-card-date">${fecha}</span>
           </div>
-          ${n.tarea_titulo ? `<span class="nota-card-tarea">${n.tarea_titulo}</span>` : ''}
+          ${n.tarea_titulo ? `<span class="nota-card-tarea">📌 ${n.tarea_titulo}</span>` : ''}
           <div class="nota-card-preview">${n.contenido ?? ''}</div>
           <div class="nota-card-actions">
-            <button class="nota-card-btn nota-card-btn--edit" data-id="${n.id_nota}" data-content="${safeContent}" data-title="${safeTitle}">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              Editar
-            </button>
-            <button class="nota-card-btn nota-card-btn--del" data-id="${n.id_nota}">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-              Eliminar
-            </button>
+            <button class="nota-card-btn nota-card-btn--edit" data-id="${n.id_nota}" data-content="${safeContent}" data-title="${safeTitle}">✏️ Editar</button>
+            <button class="nota-card-btn nota-card-btn--del" data-id="${n.id_nota}">🗑️ Eliminar</button>
           </div>
         </div>`;
       }).join('');
@@ -979,15 +987,17 @@ import '../styles/noteEditor.css';
   document.getElementById('btn-ver-notas')?.addEventListener('click', async () => { modalNotasLista.classList.add('open'); await cargarTodasLasNotas(); });
   document.getElementById('notas-lista-close')?.addEventListener('click', () => { modalNotasLista.classList.remove('open'); });
   modalNotasLista?.addEventListener('click', (e) => { if (e.target === modalNotasLista) modalNotasLista.classList.remove('open'); });
-
+ 
   /* ════ MODAL ARCHIVOS ════ */
   function iconoArchivo(tipo: string): string {
-    if (tipo.startsWith('image/')) return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
-    if (tipo.startsWith('video/')) return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`;
-    if (tipo.startsWith('audio/')) return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`;
-    if (tipo.includes('pdf'))     return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`;
-    if (tipo.includes('zip') || tipo.includes('rar')) return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
-    return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
+    if (tipo.startsWith('image/'))       return '🖼️';
+    if (tipo.startsWith('video/'))       return '🎬';
+    if (tipo.startsWith('audio/'))       return '🎵';
+    if (tipo.includes('pdf'))            return '📄';
+    if (tipo.includes('word') || tipo.includes('document')) return '📝';
+    if (tipo.includes('sheet') || tipo.includes('excel'))   return '📊';
+    if (tipo.includes('zip') || tipo.includes('rar'))       return '🗜️';
+    return '📎';
   }
   function formatSize(bytes: number): string {
     if (bytes < 1024)       return `${bytes} B`;
@@ -1018,19 +1028,13 @@ import '../styles/noteEditor.css';
             <div class="archivo-nombre">${a.nombre}</div>
             <div class="archivo-meta">
               <span class="archivo-size">${formatSize(a.tamano ?? 0)}</span>
-              ${tarea ? `<span class="archivo-tarea-tag">${tarea.titulo}</span>` : ''}
+              ${tarea ? `<span class="archivo-tarea-tag">📌 ${tarea.titulo}</span>` : ''}
               <span class="archivo-fecha">${fecha}</span>
             </div>
           </div>
           <div class="archivo-actions">
-            <a href="${a.ruta_archivo}" target="_blank" download="${a.nombre}" class="archivo-btn archivo-btn--dl">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Descargar
-            </a>
-            <button class="archivo-btn archivo-btn--del" data-id="${a.id_archivo}">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-              Eliminar
-            </button>
+            <a href="${a.ruta_archivo}" target="_blank" download="${a.nombre}" class="archivo-btn archivo-btn--dl">⬇️ Descargar</a>
+            <button class="archivo-btn archivo-btn--del" data-id="${a.id_archivo}">🗑️ Eliminar</button>
           </div>
         </div>`;
       }).join('');
@@ -1046,13 +1050,13 @@ import '../styles/noteEditor.css';
       });
     } catch { archivosBody.innerHTML = '<p class="archivos-empty">Error al cargar archivos.</p>'; }
   }
-
+ 
   const archivoInput    = document.getElementById('archivo-input')           as HTMLInputElement;
   const uploadZoneInner = document.querySelector('.archivos-upload-inner')    as HTMLElement;
   const progressWrap    = document.getElementById('archivos-upload-progress') as HTMLElement;
   const progressFill    = document.getElementById('archivos-progress-fill')   as HTMLElement;
   const progressText    = document.getElementById('archivos-progress-text')   as HTMLElement;
-
+ 
   async function subirArchivo(file: File) {
     const idTarea = (document.getElementById('archivo-tarea-select') as HTMLSelectElement).value;
     if (!idTarea) { alert('Selecciona una tarea para asociar el archivo, o crea una tarea primero.'); return; }
@@ -1069,9 +1073,10 @@ import '../styles/noteEditor.css';
       const d = await r.json();
       if (d.success) {
         progressFill.style.width = '100%';
-        progressText.textContent = 'Subido correctamente';
+        progressText.textContent = '¡Subido! ✓';
         setTimeout(() => { progressWrap.classList.add('hidden'); progressFill.style.width = '0%'; }, 1200);
-        await cargarTodosLosArchivos(); actualizarBadgeArchivos();
+        await cargarTodosLosArchivos();
+        actualizarBadgeArchivos();
       } else {
         progressText.textContent = 'Error: ' + (d.error || 'desconocido');
         progressFill.style.background = '#ef4444';
@@ -1082,7 +1087,7 @@ import '../styles/noteEditor.css';
       setTimeout(() => { progressWrap.classList.add('hidden'); progressFill.style.width = '0%'; }, 2000);
     }
   }
-
+ 
   archivoInput?.addEventListener('change', async () => {
     const files = Array.from(archivoInput.files ?? []);
     for (const file of files) await subirArchivo(file);
@@ -1096,13 +1101,15 @@ import '../styles/noteEditor.css';
     const files = Array.from(e.dataTransfer?.files ?? []);
     for (const file of files) await subirArchivo(file);
   });
-
+ 
   document.getElementById('btn-ver-archivos')?.addEventListener('click', async () => {
-    poblarSelectorTareas(); modalArchivos.classList.add('open'); await cargarTodosLosArchivos();
+    poblarSelectorTareas();
+    modalArchivos.classList.add('open');
+    await cargarTodosLosArchivos();
   });
   document.getElementById('archivos-lista-close')?.addEventListener('click', () => { modalArchivos.classList.remove('open'); });
   modalArchivos?.addEventListener('click', (e) => { if (e.target === modalArchivos) modalArchivos.classList.remove('open'); });
-
+ 
   /* ── Load y render ── */
   async function load() {
     try {
@@ -1118,7 +1125,7 @@ import '../styles/noteEditor.css';
       }
     } catch(e) { console.error(e); }
   }
-
+ 
   function render() {
     const activosIds = filtros.filter(f => f.activo).map(f => f.id);
     const filtered   = allTasks.filter(t => activosIds.includes(t.categoria));
@@ -1129,36 +1136,22 @@ import '../styles/noteEditor.css';
     else if (currentView === 'semana') renderSemana(filtered);
     else                               renderMes(filtered);
   }
-
   function getColorTarea(t: Tarea): string {
     const filtro = filtros.find(f => f.id === t.categoria);
     if (filtro) return filtro.color;
     return t.prioridad==='alta'?'#ef4444':t.prioridad==='media'?'#f59e0b':'#0ea5e9';
   }
-
-  function formatearHora(i: number): string {
-    const formato = localStorage.getItem('conf_hora') ?? '24';
-    if (formato === '12') {
-      const periodo = i < 12 ? 'AM' : 'PM';
-      const hora12  = i === 0 ? 12 : i > 12 ? i - 12 : i;
-      return `${hora12}:00 ${periodo}`;
-    }
-    return `${i.toString().padStart(2,'0')}:00`;
-  }
-
   function renderDia(filtered: Tarea[]) {
     const dStr = [viewDate.getFullYear(), String(viewDate.getMonth()+1).padStart(2,'0'), String(viewDate.getDate()).padStart(2,'0')].join('-');
     hTitle.textContent = viewDate.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/, c => c.toUpperCase());
     let html = `<div class="db-day-grid">`;
     for (let i = 0; i < 24; i++) {
-      const h     = i.toString().padStart(2,'0');
-      const label = formatearHora(i);
+      const h = i.toString().padStart(2,'0');
       const tasks = filtered.filter(t => t.fecha===dStr && t.hora?.startsWith(h+':'));
-      html += `<div class="db-day-row"><div class="db-hour-label">${label}</div><div class="db-hour-tasks">${tasks.map(crearCard).join('')}</div></div>`;
+      html += `<div class="db-day-row"><div class="db-hour-label">${h}:00</div><div class="db-hour-tasks">${tasks.map(crearCard).join('')}</div></div>`;
     }
     container.innerHTML = html + `</div>`;
   }
-
   function renderSemana(filtered: Tarea[]) {
     hTitle.textContent = 'Vista semanal';
     const start = new Date(viewDate);
@@ -1171,7 +1164,6 @@ import '../styles/noteEditor.css';
     }
     container.innerHTML = html + `</div>`;
   }
-
   function renderMes(filtered: Tarea[]) {
     const y=viewDate.getFullYear(), m=viewDate.getMonth();
     hTitle.textContent = viewDate.toLocaleDateString('es-ES',{month:'long',year:'numeric'}).replace(/^\w/, c => c.toUpperCase());
@@ -1186,15 +1178,15 @@ import '../styles/noteEditor.css';
     }
     container.innerHTML = html + `</div>`;
   }
-
   function crearCard(t: Tarea): string {
-    const color = getColorTarea(t);
+    const filtro = filtros.find(f => f.id === t.categoria);
+    const color  = getColorTarea(t);
     return `<div onclick="window.verDetalle('${t.id}')" class="db-task-card" style="background:${color}">
-      <div class="db-task-card-time">${t.hora || 'Todo el día'}</div>
+      <div class="db-task-card-time">${filtro?.emoji||''} ${t.hora || 'Todo el día'}</div>
       <div class="db-task-card-title">${t.titulo}</div>
     </div>`;
   }
-
+ 
   document.querySelectorAll<HTMLElement>('.db-view-btn').forEach(btn => {
     btn.addEventListener('click', () => { currentView = btn.dataset.v as any; render(); });
   });
@@ -1208,7 +1200,7 @@ import '../styles/noteEditor.css';
     else viewDate.setDate(viewDate.getDate()+(currentView==='semana'?7:1));
     render();
   });
-
+ 
   /* ── Etiquetas ── */
   const modalEtiquetas = document.getElementById('modal-etiquetas')!;
   const etiquetasList  = document.getElementById('etiquetas-list')!;
@@ -1217,7 +1209,6 @@ import '../styles/noteEditor.css';
   const eId     = document.getElementById('e-id')     as HTMLInputElement;
   const eNombre = document.getElementById('e-nombre') as HTMLInputElement;
   const eColor  = document.getElementById('e-color')  as HTMLInputElement;
-
   function toastEtiqueta(msg: string, ok: boolean) {
     etiquetasToast.textContent = msg;
     etiquetasToast.className = ok ? 'db-toast show db-toast--ok' : 'db-toast show db-toast--err';
@@ -1268,16 +1259,11 @@ import '../styles/noteEditor.css';
   document.getElementById('e-cancelar')?.addEventListener('click', () => etiquetasForm.classList.add('hidden'));
   document.getElementById('btn-etiquetas')?.addEventListener('click', async () => { modalEtiquetas.classList.add('open'); etiquetasForm.classList.add('hidden'); await cargarEtiquetas(); });
   document.getElementById('close-etiquetas')?.addEventListener('click', () => modalEtiquetas.classList.remove('open'));
-
+ 
   // ── INIT ──
   filtros = cargarFiltros();
   renderFiltros();
   actualizarBadgeNotas();
   actualizarBadgeArchivos();
-
-  // Aplicar vista guardada desde configuración
-  const vistaGuardada = localStorage.getItem('conf_vista') as 'dia' | 'semana' | 'mes' | null;
-  if (vistaGuardada) currentView = vistaGuardada;
-
   load();
 </script>
