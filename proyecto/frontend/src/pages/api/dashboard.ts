@@ -3,48 +3,15 @@ export const prerender = false;
 
 import type { APIRoute } from "astro";
 import { pool } from "../../lib/db";
-import { obtenerSesion, obtenerTokenDeCookie } from "../../lib/sesion";
-import { enviarNotificacionCreacion } from "../../lib/email";
- 
-// ─── Migración al arrancar el módulo ──────────────────────────────────────
-(async () => {
-  try {
-    await pool.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) DEFAULT 'personal'`);
-    await pool.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS id_usuario UUID`);
-    await pool.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS recordatorio_enviado BOOLEAN DEFAULT FALSE`);
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS public.recurrencia_serie (
-        id_serie       SERIAL PRIMARY KEY,
-        frecuencia     VARCHAR(20) NOT NULL,
-        intervalo      INT         NOT NULL DEFAULT 1,
-        fecha_inicio   DATE,
-        fecha_fin      DATE,
-        dias_semana    VARCHAR(50),
-        total_ocurr    INT,
-        fecha_creacion TIMESTAMPTZ DEFAULT NOW()
-      )
-    `);
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS public.recurrencia_instancia (
-        id_instancia  SERIAL PRIMARY KEY,
-        id_serie      INT NOT NULL REFERENCES public.recurrencia_serie(id_serie) ON DELETE CASCADE,
-        id_tarea      INT NOT NULL REFERENCES public.tarea(id_tarea) ON DELETE CASCADE,
-        ocurrencia_num INT NOT NULL DEFAULT 1
-      )
-    `);
-    console.log('[migration] tablas y columnas OK');
-  } catch (e: any) {
-    console.error('[migration] error:', e.message);
-  }
-})();
 
+// ── helpers ────────────────────────────────────────────────────────────────
 function res(body: object, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
     headers: { "Content-Type": "application/json" },
   });
 }
- 
+
 function parseFecha(iso: string): Date {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(y, m - 1, d);
@@ -55,8 +22,7 @@ function toISO(d: Date): string {
 function isoDay(d: Date): number {
   return d.getDay() === 0 ? 7 : d.getDay();
 }
- 
-/** Genera fechas para una serie recurrente (GT-85) */
+
 function generarFechas({
   fechaInicio, frecuencia, intervalo, fechaFin, totalOcurr, diasSemana,
 }: {
@@ -67,16 +33,16 @@ function generarFechas({
   totalOcurr: number | null;
   diasSemana: string | null;
 }): string[] {
-  const MAX  = totalOcurr ?? 10;
+  const MAX   = totalOcurr ?? 10;
   const fechas: string[] = [];
-  let  cur  = parseFecha(fechaInicio);
-  const lim  = fechaFin ? parseFecha(fechaFin) : null;
-  const dias = diasSemana ? diasSemana.split(",").map(Number) : null;
- 
+  let   cur   = parseFecha(fechaInicio);
+  const lim   = fechaFin ? parseFecha(fechaFin) : null;
+  const dias  = diasSemana ? diasSemana.split(",").map(Number) : null;
+
   while (fechas.length < MAX) {
     if (lim && cur > lim) break;
     if (!dias || dias.includes(isoDay(cur))) fechas.push(toISO(cur));
- 
+
     if (frecuencia === "diaria") {
       cur.setDate(cur.getDate() + intervalo);
     } else if (frecuencia === "semanal") {
@@ -93,44 +59,56 @@ function generarFechas({
   }
   return fechas;
 }
- 
-// ─── POST: Crear tarea simple o recurrente ────────────────────────────────
+
+// ── Verificar si las tablas de recurrencia existen ─────────────────────────
+async function tablaRecurrenciaExiste(): Promise<boolean> {
+  const r = await pool.query(
+    `SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='recurrencia_serie'`
+  );
+  return r.rowCount! > 0;
+}
+
+// ─── POST ─────────────────────────────────────────────────────────────────
 export const POST: APIRoute = async ({ request }) => {
   const client = await pool.connect();
   try {
-    const token = obtenerTokenDeCookie(request.headers.get("cookie"));
-    const usuario = token ? await obtenerSesion(token) : null;
-
     const body = await request.json();
- 
+
     if (!body.titulo?.trim())
       return res({ success: false, message: "El título es obligatorio." }, 400);
- 
+
     await client.query("BEGIN");
- 
-    // ── Recurrente (GT-84 / GT-85) ────────────────────────────────────────
+
+    // ── Tarea recurrente ──────────────────────────────────────────────────
     if (body.frecuencia) {
       if (!["diaria", "semanal", "mensual"].includes(body.frecuencia)) {
         await client.query("ROLLBACK");
         return res({ success: false, message: "Frecuencia inválida." }, 400);
       }
- 
-      // 1. Crear la serie en la tabla correcta (public.recurrencia_serie)
+
+      const hayTablas = await tablaRecurrenciaExiste();
+      if (!hayTablas) {
+        await client.query("ROLLBACK");
+        return res({
+          success: false,
+          message: "Las tablas de recurrencia no están creadas en la base de datos. Pide al administrador que ejecute la migración.",
+        }, 500);
+      }
+
       const { rows: [serie] } = await client.query(
         `INSERT INTO public.recurrencia_serie
            (frecuencia, intervalo, fecha_inicio, fecha_fin, dias_semana, total_ocurr, fecha_creacion)
-         VALUES ($1,$2,$3,$4,$5,$6, NOW()) RETURNING *`,
+         VALUES ($1,$2,$3,$4,$5,$6,NOW()) RETURNING *`,
         [
           body.frecuencia,
-          body.intervalo  || 1,
-          body.fecha      || null,
-          body.fecha_fin  || null,
+          body.intervalo   || 1,
+          body.fecha       || null,
+          body.fecha_fin   || null,
           body.dias_semana || null,
           body.total_ocurr || null,
         ]
       );
- 
-      // 2. Generar fechas
+
       const fechas = generarFechas({
         fechaInicio : body.fecha,
         frecuencia  : body.frecuencia,
@@ -139,95 +117,68 @@ export const POST: APIRoute = async ({ request }) => {
         totalOcurr  : body.total_ocurr || 10,
         diasSemana  : body.dias_semana || null,
       });
- 
-      // 3. Insertar tareas + instancias
+
       const tareasCreadas = [];
       for (let i = 0; i < fechas.length; i++) {
         const { rows: [tarea] } = await client.query(
           `INSERT INTO public.tarea
-             (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, categoria, id_usuario, estado, fecha_creacion)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,'pendiente',NOW()) RETURNING *`,
+             (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion)
+           VALUES ($1,$2,$3,$4,$5,'pendiente',NOW()) RETURNING *`,
           [
             body.titulo.trim(),
             body.descripcion?.trim() || "",
             fechas[i],
-            body.hora || null,
+            body.hora      || null,
             body.prioridad || "media",
-            body.categoria || "personal",
-            usuario?.id_usuario || null,
           ]
         );
- 
-        // Insertar instancia en la tabla de relación (vincula tarea ↔ serie)
+
         await client.query(
           `INSERT INTO public.recurrencia_instancia (id_serie, id_tarea, ocurrencia_num)
            VALUES ($1,$2,$3)`,
           [serie.id_serie, tarea.id_tarea, i + 1]
         );
- 
+
         if (i === 0 && body.nota_contenido) {
           await client.query(
-            `INSERT INTO public.nota (id_tarea, nota_titulo, contenido, fecha_creacion)
-             VALUES ($1,$2,$3,NOW())`,
-            [tarea.id_tarea, body.nota_titulo || "Nota sin título", body.nota_contenido]
+            `INSERT INTO public.nota (id_tarea, contenido, fecha_creacion)
+             VALUES ($1,$2,NOW())`,
+            [tarea.id_tarea, body.nota_contenido]
           );
         }
- 
+
         tareasCreadas.push(tarea);
       }
- 
+
       await client.query("COMMIT");
-
-      if (usuario?.email && tareasCreadas.length > 0) {
-        const primera = tareasCreadas[0];
-        enviarNotificacionCreacion(usuario.email, {
-          titulo: primera.titulo,
-          fecha_inicio: primera.fecha_inicio,
-          hora_inicio: primera.hora_inicio,
-          prioridad: primera.prioridad,
-        }).catch((e: any) => console.error("Error email creación:", e.message));
-      }
-
       return res({ success: true, recurrente: true, serie, tareas: tareasCreadas });
     }
- 
+
     // ── Tarea simple ──────────────────────────────────────────────────────
     const { rows: [nuevaTarea] } = await client.query(
       `INSERT INTO public.tarea
-         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, categoria, id_usuario, estado, fecha_creacion)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,'pendiente',NOW()) RETURNING *`,
+         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion)
+       VALUES ($1,$2,$3,$4,$5,'pendiente',NOW()) RETURNING *`,
       [
         body.titulo.trim(),
         body.descripcion?.trim() || "",
-        body.fecha  || null,
-        body.hora   || null,
+        body.fecha     || null,
+        body.hora      || null,
         body.prioridad || "media",
-        body.categoria || "personal",
-        usuario?.id_usuario || null,
       ]
     );
- 
+
     if (body.nota_contenido) {
       await client.query(
-        `INSERT INTO public.nota (id_tarea, nota_titulo, contenido, fecha_creacion)
-         VALUES ($1,$2,$3,NOW())`,
-        [nuevaTarea.id_tarea, body.nota_titulo || "Nota sin título", body.nota_contenido]
+        `INSERT INTO public.nota (id_tarea, contenido, fecha_creacion)
+         VALUES ($1,$2,NOW())`,
+        [nuevaTarea.id_tarea, body.nota_contenido]
       );
     }
- 
+
     await client.query("COMMIT");
-
-    if (usuario?.email) {
-      enviarNotificacionCreacion(usuario.email, {
-        titulo: nuevaTarea.titulo,
-        fecha_inicio: nuevaTarea.fecha_inicio,
-        hora_inicio: nuevaTarea.hora_inicio,
-        prioridad: nuevaTarea.prioridad,
-      }).catch((e: any) => console.error("Error email creación:", e.message));
-    }
-
     return res({ success: true, tarea: nuevaTarea });
- 
+
   } catch (error: any) {
     await client.query("ROLLBACK");
     console.error("Error al crear tarea:", error.message);
@@ -236,63 +187,77 @@ export const POST: APIRoute = async ({ request }) => {
     client.release();
   }
 };
- 
-// ─── GET: Obtener tareas con info de serie via JOIN ───────────────────────
+
+// ─── GET ──────────────────────────────────────────────────────────────────
 export const GET: APIRoute = async () => {
   try {
-    const result = await pool.query(`
-      SELECT
-        t.*,
-        ri.id_serie,
-        ri.ocurrencia_num,
-        rs.frecuencia,
-        rs.intervalo,
-        rs.fecha_fin   AS serie_fecha_fin,
-        rs.dias_semana AS serie_dias_semana,
-        CASE WHEN ri.id_serie IS NOT NULL THEN TRUE ELSE FALSE END AS es_recurrente
-      FROM public.tarea t
-      LEFT JOIN public.recurrencia_instancia ri ON ri.id_tarea  = t.id_tarea
-      LEFT JOIN public.recurrencia_serie       rs ON rs.id_serie  = ri.id_serie
-      ORDER BY t.fecha_creacion DESC
-    `);
- 
+    const hayTablas = await tablaRecurrenciaExiste();
+
+    let result;
+    if (hayTablas) {
+      result = await pool.query(`
+        SELECT
+          t.*,
+          ri.id_serie,
+          ri.ocurrencia_num,
+          rs.frecuencia,
+          rs.intervalo,
+          rs.fecha_fin   AS serie_fecha_fin,
+          rs.dias_semana AS serie_dias_semana,
+          CASE WHEN ri.id_serie IS NOT NULL THEN TRUE ELSE FALSE END AS es_recurrente
+        FROM public.tarea t
+        LEFT JOIN public.recurrencia_instancia ri ON ri.id_tarea = t.id_tarea
+        LEFT JOIN public.recurrencia_serie      rs ON rs.id_serie = ri.id_serie
+        WHERE t.deleted_at IS NULL
+        ORDER BY t.fecha_creacion DESC
+      `);
+    } else {
+      result = await pool.query(`
+        SELECT *, FALSE AS es_recurrente
+        FROM public.tarea
+        WHERE deleted_at IS NULL
+        ORDER BY fecha_creacion DESC
+      `);
+    }
+
     return res({ success: true, tareas: result.rows });
   } catch (error: any) {
     console.error("Error al obtener tareas:", error.message);
     return res({ success: false, error: error.message }, 500);
   }
 };
- 
-// ─── PUT: Editar tarea — simple, "solo este" o "toda la serie" (GT-87) ────
+
+// ─── PUT ──────────────────────────────────────────────────────────────────
 export const PUT: APIRoute = async ({ request }) => {
   const client = await pool.connect();
   try {
     const body = await request.json();
     const { id_tarea, modo, ...campos } = body;
- 
+
     if (!id_tarea)
       return res({ success: false, message: "id_tarea requerido." }, 400);
- 
+
     await client.query("BEGIN");
- 
-    if (modo === "serie") {
+
+    const hayTablas = await tablaRecurrenciaExiste();
+
+    if (modo === "serie" && hayTablas) {
       const { rows: [inst] } = await client.query(
         `SELECT id_serie FROM public.recurrencia_instancia WHERE id_tarea = $1`, [id_tarea]
       );
- 
+
       if (!inst?.id_serie) {
         await client.query("ROLLBACK");
         return res({ success: false, message: "Esta tarea no pertenece a una serie." }, 400);
       }
- 
+
       await client.query(
         `UPDATE public.tarea t
          SET
            titulo      = COALESCE(NULLIF($1,''), t.titulo),
            descripcion = COALESCE(NULLIF($2,''), t.descripcion),
            hora_inicio = COALESCE(NULLIF($3,'')::time without time zone, t.hora_inicio),
-           prioridad   = COALESCE(NULLIF($4,''), t.prioridad),
-           categoria   = COALESCE(NULLIF($6,''), t.categoria)
+           prioridad   = COALESCE(NULLIF($4,''), t.prioridad)
          FROM public.recurrencia_instancia ri
          WHERE ri.id_tarea = t.id_tarea
            AND ri.id_serie = $5
@@ -303,7 +268,6 @@ export const PUT: APIRoute = async ({ request }) => {
           campos.hora        || null,
           campos.prioridad   || null,
           inst.id_serie,
-          campos.categoria   || null,
         ]
       );
     } else {
@@ -314,8 +278,7 @@ export const PUT: APIRoute = async ({ request }) => {
            descripcion  = COALESCE(NULLIF($2,''), descripcion),
            hora_inicio  = COALESCE(NULLIF($3,'')::time without time zone, hora_inicio),
            prioridad    = COALESCE(NULLIF($4,''), prioridad),
-           fecha_inicio = COALESCE($5::date,       fecha_inicio),
-           categoria    = COALESCE(NULLIF($7,''), categoria)
+           fecha_inicio = COALESCE($5::date, fecha_inicio)
          WHERE id_tarea = $6`,
         [
           campos.titulo      || null,
@@ -324,14 +287,13 @@ export const PUT: APIRoute = async ({ request }) => {
           campos.prioridad   || null,
           campos.fecha       || null,
           id_tarea,
-          campos.categoria   || null,
         ]
       );
     }
- 
+
     await client.query("COMMIT");
     return res({ success: true, modo: modo ?? "simple" });
- 
+
   } catch (error: any) {
     await client.query("ROLLBACK");
     console.error("Error al editar tarea:", error.message);
@@ -340,68 +302,71 @@ export const PUT: APIRoute = async ({ request }) => {
     client.release();
   }
 };
- 
-// ─── DELETE: Eliminar — simple, "solo este" o "toda la serie" (GT-88) ────
+
+// ─── DELETE ───────────────────────────────────────────────────────────────
 export const DELETE: APIRoute = async ({ url }) => {
   const client = await pool.connect();
   try {
     const id   = url.searchParams.get("id");
     const modo = url.searchParams.get("modo") ?? "simple";
- 
+
     if (!id) return res({ success: false, message: "ID no proporcionado." }, 400);
- 
+
     await client.query("BEGIN");
- 
-    if (modo === "serie") {
+
+    const hayTablas = await tablaRecurrenciaExiste();
+
+    if (modo === "serie" && hayTablas) {
       const { rows: [inst] } = await client.query(
         `SELECT id_serie FROM public.recurrencia_instancia WHERE id_tarea = $1`, [id]
       );
- 
+
       if (inst?.id_serie) {
         const { rows: instancias } = await client.query(
           `SELECT id_tarea FROM public.recurrencia_instancia WHERE id_serie = $1`,
           [inst.id_serie]
         );
         const ids = instancias.map((r: any) => r.id_tarea);
- 
+
         if (ids.length) {
           await client.query(
-            `DELETE FROM public.nota WHERE id_tarea = ANY($1::int[])`, [ids]
+            `DELETE FROM public.nota WHERE id_tarea = ANY($1::uuid[])`, [ids]
           );
         }
- 
+
         await client.query(
           `DELETE FROM public.recurrencia_instancia WHERE id_serie = $1`, [inst.id_serie]
         );
-       
         await client.query(
-            `DELETE FROM public.recurrencia_serie WHERE id_serie = $1`, [inst.id_serie]
+          `DELETE FROM public.recurrencia_serie WHERE id_serie = $1`, [inst.id_serie]
         );
- 
+
         if (ids.length) {
           await client.query(
-            `DELETE FROM public.tarea WHERE id_tarea = ANY($1::int[])`, [ids]
+            `DELETE FROM public.tarea WHERE id_tarea = ANY($1::uuid[])`, [ids]
           );
         }
       }
- 
     } else {
-      await client.query(`DELETE FROM public.nota              WHERE id_tarea = $1`, [id]);
-      await client.query(`DELETE FROM public.recurrencia_instancia WHERE id_tarea = $1`, [id]);
- 
+      await client.query(`DELETE FROM public.nota WHERE id_tarea = $1`, [id]);
+
+      if (hayTablas) {
+        await client.query(`DELETE FROM public.recurrencia_instancia WHERE id_tarea = $1`, [id]);
+      }
+
       const { rowCount } = await client.query(
         `DELETE FROM public.tarea WHERE id_tarea = $1 RETURNING *`, [id]
       );
- 
+
       if (rowCount === 0) {
         await client.query("ROLLBACK");
         return res({ success: false, message: "Tarea no encontrada." }, 404);
       }
     }
- 
+
     await client.query("COMMIT");
     return res({ success: true, message: "Eliminada correctamente." });
- 
+
   } catch (error: any) {
     await client.query("ROLLBACK");
     console.error("Error al eliminar tarea:", error.message);
