@@ -1,17 +1,19 @@
 
 export const prerender = false;
- 
+
 import type { APIRoute } from "astro";
 import { pool } from "../../lib/db";
+import { obtenerSesion, obtenerTokenDeCookie } from "../../lib/sesion";
+import { enviarNotificacionCreacion } from "../../lib/email";
  
 // ─── helpers ──────────────────────────────────────────────────────────────
 let _columnaMigrada = false;
 async function asegurarColumnaCategoria(client: any) {
   if (_columnaMigrada) return;
   try {
-    await client.query(
-      `ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) DEFAULT 'personal'`
-    );
+    await client.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) DEFAULT 'personal'`);
+    await client.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS id_usuario INT`);
+    await client.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS recordatorio_enviado BOOLEAN DEFAULT FALSE`);
   } catch (_) {}
   _columnaMigrada = true;
 }
@@ -77,6 +79,10 @@ export const POST: APIRoute = async ({ request }) => {
   const client = await pool.connect();
   try {
     await asegurarColumnaCategoria(client);
+
+    const token = obtenerTokenDeCookie(request.headers.get("cookie"));
+    const usuario = token ? await obtenerSesion(token) : null;
+
     const body = await request.json();
  
     if (!body.titulo?.trim())
@@ -121,8 +127,8 @@ export const POST: APIRoute = async ({ request }) => {
       for (let i = 0; i < fechas.length; i++) {
         const { rows: [tarea] } = await client.query(
           `INSERT INTO public.tarea
-             (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, categoria, estado, fecha_creacion)
-           VALUES ($1,$2,$3,$4,$5,$6,'pendiente',NOW()) RETURNING *`,
+             (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, categoria, id_usuario, estado, fecha_creacion)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,'pendiente',NOW()) RETURNING *`,
           [
             body.titulo.trim(),
             body.descripcion?.trim() || "",
@@ -130,6 +136,7 @@ export const POST: APIRoute = async ({ request }) => {
             body.hora || null,
             body.prioridad || "media",
             body.categoria || "personal",
+            usuario?.id_usuario || null,
           ]
         );
  
@@ -152,14 +159,25 @@ export const POST: APIRoute = async ({ request }) => {
       }
  
       await client.query("COMMIT");
+
+      if (usuario?.email && tareasCreadas.length > 0) {
+        const primera = tareasCreadas[0];
+        enviarNotificacionCreacion(usuario.email, {
+          titulo: primera.titulo,
+          fecha_inicio: primera.fecha_inicio,
+          hora_inicio: primera.hora_inicio,
+          prioridad: primera.prioridad,
+        }).catch((e: any) => console.error("Error email creación:", e.message));
+      }
+
       return res({ success: true, recurrente: true, serie, tareas: tareasCreadas });
     }
  
     // ── Tarea simple ──────────────────────────────────────────────────────
     const { rows: [nuevaTarea] } = await client.query(
       `INSERT INTO public.tarea
-         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, categoria, estado, fecha_creacion)
-       VALUES ($1,$2,$3,$4,$5,$6,'pendiente',NOW()) RETURNING *`,
+         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, categoria, id_usuario, estado, fecha_creacion)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,'pendiente',NOW()) RETURNING *`,
       [
         body.titulo.trim(),
         body.descripcion?.trim() || "",
@@ -167,6 +185,7 @@ export const POST: APIRoute = async ({ request }) => {
         body.hora   || null,
         body.prioridad || "media",
         body.categoria || "personal",
+        usuario?.id_usuario || null,
       ]
     );
  
@@ -179,6 +198,16 @@ export const POST: APIRoute = async ({ request }) => {
     }
  
     await client.query("COMMIT");
+
+    if (usuario?.email) {
+      enviarNotificacionCreacion(usuario.email, {
+        titulo: nuevaTarea.titulo,
+        fecha_inicio: nuevaTarea.fecha_inicio,
+        hora_inicio: nuevaTarea.hora_inicio,
+        prioridad: nuevaTarea.prioridad,
+      }).catch((e: any) => console.error("Error email creación:", e.message));
+    }
+
     return res({ success: true, tarea: nuevaTarea });
  
   } catch (error: any) {

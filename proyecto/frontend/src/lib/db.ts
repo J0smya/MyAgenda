@@ -27,14 +27,11 @@ pool.connect()
   .then(async (client) => {
     console.log("Conectado a la base de datos ✅");
     try {
-      await client.query(`
-        ALTER TABLE public.tarea
-        ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) DEFAULT 'personal'
-      `);
-      console.log("Columna 'categoria' verificada ✅");
-    } catch (_) {
-      // Si la tabla aún no existe, se ignora el error
-    }
+      await client.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) DEFAULT 'personal'`);
+      await client.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS id_usuario INT`);
+      await client.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS recordatorio_enviado BOOLEAN DEFAULT FALSE`);
+      console.log("Columnas verificadas ✅");
+    } catch (_) {}
     client.release();
   })
   .catch(err => console.error("Error al conectar a la base de datos ❌", err));
