@@ -797,6 +797,28 @@ body {
   letter-spacing: 0.04em;
 }
 
+.db-btn-complete {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  transition: opacity .2s, background .2s;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.db-btn-complete:hover { opacity: 0.88; }
+.db-btn-complete--done {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
 .db-btn-understood {
   width: 100%;
   background: #111827;

@@ -278,7 +278,8 @@ export const PUT: APIRoute = async ({ request }) => {
            descripcion  = COALESCE(NULLIF($2,''), descripcion),
            hora_inicio  = COALESCE(NULLIF($3,'')::time without time zone, hora_inicio),
            prioridad    = COALESCE(NULLIF($4,''), prioridad),
-           fecha_inicio = COALESCE($5::date, fecha_inicio)
+           fecha_inicio = COALESCE($5::date, fecha_inicio),
+           estado       = COALESCE(NULLIF($7,'')::public.estado_tarea, estado)
          WHERE id_tarea = $6`,
         [
           campos.titulo      || null,
@@ -287,6 +288,7 @@ export const PUT: APIRoute = async ({ request }) => {
           campos.prioridad   || null,
           campos.fecha       || null,
           id_tarea,
+          campos.estado      || null,
         ]
       );
     }
