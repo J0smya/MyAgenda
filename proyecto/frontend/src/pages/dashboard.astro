@@ -12,13 +12,8 @@ import '../styles/noteEditor.css';
  
   <aside class="db-sidebar">
     <div class="db-logo">
-      <div class="db-logo-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
-          <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-        </svg>
-      </div>
-      My Agenda
+      <img src="/logo.svg" alt="My Agenda" class="db-logo-icon" width="36" height="36" />
+      <span class="db-logo-text">My Agenda</span>
     </div>
  
     <div class="db-sidebar-section">
@@ -29,25 +24,28 @@ import '../styles/noteEditor.css';
       <div id="filtros-lista"></div>
     </div>
  
-    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px; width: 100%;">
-      <div class="db-sidebar-notes-btn-wrap" style="padding: 0;">
-        <button id="btn-ver-notas" class="db-sidebar-notes-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-          </svg>
-          <span>Notas</span>
-          <span id="notas-count-badge" class="db-notes-count-badge" style="display:none"></span>
-        </button>
-      </div>
-      <div class="db-sidebar-perfil-wrap" style="width: 100%;">
+    <div class="db-sidebar-bottom-btns">
+      <button id="btn-pendientes" class="db-sidebar-pendientes-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>Pendientes</span>
+        <span id="pendientes-count-badge" class="db-pendientes-count-badge" style="display:none"></span>
+      </button>
+      <button id="btn-ver-notas" class="db-sidebar-notes-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <span>Notas</span>
+        <span id="notas-count-badge" class="db-notes-count-badge" style="display:none"></span>
+      </button>
+      <div class="db-sidebar-perfil-wrap">
         <Perfil />
       </div>
-    </div>
- 
-    <div class="db-sidebar-notes-btn-wrap">
       <button id="btn-ver-archivos" class="db-sidebar-archivos-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
@@ -140,41 +138,74 @@ import '../styles/noteEditor.css';
   <div id="modal" class="db-modal-backdrop">
     <div class="db-modal-box">
       <form id="task-form">
-        <h3 class="db-modal-title" id="modal-titulo-label">Nueva tarea</h3>
-        <div class="space-y-4">
-          <input type="text" id="t-titulo" required placeholder="Título de la tarea" class="db-input">
-          <textarea id="t-desc" placeholder="Descripción o notas" rows="2" class="db-input" style="resize:none"></textarea>
-          <div class="grid-2">
-            <select id="t-prioridad" class="db-select">
-              <option value="alta">Alta prioridad</option>
-              <option value="media" selected>Media prioridad</option>
-              <option value="baja">Baja prioridad</option>
-            </select>
-            <select id="t-cat" class="db-select">
-              <option value="trabajo">Trabajo</option>
-              <option value="personal">Personal</option>
-            </select>
+        <div class="db-modal-form-head">
+          <div class="db-modal-form-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
           </div>
- 
-          <div class="grid-2" style="align-items:end;">
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Fecha</label>
+          <h3 class="db-modal-title" id="modal-titulo-label">Nueva tarea</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="db-field-group">
+            <label class="db-field-label" for="t-titulo">Título</label>
+            <input type="text" id="t-titulo" required placeholder="Ej: Reunión de equipo..." class="db-input">
+          </div>
+
+          <div class="db-field-group">
+            <label class="db-field-label" for="t-desc">Descripción</label>
+            <textarea id="t-desc" placeholder="Agrega notas o detalles opcionales..." rows="2" class="db-input" style="resize:none"></textarea>
+          </div>
+
+          <div class="grid-2">
+            <div class="db-field-group">
+              <label class="db-field-label" for="t-prioridad">Prioridad</label>
+              <div class="db-select-pill-wrap">
+                <span class="db-select-pill-dot" id="dot-prioridad"></span>
+                <select id="t-prioridad" class="db-select db-select-has-dot">
+                  <option value="alta">Alta prioridad</option>
+                  <option value="media" selected>Media prioridad</option>
+                  <option value="baja">Baja prioridad</option>
+                </select>
+              </div>
+            </div>
+            <div class="db-field-group">
+              <label class="db-field-label" for="t-cat">Categoría</label>
+              <div class="db-select-pill-wrap">
+                <span class="db-select-pill-dot" id="dot-categoria"></span>
+                <select id="t-cat" class="db-select db-select-has-dot"></select>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="db-field-group">
+              <label class="db-field-label" for="t-fecha">Fecha</label>
               <input type="date" id="t-fecha" class="db-input">
             </div>
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Hora</label>
+            <div class="db-field-group">
+              <label class="db-field-label" for="t-hora-inicio">Hora</label>
               <input type="time" id="t-hora-inicio" class="db-input" style="text-align:center;">
             </div>
           </div>
  
           <!-- RECORDATORIO -->
-          <div style="display:flex;flex-direction:column;gap:8px;padding:12px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;">
-            <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#374151;cursor:pointer;">
-              <input type="checkbox" id="t-usa-recordatorio" style="width:16px;height:16px;">
-              Activar recordatorio
+          <div class="db-form-section">
+            <label class="db-form-section-toggle">
+              <input type="checkbox" id="t-usa-recordatorio" class="db-form-checkbox">
+              <span class="db-form-section-icon db-form-section-icon--blue">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+              </span>
+              <span class="db-form-section-label">Activar recordatorio</span>
             </label>
-            <div id="wrapper-recordatorio" class="hidden" style="flex-direction:column;gap:8px;">
-              <select id="t-minutos-antes" class="db-select" style="font-size:13px;">
+            <div id="wrapper-recordatorio" class="hidden db-form-section-body">
+              <select id="t-minutos-antes" class="db-select">
                 <option value="5">5 minutos antes</option>
                 <option value="15">15 minutos antes</option>
                 <option value="30">30 minutos antes</option>
@@ -182,41 +213,56 @@ import '../styles/noteEditor.css';
                 <option value="120">2 horas antes</option>
                 <option value="1440">1 día antes</option>
               </select>
-              <p style="font-size:11px;color:#6b7280;margin:0;">Aparecerá una notificación en pantalla.</p>
+              <p class="db-form-section-hint">Recibirás una notificación en pantalla.</p>
             </div>
           </div>
  
-          <!-- RECURRENCIA (GT-84) -->
-          <div id="recurrencia-wrap" style="display:flex;flex-direction:column;gap:8px;padding:12px;background:#f0fdf4;border-radius:10px;border:1px solid #bbf7d0;">
-            <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#374151;cursor:pointer;">
-              <input type="checkbox" id="t-usa-recurrencia" style="width:16px;height:16px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-              Repetir tarea
+          <!-- RECURRENCIA -->
+          <div id="recurrencia-wrap" class="db-form-section db-form-section--green">
+            <label class="db-form-section-toggle">
+              <input type="checkbox" id="t-usa-recurrencia" class="db-form-checkbox">
+              <span class="db-form-section-icon db-form-section-icon--green">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="17 1 21 5 17 9"/>
+                  <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                  <polyline points="7 23 3 19 7 15"/>
+                  <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                </svg>
+              </span>
+              <span class="db-form-section-label">Repetir tarea</span>
             </label>
-            <div id="wrapper-recurrencia" style="display:none;flex-direction:column;gap:12px;">
- 
+            <div id="wrapper-recurrencia" style="display:none;" class="db-form-section-body db-recur-body">
+
               <!-- Frecuencia -->
-              <div>
-                <p style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin:0 0 6px;">Frecuencia</p>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;" id="rec-freq-tabs">
-                  <button type="button" class="db-rec-freq-btn active" data-freq="diaria">📅 Diaria</button>
-                  <button type="button" class="db-rec-freq-btn" data-freq="semanal">📆 Semanal</button>
-                  <button type="button" class="db-rec-freq-btn" data-freq="mensual">🗓️ Mensual</button>
+              <div class="db-recur-group">
+                <p class="db-recur-group-label">Frecuencia</p>
+                <div class="db-recur-tabs" id="rec-freq-tabs">
+                  <button type="button" class="db-rec-freq-btn active" data-freq="diaria">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                    Diaria
+                  </button>
+                  <button type="button" class="db-rec-freq-btn" data-freq="semanal">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                    Semanal
+                  </button>
+                  <button type="button" class="db-rec-freq-btn" data-freq="mensual">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                    Mensual
+                  </button>
                 </div>
               </div>
- 
+
               <!-- Intervalo -->
-              <div style="display:flex;align-items:center;gap:10px;">
-                <span style="font-size:12px;color:#6b7280;font-weight:600;">Cada</span>
-                <input type="number" id="rec-intervalo" min="1" max="30" value="1"
-                  class="db-input" style="width:64px;text-align:center;padding:8px;">
-                <span id="rec-intervalo-label" style="font-size:12px;color:#6b7280;font-weight:600;">día(s)</span>
+              <div class="db-recur-interval">
+                <span class="db-recur-lbl">Cada</span>
+                <input type="number" id="rec-intervalo" min="1" max="30" value="1" class="db-input db-recur-num">
+                <span id="rec-intervalo-label" class="db-recur-lbl">día(s)</span>
               </div>
- 
+
               <!-- Días semana (solo semanal) -->
-              <div id="rec-dias-wrap" style="display:none;">
-                <p style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin:0 0 6px;">Días</p>
-                <div style="display:flex;gap:5px;" id="rec-dias">
+              <div id="rec-dias-wrap" style="display:none;" class="db-recur-group">
+                <p class="db-recur-group-label">Días</p>
+                <div class="db-dia-btns-row" id="rec-dias">
                   <button type="button" class="db-dia-btn" data-day="1">L</button>
                   <button type="button" class="db-dia-btn" data-day="2">M</button>
                   <button type="button" class="db-dia-btn" data-day="3">X</button>
@@ -226,11 +272,11 @@ import '../styles/noteEditor.css';
                   <button type="button" class="db-dia-btn" data-day="7">D</button>
                 </div>
               </div>
- 
+
               <!-- Fin de serie -->
-              <div>
-                <p style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin:0 0 6px;">Terminar</p>
-                <div style="display:flex;gap:6px;" id="rec-fin-tabs">
+              <div class="db-recur-group">
+                <p class="db-recur-group-label">Terminar</p>
+                <div class="db-recur-fin-row" id="rec-fin-tabs">
                   <button type="button" class="db-rec-fin-btn active" data-fin="nunca">Nunca</button>
                   <button type="button" class="db-rec-fin-btn" data-fin="fecha">Por fecha</button>
                   <button type="button" class="db-rec-fin-btn" data-fin="cantidad">Por cantidad</button>
@@ -239,16 +285,15 @@ import '../styles/noteEditor.css';
                   <input type="date" id="rec-fecha-fin" class="db-input">
                 </div>
                 <div id="rec-fin-cantidad-wrap" style="display:none;margin-top:8px;align-items:center;gap:10px;">
-                  <input type="number" id="rec-total-ocurr" min="2" max="365" value="10"
-                    class="db-input" style="width:64px;text-align:center;padding:8px;">
-                  <span style="font-size:12px;color:#6b7280;font-weight:600;">repeticiones</span>
+                  <input type="number" id="rec-total-ocurr" min="2" max="365" value="10" class="db-input db-recur-num">
+                  <span class="db-recur-lbl">repeticiones</span>
                 </div>
               </div>
- 
+
               <!-- Preview fechas -->
-              <div>
-                <p style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin:0 0 6px;">Próximas fechas</p>
-                <div id="rec-preview" style="display:flex;flex-wrap:wrap;gap:5px;padding:10px;background:#fff;border-radius:8px;border:1px solid #d1fae5;min-height:38px;"></div>
+              <div class="db-recur-group">
+                <p class="db-recur-group-label">Próximas fechas</p>
+                <div id="rec-preview" class="db-rec-preview-wrap"></div>
               </div>
             </div>
           </div>
@@ -296,11 +341,17 @@ import '../styles/noteEditor.css';
     <div class="db-view-modal-box">
       <div id="view-content" class="space-y-4"></div>
       <div class="space-y-3" style="margin-top:24px;">
-        <button id="btn-complete-task" class="db-btn-complete">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><polyline points="20 6 9 17 4 12"/></svg>
-          <span id="complete-task-label">Marcar como completada</span>
-        </button>
-        <button id="btn-edit-task" class="db-btn-submit" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">
+        <div class="db-view-action-row">
+          <button id="btn-complete-task" class="db-btn-complete">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="complete-task-label">Completar</span>
+          </button>
+          <button id="btn-view-pendientes" class="db-btn-pendientes-view">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Pendientes
+          </button>
+        </div>
+        <button id="btn-edit-task" class="db-btn-submit" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 4px 14px rgba(99,102,241,0.35);">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           Editar tarea
         </button>
@@ -424,26 +475,92 @@ import '../styles/noteEditor.css';
  
 <!-- CSS inline para recurrencia y edición -->
 <style>
+/* ── Field labels ── */
+.db-field-group { display:flex;flex-direction:column;gap:5px; }
+.db-field-label { font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em; }
+
+/* ── Select with colored dot ── */
+.db-select-pill-wrap { position:relative;display:flex;align-items:center; }
+.db-select-pill-dot {
+  position:absolute;left:12px;width:9px;height:9px;border-radius:50%;
+  background:#94a3b8;pointer-events:none;z-index:1;flex-shrink:0;
+}
+.db-select-has-dot { padding-left:28px !important; }
+
+/* ── Form section (Recordatorio / Recurrencia) ── */
+.db-form-section {
+  border-radius:12px;padding:2px 0 0;
+  border:1.5px solid #e2e8f0;background:#f8fafc;
+  overflow:hidden;
+}
+.db-form-section--green { border-color:#bbf7d0;background:#f0fdf4; }
+.db-form-section-toggle {
+  display:flex;align-items:center;gap:10px;
+  padding:11px 14px;cursor:pointer;
+}
+.db-form-checkbox { width:15px;height:15px;cursor:pointer;flex-shrink:0; }
+.db-form-section-icon {
+  width:28px;height:28px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  background:linear-gradient(135deg,#bfdbfe,#93c5fd);color:#1d4ed8;
+}
+.db-form-section-icon--blue { background:linear-gradient(135deg,#bfdbfe,#93c5fd);color:#1d4ed8; }
+.db-form-section-icon--green { background:linear-gradient(135deg,#bbf7d0,#6ee7b7);color:#065f46; }
+.db-form-section-label { font-size:13px;font-weight:600;color:#374151; }
+.db-form-section-body {
+  padding:0 14px 13px;display:flex;flex-direction:column;gap:12px;
+}
+.db-form-section-hint { font-size:11px;color:#94a3b8;margin:0; }
+
+/* ── Recurrencia layout ── */
+.db-recur-body { border-top:1px solid #d1fae5;padding-top:12px; }
+.db-recur-group { display:flex;flex-direction:column;gap:6px; }
+.db-recur-group-label {
+  font-size:10px;font-weight:700;color:#6b7280;
+  text-transform:uppercase;letter-spacing:.06em;margin:0;
+}
+.db-recur-tabs { display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px; }
+.db-recur-interval { display:flex;align-items:center;gap:8px; }
+.db-recur-lbl { font-size:12px;font-weight:600;color:#6b7280; }
+.db-recur-num { width:60px !important;text-align:center;padding:7px 8px !important;font-size:13px !important; }
+.db-dia-btns-row { display:flex;gap:5px; }
+.db-recur-fin-row { display:flex;gap:5px; }
+
+/* ── Recurrencia buttons ── */
 .db-rec-freq-btn {
-  padding:8px 4px;border-radius:8px;border:1.5px solid #d1fae5;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:8px 4px;border-radius:10px;border:1.5px solid #d1fae5;
   background:#fff;color:#374151;font-size:11px;font-weight:600;
   cursor:pointer;transition:all .15s;
 }
+.db-rec-freq-btn:hover { border-color:#6ee7b7;background:#f0fdf4; }
 .db-rec-freq-btn.active { background:#059669;border-color:#059669;color:#fff; }
+.db-rec-freq-btn.active svg { stroke:#fff; }
 .db-rec-fin-btn {
   flex:1;padding:7px;border-radius:8px;border:1.5px solid #e5e7eb;
   background:#fff;color:#6b7280;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;
 }
+.db-rec-fin-btn:hover { border-color:#93c5fd;background:#eff6ff;color:#2563eb; }
 .db-rec-fin-btn.active { background:#eff6ff;border-color:#93c5fd;color:#2563eb; }
 .db-dia-btn {
   width:33px;height:33px;border-radius:50%;border:1.5px solid #d1fae5;
   background:#fff;color:#374151;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;
 }
+.db-dia-btn:hover { border-color:#6ee7b7;background:#f0fdf4; }
 .db-dia-btn.activo { background:#059669;border-color:#059669;color:#fff; }
+
+/* ── Preview chips ── */
+.db-rec-preview-wrap {
+  display:flex;flex-wrap:wrap;gap:5px;
+  padding:10px 12px;background:#fff;border-radius:10px;
+  border:1px solid #d1fae5;min-height:38px;align-items:center;
+}
 .db-rec-preview-chip {
   padding:3px 9px;background:#ecfdf5;border:1px solid #bbf7d0;
   border-radius:20px;font-size:11px;font-weight:600;color:#059669;
 }
+
+/* ── Task card & series ── */
 .db-task-card-rec {
   display:inline-block;font-size:9px;font-weight:700;letter-spacing:.03em;
   background:rgba(255,255,255,.28);border-radius:4px;padding:1px 5px;margin-top:2px;
@@ -485,6 +602,7 @@ import '../styles/noteEditor.css';
   const FILTROS_KEY = 'myagenda_filtros';
   let filtros: Filtro[] = [];
   let filtroEditandoId: string | null = null;
+  let mostrarSoloPendientes = false;
   let colorSeleccionado = '#0ea5e9';
   const COLORES_PRESET = ['#0ea5e9','#6366f1','#f59e0b','#ef4444','#10b981','#8b5cf6','#f97316','#ec4899','#14b8a6','#64748b'];
  
@@ -500,6 +618,24 @@ import '../styles/noteEditor.css';
   };
  
   const INTERVALO_LABELS: Record<string,string> = { diaria:'día(s)', semanal:'semana(s)', mensual:'mes(es)' };
+
+  const PRIORIDAD_COLORS: Record<string,string> = {
+    alta: '#ef4444', media: '#f59e0b', baja: '#22c55e',
+  };
+
+  function actualizarDots() {
+    const prioEl = document.getElementById('t-prioridad') as HTMLSelectElement;
+    const catEl  = document.getElementById('t-cat')       as HTMLSelectElement;
+    const dotPrio = document.getElementById('dot-prioridad') as HTMLElement;
+    const dotCat  = document.getElementById('dot-categoria') as HTMLElement;
+    if (dotPrio && prioEl) {
+      dotPrio.style.background = PRIORIDAD_COLORS[prioEl.value] || '#94a3b8';
+    }
+    if (dotCat && catEl) {
+      const f = filtros.find(x => x.id === catEl.value);
+      dotCat.style.background = f ? f.color : '#94a3b8';
+    }
+  }
  
   let estadoChat: { menu:string; datos?: Record<string,any> } = { menu:'inicio' };
   let datosAcumulados: Record<string,any> = {};
@@ -566,6 +702,7 @@ import '../styles/noteEditor.css';
     const val = sel.value;
     sel.innerHTML = filtros.map(f=>`<option value="${f.id}">${f.nombre}</option>`).join('');
     if (filtros.find(f=>f.id===val)) sel.value = val;
+    actualizarDots();
   }
  
   function abrirModalFiltro(id?: string) {
@@ -897,6 +1034,7 @@ import '../styles/noteEditor.css';
       (document.getElementById('t-prioridad')   as HTMLSelectElement).value  = tarea.prioridad;
       actualizarSelectCategoria();
       (document.getElementById('t-cat') as HTMLSelectElement).value = tarea.categoria;
+      actualizarDots();
       // Ocultar recurrencia en modo edición (se maneja por separado)
       document.getElementById('recurrencia-wrap')!.style.display = 'none';
     } else {
@@ -910,6 +1048,7 @@ import '../styles/noteEditor.css';
       const avisoGuardado=localStorage.getItem('conf_aviso');
       if (avisoGuardado) (document.getElementById('t-minutos-antes') as HTMLSelectElement).value=avisoGuardado;
       actualizarSelectCategoria();
+      actualizarDots();
       document.getElementById('recurrencia-wrap')!.style.display='';
       resetRecurrencia();
       resetNota();
@@ -927,6 +1066,9 @@ import '../styles/noteEditor.css';
  
   document.getElementById('btn-add')?.addEventListener('click',()=>openModalTarea('nueva'));
   document.getElementById('close-modal')?.addEventListener('click',closeModalTarea);
+  modalCreate.addEventListener('click', e => { if (e.target === modalCreate) closeModalTarea(); });
+  document.getElementById('t-prioridad')?.addEventListener('change', actualizarDots);
+  document.getElementById('t-cat')?.addEventListener('change', actualizarDots);
   document.getElementById('t-usa-recordatorio')?.addEventListener('change',e=>{
     const w=document.getElementById('wrapper-recordatorio')!;
     const c=(e.target as HTMLInputElement).checked;
@@ -1115,6 +1257,12 @@ import '../styles/noteEditor.css';
   /* ─────────────────── VER TAREA ─────────────────── */
   document.getElementById('close-view')?.addEventListener('click',()=>modalView.classList.remove('open'));
   modalView.addEventListener('click',(e)=>{ if(e.target===modalView) modalView.classList.remove('open'); });
+  document.getElementById('btn-view-pendientes')?.addEventListener('click',()=>{
+    modalView.classList.remove('open');
+    mostrarSoloPendientes = true;
+    document.getElementById('btn-pendientes')?.classList.add('activo');
+    render();
+  });
  
   (window as any).verDetalle = (id:string)=>{
     selectedTaskId=id;
@@ -1138,7 +1286,7 @@ import '../styles/noteEditor.css';
     const btnComplete = document.getElementById('btn-complete-task') as HTMLButtonElement;
     if(label && btnComplete){
       const completada = t.estado === 'completada';
-      label.textContent = completada ? 'Quitar completada' : 'Marcar como completada';
+      label.textContent = completada ? 'Desmarcar' : 'Completar';
       btnComplete.classList.toggle('db-btn-complete--done', completada);
     }
     modalView.classList.add('open');
@@ -1290,6 +1438,12 @@ import '../styles/noteEditor.css';
     neEditor.innerHTML=''; neTitleInput.value=''; neWords.textContent='0 palabras';
     modalNota.classList.add('ne-open'); setTimeout(()=>neEditor.focus(),150);
   });
+  document.getElementById('btn-pendientes')?.addEventListener('click',()=>{
+    mostrarSoloPendientes = !mostrarSoloPendientes;
+    const btn = document.getElementById('btn-pendientes');
+    btn?.classList.toggle('activo', mostrarSoloPendientes);
+    render();
+  });
   document.getElementById('btn-ver-notas')?.addEventListener('click',async()=>{modalNotasLista.classList.add('open');await cargarTodasLasNotas();});
   document.getElementById('notas-lista-close')?.addEventListener('click',()=>modalNotasLista.classList.remove('open'));
   modalNotasLista?.addEventListener('click',e=>{if(e.target===modalNotasLista) modalNotasLista.classList.remove('open');});
@@ -1411,7 +1565,17 @@ import '../styles/noteEditor.css';
  
   function render() {
     const activos=filtros.filter(f=>f.activo).map(f=>f.id);
-    const filtered=allTasks.filter(t=>activos.includes(t.categoria));
+    const filtered=allTasks.filter(t=>
+      activos.includes(t.categoria) &&
+      (!mostrarSoloPendientes || t.estado === 'pendiente')
+    );
+    // Actualizar badge de pendientes
+    const totalPendientes = allTasks.filter(t => t.estado === 'pendiente').length;
+    const badge = document.getElementById('pendientes-count-badge');
+    if (badge) {
+      badge.textContent = String(totalPendientes);
+      badge.style.display = totalPendientes > 0 ? '' : 'none';
+    }
     document.querySelectorAll<HTMLElement>('.db-view-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.v===currentView));
     if(currentView==='dia') renderDia(filtered);
     else if(currentView==='semana') renderSemana(filtered);

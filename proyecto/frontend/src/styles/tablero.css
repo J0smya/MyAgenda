@@ -38,25 +38,27 @@ body {
 .db-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: #111827;
-  letter-spacing: -0.02em;
+  gap: 11px;
   text-decoration: none;
+  user-select: none;
 }
 
 .db-logo-icon {
   width: 36px;
   height: 36px;
-  background: #0ea5e9;
   border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 18px;
   flex-shrink: 0;
+  display: block;
+}
+
+.db-logo-text {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  background: linear-gradient(135deg, #0ea5e9 0%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Sección filtros */
@@ -499,8 +501,9 @@ body {
   width: 100%;
   max-width: 520px;
   border-radius: 24px;
-  padding: 32px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+  padding: 28px 32px 32px;
+  box-shadow: inset 0 5px 0 0 #0ea5e9, 0 24px 60px rgba(0,0,0,0.18);
+  border: 1px solid #f1f5f9;
   max-height: 92vh;
   overflow-y: auto;
   animation: modal-in 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
@@ -511,48 +514,84 @@ body {
   to   { opacity: 1; transform: scale(1)    translateY(0); }
 }
 
+/* Header del formulario */
+.db-modal-form-head {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1.5px solid #f1f5f9;
+}
+
+.db-modal-form-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
 .db-modal-title {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 800;
-  color: #111827;
-  text-align: center;
-  margin-bottom: 20px;
-  letter-spacing: -0.02em;
+  color: #0f172a;
+  text-align: left;
+  margin-bottom: 0;
+  letter-spacing: -0.025em;
 }
 
 /* Inputs del formulario */
 .db-input {
   width: 100%;
-  background: #f9fafb;
-  border: 1.5px solid #e5e7eb;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
   border-radius: 12px;
-  padding: 14px 16px;
+  padding: 13px 16px;
   font-size: 13px;
   font-weight: 500;
-  color: #111827;
+  color: #0f172a;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   font-family: inherit;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
-.db-input:focus { border-color: #0ea5e9; background: #f0f9ff; }
-.db-input::placeholder { color: #9ca3af; }
+.db-input:focus {
+  border-color: #0ea5e9;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12), 0 1px 3px rgba(0,0,0,0.04);
+}
+.db-input::placeholder { color: #94a3b8; }
 
 .db-select {
   width: 100%;
-  background: #f9fafb;
-  border: 1.5px solid #e5e7eb;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
   border-radius: 12px;
-  padding: 14px 16px;
+  padding: 13px 16px;
   font-size: 12px;
   font-weight: 600;
-  color: #374151;
+  color: #334155;
   outline: none;
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   font-family: inherit;
   appearance: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
 }
-.db-select:focus { border-color: #0ea5e9; }
+.db-select:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
+}
 
 /* Separador */
 .db-form-sep {
@@ -674,35 +713,48 @@ body {
 /* Botón submit principal */
 .db-btn-submit {
   width: 100%;
-  background: #0ea5e9;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
   color: #ffffff;
   border: none;
-  border-radius: 12px;
+  border-radius: 13px;
   padding: 15px;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s, transform 0.12s;
-  letter-spacing: 0.02em;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.db-btn-submit:hover  { background: #0284c7; }
-.db-btn-submit:active { transform: scale(0.98); }
+.db-btn-submit:hover {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.45);
+  transform: translateY(-1px);
+}
+.db-btn-submit:active { transform: scale(0.98); box-shadow: none; }
 
 /* Botón cancelar */
 .db-btn-cancel {
   width: 100%;
-  background: none;
-  border: none;
-  color: #9ca3af;
-  font-size: 11px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  color: #64748b;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  padding: 8px;
-  transition: color 0.15s;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  padding: 12px;
+  border-radius: 12px;
+  transition: all 0.15s;
+  letter-spacing: 0.01em;
+  font-family: inherit;
 }
-.db-btn-cancel:hover { color: #ef4444; }
+.db-btn-cancel:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #ef4444;
+}
 
 /* Checkbox hora */
 .db-hora-toggle {
@@ -797,12 +849,47 @@ body {
   letter-spacing: 0.04em;
 }
 
+/* Fila de 2 acciones en el modal ver tarea */
+.db-view-action-row {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+/* Botón pendientes dentro del modal ver tarea */
+.db-btn-pendientes-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 12px;
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border: 1.5px solid #fed7aa;
+  border-radius: 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #c2410c;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.db-btn-pendientes-view:hover {
+  background: #ffedd5;
+  border-color: #fdba74;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.22);
+}
+.db-btn-pendientes-view:active { transform: scale(0.97); }
+
 .db-btn-complete {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 20px;
+  padding: 11px 12px;
   border-radius: 12px;
   border: none;
   cursor: pointer;
@@ -2653,64 +2740,43 @@ body {
   padding-left: 4px;
 }
 
-/* Contenedor de cada botón */
-.db-sidebar-notes-btn-wrap {
-  margin-bottom: 8px;
-}
-
-/* Botón Notas */
-.db-sidebar-notes-btn {
-  width: 100%;
+/* ── Contenedor unificado de botones inferiores del sidebar ── */
+.db-sidebar-bottom-btns {
+  margin-top: auto;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 13px 14px;
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border: 1.5px solid #bbf7d0;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: inherit;
-  position: relative;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
 }
 
-.db-sidebar-notes-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.15);
-  border-color: #86efac;
+.db-sidebar-perfil-wrap {
+  width: 100%;
 }
 
-.db-sidebar-notes-btn:active {
-  transform: scale(0.97);
-}
-
-/* Botón Archivos */
+/* ── Estilos base compartidos para todos los botones del sidebar ── */
+.db-sidebar-pendientes-btn,
+.db-sidebar-notes-btn,
 .db-sidebar-archivos-btn {
   width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 13px 14px;
-  background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%);
-  border: 1.5px solid #e9d5ff;
   border-radius: 14px;
+  border: 1.5px solid transparent;
   cursor: pointer;
   transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: inherit;
   position: relative;
 }
 
-.db-sidebar-archivos-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(147, 51, 234, 0.15);
-  border-color: #c4b5fd;
-}
-
+.db-sidebar-pendientes-btn:active,
+.db-sidebar-notes-btn:active,
 .db-sidebar-archivos-btn:active {
   transform: scale(0.97);
 }
 
-/* Iconos SVG */
+.db-sidebar-pendientes-btn svg,
 .db-sidebar-notes-btn svg,
 .db-sidebar-archivos-btn svg {
   width: 18px;
@@ -2719,37 +2785,73 @@ body {
   transition: transform 0.2s;
 }
 
-.db-sidebar-notes-btn:hover svg {
-  color: #16a34a;
-  transform: scale(1.1);
-}
-
-.db-sidebar-archivos-btn:hover svg {
-  color: #9333ea;
-  transform: scale(1.1);
-}
-
-/* Texto */
+.db-sidebar-pendientes-btn span,
 .db-sidebar-notes-btn span,
 .db-sidebar-archivos-btn span {
   font-size: 13.5px;
   font-weight: 700;
 }
 
-.db-sidebar-notes-btn span {
-  color: #166534;
+/* ── Botón Pendientes (ámbar) ── */
+.db-sidebar-pendientes-btn {
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+  border-color: #fed7aa;
 }
 
-.db-sidebar-archivos-btn span {
-  color: #6b21a8;
+.db-sidebar-pendientes-btn span { color: #9a3412; }
+
+.db-sidebar-pendientes-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(249, 115, 22, 0.18);
+  border-color: #fdba74;
 }
 
-/* Badges de conteo */
+.db-sidebar-pendientes-btn:hover svg { color: #ea580c; transform: scale(1.1); }
+
+.db-sidebar-pendientes-btn.activo {
+  background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+  border-color: #f97316;
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
+}
+
+/* ── Botón Notas (verde) ── */
+.db-sidebar-notes-btn {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-color: #bbf7d0;
+}
+
+.db-sidebar-notes-btn span { color: #166534; }
+
+.db-sidebar-notes-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.15);
+  border-color: #86efac;
+}
+
+.db-sidebar-notes-btn:hover svg { color: #16a34a; transform: scale(1.1); }
+
+/* ── Botón Archivos (violeta) ── */
+.db-sidebar-archivos-btn {
+  background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%);
+  border-color: #e9d5ff;
+}
+
+.db-sidebar-archivos-btn span { color: #6b21a8; }
+
+.db-sidebar-archivos-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(147, 51, 234, 0.15);
+  border-color: #c4b5fd;
+}
+
+.db-sidebar-archivos-btn:hover svg { color: #9333ea; transform: scale(1.1); }
+
+/* ── Badges de conteo ── */
+.db-pendientes-count-badge,
 .db-notes-count-badge,
 .db-archivos-count-badge {
   margin-left: auto;
   background: white;
-  color: #166534;
   font-size: 11px;
   font-weight: 800;
   padding: 3px 8px;
@@ -2757,26 +2859,16 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   min-width: 20px;
   text-align: center;
-  border: 1.5px solid #bbf7d0;
+  border: 1.5px solid;
 }
 
-.db-archivos-count-badge {
-  color: #6b21a8;
-  border-color: #e9d5ff;
-}
+.db-pendientes-count-badge { color: #9a3412; border-color: #fed7aa; }
+.db-notes-count-badge      { color: #166534; border-color: #bbf7d0; }
+.db-archivos-count-badge   { color: #6b21a8; border-color: #e9d5ff; }
 
-/* Hover en badges */
-.db-sidebar-notes-btn:hover .db-notes-count-badge {
-  background: #16a34a;
-  color: white;
-  border-color: #16a34a;
-}
-
-.db-sidebar-archivos-btn:hover .db-archivos-count-badge {
-  background: #9333ea;
-  color: white;
-  border-color: #9333ea;
-}
+.db-sidebar-pendientes-btn:hover .db-pendientes-count-badge { background: #f97316; color: white; border-color: #f97316; }
+.db-sidebar-notes-btn:hover     .db-notes-count-badge       { background: #16a34a; color: white; border-color: #16a34a; }
+.db-sidebar-archivos-btn:hover  .db-archivos-count-badge    { background: #9333ea; color: white; border-color: #9333ea; }
 
 /* =============================================
    MODAL ARCHIVOS

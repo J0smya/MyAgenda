@@ -9,27 +9,42 @@
 .btn-estilo-notas {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
-  background: #f0f9ff;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
   border: 1.5px solid #bae6fd;
-  border-radius: 12px;
-  padding: 12px 14px;
-  font-size: 13px;
+  border-radius: 14px;
+  padding: 13px 14px;
+  font-size: 13.5px;
   font-weight: 700;
-  color: #0284c7;
+  color: #0369a1;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  position: relative;
 }
 
 .btn-estilo-notas:hover {
-  background: #e0f2fe;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(14, 165, 233, 0.18);
   border-color: #7dd3fc;
-  color: #0369a1;
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+}
+
+.btn-estilo-notas:active {
+  transform: scale(0.97);
 }
 
 .btn-estilo-notas svg {
   flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s;
+}
+
+.btn-estilo-notas:hover svg {
+  color: #0ea5e9;
+  transform: scale(1.1);
 }
 
 /* === ESTILOS DEL MENÚ EMERGENTE === */
