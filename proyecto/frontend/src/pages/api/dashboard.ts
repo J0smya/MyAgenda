@@ -6,17 +6,12 @@ import { pool } from "../../lib/db";
 import { obtenerSesion, obtenerTokenDeCookie } from "../../lib/sesion";
 import { enviarNotificacionCreacion } from "../../lib/email";
  
-// ─── helpers ──────────────────────────────────────────────────────────────
-let _columnaMigrada = false;
-async function asegurarColumnaCategoria(client: any) {
-  if (_columnaMigrada) return;
-  try {
-    await client.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) DEFAULT 'personal'`);
-    await client.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS id_usuario INT`);
-    await client.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS recordatorio_enviado BOOLEAN DEFAULT FALSE`);
-  } catch (_) {}
-  _columnaMigrada = true;
-}
+// ─── Migración al arrancar el módulo ──────────────────────────────────────
+pool.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) DEFAULT 'personal'`)
+  .then(() => pool.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS id_usuario UUID`))
+  .then(() => pool.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS recordatorio_enviado BOOLEAN DEFAULT FALSE`))
+  .then(() => console.log('[migration] columnas de tarea OK'))
+  .catch((e: any) => console.error('[migration] error alterando tarea:', e.message));
 
 function res(body: object, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -78,8 +73,6 @@ function generarFechas({
 export const POST: APIRoute = async ({ request }) => {
   const client = await pool.connect();
   try {
-    await asegurarColumnaCategoria(client);
-
     const token = obtenerTokenDeCookie(request.headers.get("cookie"));
     const usuario = token ? await obtenerSesion(token) : null;
 
@@ -249,7 +242,6 @@ export const GET: APIRoute = async () => {
 export const PUT: APIRoute = async ({ request }) => {
   const client = await pool.connect();
   try {
-    await asegurarColumnaCategoria(client);
     const body = await request.json();
     const { id_tarea, modo, ...campos } = body;
  
