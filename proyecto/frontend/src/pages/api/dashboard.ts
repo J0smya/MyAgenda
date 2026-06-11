@@ -7,11 +7,36 @@ import { obtenerSesion, obtenerTokenDeCookie } from "../../lib/sesion";
 import { enviarNotificacionCreacion } from "../../lib/email";
  
 // ─── Migración al arrancar el módulo ──────────────────────────────────────
-pool.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) DEFAULT 'personal'`)
-  .then(() => pool.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS id_usuario UUID`))
-  .then(() => pool.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS recordatorio_enviado BOOLEAN DEFAULT FALSE`))
-  .then(() => console.log('[migration] columnas de tarea OK'))
-  .catch((e: any) => console.error('[migration] error alterando tarea:', e.message));
+(async () => {
+  try {
+    await pool.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) DEFAULT 'personal'`);
+    await pool.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS id_usuario UUID`);
+    await pool.query(`ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS recordatorio_enviado BOOLEAN DEFAULT FALSE`);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS public.recurrencia_serie (
+        id_serie       SERIAL PRIMARY KEY,
+        frecuencia     VARCHAR(20) NOT NULL,
+        intervalo      INT         NOT NULL DEFAULT 1,
+        fecha_inicio   DATE,
+        fecha_fin      DATE,
+        dias_semana    VARCHAR(50),
+        total_ocurr    INT,
+        fecha_creacion TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS public.recurrencia_instancia (
+        id_instancia  SERIAL PRIMARY KEY,
+        id_serie      INT NOT NULL REFERENCES public.recurrencia_serie(id_serie) ON DELETE CASCADE,
+        id_tarea      INT NOT NULL REFERENCES public.tarea(id_tarea) ON DELETE CASCADE,
+        ocurrencia_num INT NOT NULL DEFAULT 1
+      )
+    `);
+    console.log('[migration] tablas y columnas OK');
+  } catch (e: any) {
+    console.error('[migration] error:', e.message);
+  }
+})();
 
 function res(body: object, status = 200) {
   return new Response(JSON.stringify(body), {
