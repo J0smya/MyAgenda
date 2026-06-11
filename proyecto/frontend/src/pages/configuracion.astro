@@ -1,15 +1,38 @@
 ---
-import '../styles/global.css'
+export const prerender = false;
+
+import '../styles/global.css';
 import Layout from "../layouts/Layout.astro";
 import '../styles/configuracion.css';
+import { obtenerTokenDeCookie, obtenerSesion } from '../lib/sesion';
+
+const token  = obtenerTokenDeCookie(Astro.request.headers.get('cookie'));
+if (!token) return Astro.redirect('/login');
+
+const sesion = await obtenerSesion(token);
+if (!sesion) return Astro.redirect('/login');
+
+const nombre    = sesion.nombre    ?? '';
+const email     = sesion.email     ?? '';
+const telefono  = sesion.telefono ?? '';
+const fotoPerfil = sesion.foto_perfil ?? '';
 ---
 
 <Layout title="Configuración | My Agenda">
-  <div class="config-wrapper">
+  <div
+    class="config-wrapper"
+    data-nombre={nombre}
+    data-email={email}
+    data-telefono={telefono}
+    data-foto={fotoPerfil}
+  >
 
     <header class="config-header">
-      <a href="/" class="btn-volver">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      <a href="/" id="btn-volver" class="btn-volver">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6"/>
+        </svg>
         Volver al Inicio
       </a>
       <h1 class="config-title">Configuración General</h1>
@@ -22,19 +45,30 @@ import '../styles/configuracion.css';
       <section class="config-card">
         <div class="card-header">
           <span class="card-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                 stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
           </span>
           <h2>Editar Perfil</h2>
         </div>
         <div class="card-body">
+
+          <!-- FOTO DE PERFIL -->
           <div class="form-group">
             <label>Foto de perfil</label>
             <div class="avatar-upload-container">
-              <div class="avatar-preview" id="avatar-preview-circulo">A</div>
+              <div class="avatar-preview" id="avatar-preview-circulo">
+                {fotoPerfil
+                  ? <img src={fotoPerfil} alt="foto" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />
+                  : nombre.charAt(0).toUpperCase() || 'U'}
+              </div>
               <button type="button" class="btn-primary" id="btn-cambiar-foto">Cambiar foto</button>
               <input type="file" id="input-foto" accept="image/*" class="hidden">
             </div>
           </div>
+
+          <!-- NOMBRE -->
           <div class="form-group">
             <label>Nombre completo</label>
             <input
@@ -42,41 +76,141 @@ import '../styles/configuracion.css';
               id="input-nombre"
               class="config-input"
               placeholder="Ingresa tu nombre completo"
-              value="Alex Sebastian Saldaña Palomino"
+              value={nombre}
             >
             <span id="error-nombre" class="config-error-msg">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
               El nombre debe tener al menos 1 carácter.
             </span>
           </div>
+
+          <!-- TELÉFONO -->
+          <div class="form-group">
+            <label>Número de teléfono</label>
+            <div class="telefono-row">
+              <input
+                type="tel"
+                id="input-telefono-actual"
+                class="config-input telefono-display"
+                placeholder="Sin número registrado"
+                value={telefono}
+                readonly
+              >
+              <button type="button" class="btn-cambiar-tel" id="btn-cambiar-telefono">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Cambiar
+              </button>
+            </div>
+            <span class="config-hint">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              Se enviará un código de verificación a tu email y SMS
+            </span>
+          </div>
+
         </div>
       </section>
 
-    <!-- PREFERENCIAS -->
-<section class="config-card">
-  <div class="card-header">
-    <span class="card-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-    </span>
-    <h2>Preferencias de la Agenda</h2>
-  </div>
-  <div class="card-body">
-    <div class="form-group">
-      <label>Vista predeterminada al iniciar</label>
-      <select id="select-vista" class="config-input">
-        <option value="dia">Vista de Día</option>
-        <option value="semana">Vista de Semana</option>
-        <option value="mes">Vista de Mes</option>
-      </select>
-    </div>
-  </div>
-</section>
+      <!-- APARIENCIA / MODO OSCURO -->
+      <section class="config-card">
+        <div class="card-header">
+          <span class="card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                 stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+          </span>
+          <h2>Apariencia</h2>
+        </div>
+        <div class="card-body">
+
+          <div class="dm-toggle-row" id="dm-toggle-row">
+            <div class="dm-info">
+              <div class="dm-mode-icon" id="dm-mode-icon">
+                <svg id="dm-sun-svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                     stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="5"/>
+                  <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                  <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+                <svg id="dm-moon-svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                     stroke="#bae6fd" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                     style="display:none">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              </div>
+              <div>
+                <div class="dm-mode-label" id="dm-mode-label">Modo Claro</div>
+                <div class="dm-mode-desc" id="dm-mode-desc">Activa el modo oscuro para reducir la fatiga visual</div>
+              </div>
+            </div>
+
+            <button class="dm-pill-toggle" id="btn-dark-mode" aria-label="Cambiar tema" title="Cambiar tema">
+              <div class="dm-pill-track-stars">✦ ✦</div>
+              <div class="dm-pill-thumb">
+                <svg id="dm-thumb-sun" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                     stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="5"/>
+                  <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                  <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+                <svg id="dm-thumb-moon" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                     stroke="#bae6fd" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                     style="display:none">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              </div>
+            </button>
+          </div>
+
+          <div class="dm-preview-chips">
+            <div class="dm-chip dm-chip-light active" id="dm-chip-light">
+              <div class="dm-chip-swatch dm-swatch-light"></div>
+              <span>Claro</span>
+              <svg id="dm-check-light" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <div class="dm-chip dm-chip-dark" id="dm-chip-dark">
+              <div class="dm-chip-swatch dm-swatch-dark"></div>
+              <span>Oscuro</span>
+              <svg id="dm-check-dark" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+                   style="display:none">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+          </div>
+
+        </div>
+      </section>
 
       <!-- NOTIFICACIONES -->
       <section class="config-card">
         <div class="card-header">
           <span class="card-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                 stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+            </svg>
           </span>
           <h2>Notificaciones y Recordatorios</h2>
         </div>
@@ -104,7 +238,11 @@ import '../styles/configuracion.css';
       <section class="config-card danger-zone-container">
         <div class="card-header">
           <span class="card-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                 stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+            </svg>
           </span>
           <h2>Gestión de Datos Privados</h2>
         </div>
@@ -112,7 +250,7 @@ import '../styles/configuracion.css';
           <div class="data-action">
             <div class="data-info">
               <h3>Exportar mis datos</h3>
-              <p>Descarga un archivo con todas tus tareas y notas actuales.</p>
+              <p>Descarga un archivo con todas tus tareas, notas y proyectos actuales.</p>
             </div>
             <button id="btn-exportar" class="btn-primary">Descargar Datos</button>
           </div>
@@ -137,5 +275,78 @@ import '../styles/configuracion.css';
 
   </div>
 </Layout>
+
+<!-- MODAL: CAMBIAR TELÉFONO (paso 1 → paso 2) -->
+<div id="modal-telefono" class="config-confirm-overlay" style="display:none">
+  <div class="config-confirm-box tel-modal-box">
+
+    <!-- PASO 1: ingresar nuevo número -->
+    <div id="tel-paso-1">
+      <div class="config-confirm-icon tel-icon-blue">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.29 6.29l1.47-1.47a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+      </div>
+      <div class="config-confirm-title">Cambiar número de teléfono</div>
+      <div class="config-confirm-desc">
+        Ingresa tu nuevo número. Te enviaremos un código de verificación por email y SMS.
+      </div>
+      <div class="tel-input-group">
+        <input type="tel" id="input-nuevo-tel" class="config-input"
+               placeholder="+51 999 999 999" autocomplete="tel">
+        <span id="error-nuevo-tel" class="config-error-msg">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Ingresa un número válido (mínimo 7 dígitos).
+        </span>
+      </div>
+      <div class="config-confirm-actions">
+        <button class="config-confirm-cancel" id="btn-tel-cancelar">Cancelar</button>
+        <button class="config-confirm-ok config-confirm-ok--blue" id="btn-tel-enviar">
+          Enviar código
+        </button>
+      </div>
+    </div>
+
+    <!-- PASO 2: ingresar OTP -->
+    <div id="tel-paso-2" style="display:none">
+      <div class="config-confirm-icon tel-icon-green">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <div class="config-confirm-title">Ingresa el código</div>
+      <div class="config-confirm-desc" id="tel-paso2-desc">
+        Código enviado a tu email y número <strong id="tel-paso2-num"></strong>.
+      </div>
+      <div class="otp-input-row" id="otp-boxes"></div>
+      <div id="error-otp" class="config-error-msg" style="margin-top:8px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="error-otp-msg">Código incorrecto.</span>
+      </div>
+      <div class="otp-resend-row">
+        <span class="otp-timer" id="otp-timer">Reenviar en <strong id="otp-seconds">60</strong>s</span>
+        <button class="otp-resend-btn" id="btn-reenviar-otp" disabled>Reenviar código</button>
+      </div>
+      <div class="config-confirm-actions">
+        <button class="config-confirm-cancel" id="btn-otp-volver">Volver</button>
+        <button class="config-confirm-ok config-confirm-ok--blue" id="btn-otp-verificar">
+          Verificar y guardar
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <script src="../pages/api/configuracion.ts"></script>

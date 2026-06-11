@@ -14,9 +14,72 @@ const {title} = Astro.props;
         <title>{title}</title>
     </head>
     <body>
+        <script is:inline>
+          (function(){try{if(localStorage.getItem('conf_darkmode')==='true')document.body.classList.add('dark-mode');}catch(e){}})();
+        </script>
         <div>
             <slot />
         </div>
+
+        <!-- Sistema global de alertas (toast + confirm) -->
+        <div id="g-toast-container" class="g-toast-container"></div>
+        <script is:inline>
+        (function(){
+          window.gToast = function(titulo, subtitulo, tipo) {
+            tipo = tipo || 'success';
+            var c = document.getElementById('g-toast-container');
+            if (!c) return;
+            var claseExtra = tipo === 'error' ? ' g-toast--error'
+              : tipo === 'warning' ? ' g-toast--warning'
+              : tipo === 'info'    ? ' g-toast--info' : '';
+            var icon = tipo === 'error' || tipo === 'warning'
+              ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+              : tipo === 'info'
+              ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+              : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+            var t = document.createElement('div');
+            t.className = 'g-toast' + claseExtra;
+            t.innerHTML = '<div class="g-toast-icon">' + icon + '</div>'
+              + '<div class="g-toast-body"><div class="g-toast-title">' + titulo + '</div>'
+              + '<div class="g-toast-sub">' + subtitulo + '</div></div>'
+              + '<button class="g-toast-close" title="Cerrar">✕</button>';
+            function cerrar() {
+              t.classList.add('g-toast--out');
+              t.addEventListener('animationend', function(){ t.remove(); }, { once: true });
+            }
+            t.querySelector('.g-toast-close').addEventListener('click', cerrar);
+            c.appendChild(t);
+            setTimeout(cerrar, 4000);
+          };
+
+          window.gConfirm = function(titulo, descripcion, onConfirm, opts) {
+            opts = opts || {};
+            var tipo        = opts.tipo       || 'danger';
+            var textoOk     = opts.textoOk    || 'Confirmar';
+            var textoCancel = opts.textoCancel || 'Cancelar';
+            var iconColor = tipo === 'danger' ? '#ef4444' : tipo === 'warning' ? '#f59e0b' : '#0ea5e9';
+            var iconBg    = tipo === 'danger' ? '#fef2f2' : tipo === 'warning' ? '#fffbeb' : '#f0f9ff';
+            var okBg      = tipo === 'danger' ? '#ef4444' : tipo === 'warning' ? '#f59e0b' : '#0ea5e9';
+            var iconSvg   = tipo === 'warning'
+              ? '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="'+iconColor+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+              : '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="'+iconColor+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
+            var ov = document.createElement('div');
+            ov.className = 'g-confirm-overlay';
+            ov.innerHTML = '<div class="g-confirm-box">'
+              + '<div class="g-confirm-icon" style="background:'+iconBg+';color:'+iconColor+'">'+iconSvg+'</div>'
+              + '<div class="g-confirm-title">'+titulo+'</div>'
+              + '<div class="g-confirm-desc">'+descripcion+'</div>'
+              + '<div class="g-confirm-actions">'
+              + '<button class="g-confirm-cancel">'+textoCancel+'</button>'
+              + '<button class="g-confirm-ok" style="background:'+okBg+';box-shadow:0 4px 14px rgba(0,0,0,0.2)">'+textoOk+'</button>'
+              + '</div></div>';
+            ov.querySelector('.g-confirm-cancel').addEventListener('click', function(){ ov.remove(); });
+            ov.querySelector('.g-confirm-ok').addEventListener('click', function(){ ov.remove(); onConfirm(); });
+            ov.addEventListener('click', function(e){ if (e.target === ov) ov.remove(); });
+            document.body.appendChild(ov);
+          };
+        })();
+        </script>
     </body>
 </html>
 

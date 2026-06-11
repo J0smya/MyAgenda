@@ -17,7 +17,7 @@ export async function crearSesion(idUsuario: string): Promise<string> {
 export async function obtenerSesion(token: string) {
   const result = await pool.query(
     `SELECT s.id, s.id_usuario, s.expires_at,
-            u.nombre, u.email, u.foto_perfil, u.google_id
+            u.nombre, u.email, u.foto_perfil, u.telefono, u.google_id
      FROM public.sesion s
      JOIN public.usuario u ON u.id_usuario = s.id_usuario
      WHERE s.token = $1

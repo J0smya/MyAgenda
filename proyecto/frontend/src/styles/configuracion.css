@@ -452,3 +452,394 @@
   box-shadow: 0 6px 20px rgba(239,68,68,0.4);
   transform: translateY(-1px);
 }
+
+/* ═══════════════════════════════════════
+   DARK MODE TOGGLE
+═══════════════════════════════════════ */
+
+.dm-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 18px;
+  border: 2px solid #e2e8f0;
+  gap: 16px;
+  transition: background 0.5s ease, border-color 0.5s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.dm-toggle-row.dm-dark-active {
+  background: linear-gradient(135deg, #1a2744 0%, #0f172a 100%);
+  border-color: #334155;
+}
+
+.dm-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.dm-mode-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.18);
+  flex-shrink: 0;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.dm-dark-active .dm-mode-icon {
+  background: linear-gradient(135deg, #1e3a5f, #0f172a);
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
+  border-color: #334155;
+}
+
+.dm-mode-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
+  transition: color 0.4s ease;
+}
+
+.dm-dark-active .dm-mode-label { color: #f1f5f9; }
+
+.dm-mode-desc {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 4px;
+  line-height: 1.4;
+  transition: color 0.4s ease;
+}
+
+.dm-dark-active .dm-mode-desc { color: #94a3b8; }
+
+/* ── Pill Toggle ── */
+.dm-pill-toggle {
+  position: relative;
+  width: 78px;
+  height: 40px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  border: 2px solid #cbd5e1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.5s ease, border-color 0.4s ease,
+              box-shadow 0.4s ease;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+.dm-pill-toggle.active {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-color: #475569;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.18),
+              inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.dm-pill-track-stars {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 7px;
+  color: rgba(148, 163, 184, 0.5);
+  letter-spacing: 3px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+.dm-pill-toggle.active .dm-pill-track-stars { opacity: 1; }
+
+.dm-pill-thumb {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 28px;
+  height: 28px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background 0.4s ease, box-shadow 0.4s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.dm-pill-toggle.active .dm-pill-thumb {
+  transform: translateX(38px);
+  background: #0f172a;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5),
+              0 0 14px rgba(14, 165, 233, 0.35);
+}
+
+/* ── Preview Chips ── */
+.dm-preview-chips {
+  display: flex;
+  gap: 10px;
+}
+
+.dm-chip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-size: 13px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.dm-chip.active {
+  border-color: #0ea5e9;
+  background: #f0f9ff;
+  color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.dm-chip-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  flex-shrink: 0;
+}
+
+.dm-swatch-light {
+  background: linear-gradient(135deg, #ffffff, #f1f5f9);
+  border: 1.5px solid #e2e8f0;
+}
+
+.dm-swatch-dark {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 1.5px solid #334155;
+}
+
+.dm-chip svg { margin-left: auto; flex-shrink: 0; }
+
+/* ══════════════════════════════════════════════════
+   TELÉFONO — fila con botón cambiar
+══════════════════════════════════════════════════ */
+.telefono-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.telefono-display {
+  flex: 1;
+  background-color: #f8fafc !important;
+  cursor: default;
+}
+
+.btn-cambiar-tel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 2px solid #bae6fd;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.btn-cambiar-tel:hover {
+  background: #0ea5e9;
+  color: #fff;
+  border-color: #0ea5e9;
+  box-shadow: 0 4px 14px rgba(14,165,233,0.3);
+  transform: translateY(-1px);
+}
+
+.config-hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* ══════════════════════════════════════════════════
+   MODAL TELÉFONO — variantes de icono y botón
+══════════════════════════════════════════════════ */
+.tel-modal-box { max-width: 460px; }
+
+.tel-icon-blue {
+  background: #f0f9ff !important;
+  color: #0284c7 !important;
+}
+.tel-icon-green {
+  background: #f0fdf4 !important;
+  color: #16a34a !important;
+}
+
+.config-confirm-ok--blue {
+  background: #0ea5e9 !important;
+  box-shadow: 0 4px 14px rgba(14,165,233,0.3) !important;
+}
+.config-confirm-ok--blue:hover {
+  background: #0284c7 !important;
+  box-shadow: 0 6px 20px rgba(14,165,233,0.4) !important;
+  transform: translateY(-1px);
+}
+.config-confirm-ok--warning {
+  background: #f59e0b !important;
+  box-shadow: 0 4px 14px rgba(245,158,11,0.3) !important;
+}
+.config-confirm-ok--warning:hover {
+  background: #d97706 !important;
+}
+
+.tel-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+.tel-input-group .config-input {
+  font-size: 16px;
+  letter-spacing: 0.03em;
+}
+
+/* ══════════════════════════════════════════════════
+   OTP — cajas de dígitos
+══════════════════════════════════════════════════ */
+.otp-input-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 20px 0 8px;
+}
+
+.otp-box {
+  width: 48px;
+  height: 56px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  font-family: monospace;
+}
+.otp-box:focus {
+  border-color: #0ea5e9;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.15);
+}
+.otp-box:not(:placeholder-shown) {
+  border-color: #0ea5e9;
+  background: #f0f9ff;
+}
+
+.otp-resend-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 12px 0 20px;
+  font-size: 13px;
+}
+
+.otp-timer { color: #94a3b8; font-weight: 500; }
+.otp-timer strong { color: #0284c7; }
+
+.otp-resend-btn {
+  background: none;
+  border: none;
+  color: #0ea5e9;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+.otp-resend-btn:hover:not(:disabled) { background: #f0f9ff; }
+.otp-resend-btn:disabled { color: #cbd5e1; cursor: default; }
+
+/* ══════════════════════════════════════════════════
+   TOAST — variantes warning e info
+══════════════════════════════════════════════════ */
+.config-toast--warning {
+  border-left-color: #f59e0b !important;
+}
+.config-toast--warning::after { background: #f59e0b !important; }
+.config-toast--warning .config-toast-icon {
+  background: #fffbeb !important;
+  color: #d97706 !important;
+}
+.config-toast--info {
+  border-left-color: #6366f1 !important;
+}
+.config-toast--info::after { background: #6366f1 !important; }
+.config-toast--info .config-toast-icon {
+  background: #eef2ff !important;
+  color: #6366f1 !important;
+}
+
+/* Dark mode — teléfono y OTP */
+body.dark-mode .telefono-display {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+body.dark-mode .btn-cambiar-tel {
+  background: rgba(14,165,233,0.1) !important;
+  color: #38bdf8 !important;
+  border-color: rgba(14,165,233,0.3) !important;
+}
+body.dark-mode .btn-cambiar-tel:hover {
+  background: #0ea5e9 !important;
+  color: #fff !important;
+}
+body.dark-mode .config-hint { color: #475569 !important; }
+body.dark-mode .otp-box {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+body.dark-mode .otp-box:focus {
+  border-color: #0ea5e9 !important;
+  background: #1e293b !important;
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.2) !important;
+}
+body.dark-mode .otp-box:not(:placeholder-shown) {
+  background: rgba(14,165,233,0.1) !important;
+  border-color: #0ea5e9 !important;
+}
+body.dark-mode .config-confirm-box { background: #1e293b !important; }
+body.dark-mode .tel-input-group .config-input {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
