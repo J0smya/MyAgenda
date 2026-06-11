@@ -248,6 +248,24 @@ label {
   box-shadow: 0 0 0 3px rgba(14,165,233,.12);
 }
 .wrap-input input::placeholder { color: #cbd5e1; }
+.wrap-input--pass input { padding-right: 44px; }
+
+/* ── Botón ojo (ver/ocultar contraseña) ─────────────────────── */
+.btn-ojo {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: color .2s, background .2s;
+}
+.btn-ojo:hover { color: var(--texto-suave); background: #f1f5f9; }
 
 /* ── Botón principal ─────────────────────────────────────────── */
 .btn-ok {
@@ -377,28 +395,6 @@ label {
   40%,80% { transform: translateX(5px); }
 }
 
-/* ── Dev hint (código visible en modo desarrollo) ────────────── */
-.dev-hint {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #fffbeb;
-  border: 1.5px solid #fde68a;
-  border-radius: 10px;
-  padding: 10px 14px;
-  margin: 10px 0 4px;
-  font-size: 13px;
-  color: #92400e;
-}
-.dev-hint svg { flex-shrink: 0; stroke: #d97706; }
-.dev-codigo {
-  font-family: monospace;
-  font-size: 18px;
-  font-weight: 900;
-  color: #b45309;
-  letter-spacing: 4px;
-  margin-left: 4px;
-}
 
 /* ── Timer ───────────────────────────────────────────────────── */
 .timer-row {

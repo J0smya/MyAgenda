@@ -3594,3 +3594,74 @@ body {
   from { width: 100%; }
   to   { width: 0%; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE MÓVIL
+══════════════════════════════════════════════════════════════ */
+
+.db-sidebar-toggle { display: none; }
+
+.db-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 199;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .db-sidebar-overlay { display: block; }
+  .db-layout.sidebar-open .db-sidebar-overlay { opacity: 1; pointer-events: all; }
+
+  .db-sidebar {
+    position: fixed !important;
+    top: 0; left: 0; bottom: 0;
+    height: 100vh !important;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+    box-shadow: 4px 0 28px rgba(0,0,0,0.18);
+  }
+  .db-layout.sidebar-open .db-sidebar { transform: translateX(0); }
+
+  .db-main { width: 100%; min-width: 0; }
+
+  .db-header { padding: 10px 14px; gap: 8px; flex-wrap: nowrap; }
+
+  .db-sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #374151;
+    transition: background .2s, color .2s;
+  }
+  .db-sidebar-toggle:hover { background: #e5e7eb; }
+
+  .db-date-title { font-size: 14px !important; white-space: nowrap; }
+  .db-header-right { gap: 6px; }
+  .db-view-tabs { gap: 2px; }
+  .db-view-btn  { padding: 6px 9px !important; font-size: 12px !important; }
+  .db-btn-add-text { display: none; }
+  .db-btn-add { padding: 8px 10px !important; min-width: 36px; }
+  .db-hour-label { font-size: 10px !important; min-width: 36px !important; }
+  .db-week-col-header { font-size: 10px; }
+}
+
+@media (max-width: 480px) {
+  .db-header { padding: 8px 10px; }
+  .db-nav-arrow { width: 30px !important; height: 30px !important; }
+  .db-date-title { font-size: 13px !important; }
+}
+
+body.dark-mode .db-sidebar-toggle { background: #374151; color: #e5e7eb; }
+body.dark-mode .db-sidebar-toggle:hover { background: #4b5563; }

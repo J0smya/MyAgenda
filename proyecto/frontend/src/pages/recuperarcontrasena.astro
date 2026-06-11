@@ -121,12 +121,6 @@ import '../styles/recuperarcontrasena.css';
             <input class="otp-caja" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
           </div>
 
-          <!-- Hint de modo desarrollo (solo aparece si no hay email/SMS configurado) -->
-          <div id="dev-hint" class="dev-hint" style="display:none">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span>Modo dev — tu código es: <strong id="dev-codigo" class="dev-codigo"></strong></span>
-          </div>
-
           <div class="timer-row">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             Expira en <strong id="timer">10:00</strong>
@@ -147,17 +141,23 @@ import '../styles/recuperarcontrasena.css';
       <div class="panel" id="panel-3">
         <div class="campo">
           <label for="input-nueva">Nueva contraseña</label>
-          <div class="wrap-input">
+          <div class="wrap-input wrap-input--pass">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input type="password" id="input-nueva" placeholder="Mínimo 8 caracteres" />
+            <input type="password" id="input-nueva" placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
+            <button type="button" class="btn-ojo" id="ojo-nueva" aria-label="Mostrar contraseña">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
           </div>
           <div class="pass-strength" id="pass-strength"></div>
         </div>
         <div class="campo">
           <label for="input-confirmar">Confirmar contraseña</label>
-          <div class="wrap-input">
+          <div class="wrap-input wrap-input--pass">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input type="password" id="input-confirmar" placeholder="Repite la contraseña" />
+            <input type="password" id="input-confirmar" placeholder="Repite la contraseña" autocomplete="new-password" />
+            <button type="button" class="btn-ojo" id="ojo-confirmar" aria-label="Mostrar contraseña">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
           </div>
           <p class="msg" id="msg-confirmar"></p>
         </div>
@@ -309,22 +309,7 @@ import '../styles/recuperarcontrasena.css';
         iniciarTemporizador(600);
         iniciarReenviar(60);
 
-        // Modo dev: mostrar código en pantalla cuando no hay email/SMS configurado
-        if (data.devCodigo) {
-          const hint    = document.getElementById('dev-hint');
-          const codigoEl = document.getElementById('dev-codigo');
-          if (hint && codigoEl) {
-            codigoEl.textContent = data.devCodigo;
-            hint.style.display   = 'flex';
-            // Autocompletar las cajas para mayor comodidad
-            const cajas = document.querySelectorAll('.otp-caja');
-            [...data.devCodigo].forEach((d, i) => { if (cajas[i]) cajas[i].value = d; });
-            document.getElementById('btn-verificar').disabled = false;
-          }
-          mostrarToast('Modo desarrollo', `Sin SMTP/SMS: código → ${data.devCodigo}`, 'warning');
-        } else {
-          mostrarToast('Código enviado', `Revisa ${metodoActual === 'email' ? 'tu bandeja de entrada' : 'tus mensajes SMS'}.`, 'info');
-        }
+        mostrarToast('Código enviado', `Revisa ${metodoActual === 'email' ? 'tu bandeja de entrada' : 'tus mensajes SMS'}.`, 'info');
 
       } catch {
         mostrarToast('Error de conexión', 'Verifica tu red e intenta de nuevo.', 'error');
@@ -420,17 +405,8 @@ import '../styles/recuperarcontrasena.css';
           otpInputs.forEach(i => i.value = '');
           iniciarTemporizador(600);
           iniciarReenviar(60);
-          if (data.devCodigo) {
-            const codigoEl = document.getElementById('dev-codigo');
-            if (codigoEl) codigoEl.textContent = data.devCodigo;
-            document.getElementById('dev-hint').style.display = 'flex';
-            [...data.devCodigo].forEach((d, i) => { if (otpInputs[i]) otpInputs[i].value = d; });
-            document.getElementById('btn-verificar').disabled = false;
-            mostrarToast('Modo desarrollo', `Nuevo código → ${data.devCodigo}`, 'warning');
-          } else {
-            otpInputs[0].focus();
-            mostrarToast('Código reenviado', 'Se envió un nuevo código.', 'info');
-          }
+          otpInputs[0].focus();
+          mostrarToast('Código reenviado', 'Se envió un nuevo código.', 'info');
         } else {
           mostrarToast('Error', data.error || 'No se pudo reenviar.', 'error');
           btn.disabled = false;
@@ -551,6 +527,22 @@ import '../styles/recuperarcontrasena.css';
       if (timerInterval)  { clearInterval(timerInterval);  timerInterval  = null; }
       if (reenviarInterval) { clearInterval(reenviarInterval); reenviarInterval = null; }
     }
+
+    // ── Mostrar/ocultar contraseña ────────────────────────────────
+    const SVG_OJO_ABIERTO = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    const SVG_OJO_CERRADO = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+
+    function toggleOjo(inputId, btnId) {
+      const input   = document.getElementById(inputId);
+      const btn     = document.getElementById(btnId);
+      const mostrar = input.type === 'password';
+      input.type    = mostrar ? 'text' : 'password';
+      btn.innerHTML = mostrar ? SVG_OJO_CERRADO : SVG_OJO_ABIERTO;
+      btn.setAttribute('aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    }
+
+    document.getElementById('ojo-nueva').addEventListener('click',     () => toggleOjo('input-nueva',     'ojo-nueva'));
+    document.getElementById('ojo-confirmar').addEventListener('click', () => toggleOjo('input-confirmar', 'ojo-confirmar'));
   </script>
 
 </body>

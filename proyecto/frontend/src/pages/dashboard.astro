@@ -57,10 +57,19 @@ import '../styles/noteEditor.css';
       </button>
     </div>
   </aside>
- 
+
+  <div id="sidebar-overlay" class="db-sidebar-overlay"></div>
+
   <main class="db-main">
     <header class="db-header">
       <div class="db-header-left">
+        <button id="btn-sidebar-toggle" class="db-sidebar-toggle" aria-label="Abrir menú">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
         <button id="prev-date" class="db-nav-arrow" title="Anterior">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
         </button>
@@ -77,7 +86,7 @@ import '../styles/noteEditor.css';
         </div>
         <button id="btn-add" class="db-btn-add">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Nueva tarea
+          <span class="db-btn-add-text">Nueva tarea</span>
         </button>
       </div>
     </header>
@@ -1516,6 +1525,23 @@ import '../styles/noteEditor.css';
   document.getElementById('btn-etiquetas')?.addEventListener('click',async()=>{modalEtiquetas.classList.add('open');etiquetasForm.classList.add('hidden');await cargarEtiquetas();});
   document.getElementById('close-etiquetas')?.addEventListener('click',()=>modalEtiquetas.classList.remove('open'));
  
+  /* ─────────────────── SIDEBAR RESPONSIVE ─────────────────── */
+  const dbLayout       = document.querySelector('.db-layout') as HTMLElement;
+  const sidebarOverlay = document.getElementById('sidebar-overlay');
+  const sidebarToggle  = document.getElementById('btn-sidebar-toggle');
+  const dbMainEl       = document.querySelector('.db-main') as HTMLElement;
+
+  function cerrarSidebarMobile() { dbLayout?.classList.remove('sidebar-open'); }
+
+  sidebarToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dbLayout?.classList.toggle('sidebar-open');
+  });
+  sidebarOverlay?.addEventListener('click', cerrarSidebarMobile);
+  dbMainEl?.addEventListener('click', () => {
+    if (window.innerWidth <= 768) cerrarSidebarMobile();
+  });
+
   /* ─────────────────── INIT ─────────────────── */
   filtros=cargarFiltros();
   renderFiltros();
