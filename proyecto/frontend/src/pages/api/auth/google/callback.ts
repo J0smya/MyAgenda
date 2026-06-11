@@ -5,18 +5,22 @@ import { Google } from "arctic";
 import { pool } from "../../../../lib/db";
 import { crearSesion, cookieSesion } from "../../../../lib/sesion";
 
+// ✅ URL dinámica según entorno — nunca más hardcodeado a localhost
+const SITE = import.meta.env.SITE ?? "http://localhost:4321";
+const CALLBACK_URL = `${SITE}/api/auth/google/callback`;
+
 const google = new Google(
   import.meta.env.GOOGLE_CLIENT_ID,
   import.meta.env.GOOGLE_CLIENT_SECRET,
-  "http://localhost:4321/api/auth/google/callback"
+  CALLBACK_URL
 );
 
 export const GET: APIRoute = async ({ url, cookies, redirect }) => {
   try {
-    const code              = url.searchParams.get("code");
-    const state             = url.searchParams.get("state");
-    const storedState       = cookies.get("google_state")?.value;
-    const storedVerifier    = cookies.get("google_code_verifier")?.value;
+    const code           = url.searchParams.get("code");
+    const state          = url.searchParams.get("state");
+    const storedState    = cookies.get("google_state")?.value;
+    const storedVerifier = cookies.get("google_code_verifier")?.value;
 
     // Limpiar cookies temporales
     cookies.delete("google_state",         { path: "/" });
@@ -77,10 +81,10 @@ export const GET: APIRoute = async ({ url, cookies, redirect }) => {
         usuario = porEmail.rows[0];
         await pool.query(
           `UPDATE public.usuario
-           SET google_id     = $1,
-               foto_perfil   = $2,
+           SET google_id        = $1,
+               foto_perfil      = $2,
                email_verificado = TRUE
-           WHERE id_usuario  = $3`,
+           WHERE id_usuario     = $3`,
           [googleUser.id, googleUser.picture, usuario.id_usuario]
         );
       } else {
@@ -99,7 +103,7 @@ export const GET: APIRoute = async ({ url, cookies, redirect }) => {
     // Crear sesión
     const token = await crearSesion(usuario.id_usuario);
 
-    // Setear cookie y redirigir
+    // Setear cookie y redirigir al dashboard
     const response = redirect("/dashboard");
     response.headers.append("Set-Cookie", cookieSesion(token));
     return response;
