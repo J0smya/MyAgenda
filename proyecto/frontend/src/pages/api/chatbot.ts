@@ -1,216 +1,138 @@
+// src/pages/api/chatbot.ts
 export const prerender = false;
+
 import type { APIRoute } from "astro";
-import { pool } from "../../lib/db";
- 
-function respuesta(
-  texto: string,
-  opciones: string[] = [],
-  estado = "inicio",
-  accion: string | null = null,
-  datosRetorno: Record<string, any> = {}
-) {
+
+function r(texto: string, opciones: string[] = []) {
   return new Response(
-    JSON.stringify({ success: true, texto, opciones, estado, accion, datosRetorno }),
+    JSON.stringify({ success: true, texto, opciones }),
     { status: 200, headers: { "Content-Type": "application/json" } }
   );
 }
- 
+
+const AYUDA: Record<string, { texto: string; opciones: string[] }> = {
+
+  inicio: {
+    texto: `👋 ¡Hola! Soy **Aria**, tu guía de MyAgenda.\n\n¿Sobre qué te ayudo hoy?`,
+    opciones: ["📋 Cómo crear tareas", "📝 Cómo crear notas", "📂 Cómo subir archivos", "🔔 Recordatorios", "🔍 Filtros y categorías", "🤖 Sobre Aria"],
+  },
+
+  tareas: {
+    texto: `📋 **Crear una tarea** es muy sencillo:\n\n**Paso 1 —** Haz clic en **"+ Nueva tarea"** (esquina superior derecha).\n\n**Paso 2 —** Completa el formulario:\n• **Título** — nombre de la tarea (obligatorio)\n• **Descripción** — notas adicionales (opcional)\n• **Prioridad** — 🔴 Alta · 🟡 Media · 🔵 Baja\n• **Categoría** — elige un filtro del sidebar\n• **Fecha y hora** — cuándo debe ocurrir\n\n**Paso 3 —** Activa **🔔 Activar recordatorio** si quieres una alerta.\n\n**Paso 4 —** Pulsa **"Guardar tarea"**.\n\nLa tarea aparecerá en la vista Día, Semana o Mes según la fecha elegida.`,
+    opciones: ["▶️ Ver detalle de una tarea", "🗑️ Eliminar una tarea", "↩️ Volver al inicio"],
+  },
+
+  tareas_ver: {
+    texto: `🔎 **Ver el detalle de una tarea:**\n\n**Haz clic sobre cualquier tarjeta** de color en el calendario.\n\nSe abrirá un panel con:\n• Título y descripción\n• Fecha y hora\n• Prioridad y categoría\n\nDesde ese panel también puedes **eliminarla** con el botón rojo al fondo.`,
+    opciones: ["🗑️ Eliminar una tarea", "📋 Volver a tareas", "↩️ Volver al inicio"],
+  },
+
+  tareas_eliminar: {
+    texto: `🗑️ **Eliminar una tarea:**\n\n1. Haz clic en la tarjeta de la tarea en el calendario\n2. En el panel emergente, pulsa **"Eliminar tarea"** (texto rojo al fondo)\n3. Confirma en el diálogo\n\n⚠️ Al eliminar una tarea también se eliminan sus notas y archivos asociados.`,
+    opciones: ["📋 Volver a tareas", "↩️ Volver al inicio"],
+  },
+
+  notas: {
+    texto: `📝 **Las notas** tienen dos modos:\n\n**Nota adjunta a tarea:**\nAl crear una tarea, pulsa **"Agregar nota"** en la sección Extras. Se abre el editor enriquecido.\n\n**Nota independiente:**\nHaz clic en **"Notas"** en el sidebar → botón **"+ Nueva nota"**.\n\n¿Cuál quieres aprender?`,
+    opciones: ["📌 Nota adjunta a tarea", "🗒️ Nota independiente", "✏️ Editar una nota", "🗑️ Eliminar una nota", "↩️ Volver al inicio"],
+  },
+
+  notas_adjunta: {
+    texto: `📌 **Nota adjunta a una tarea:**\n\n**Paso 1 —** Abre el formulario de nueva tarea.\n\n**Paso 2 —** Baja a la sección **"Extras"** y pulsa **"Agregar nota"**.\n\n**Paso 3 —** En el editor escribe el contenido y usa la barra de herramientas:\n• **N** Negrita · *I* Cursiva · __S__ Subrayado\n• Listas · Colores de texto\n\n**Paso 4 —** Pulsa **"Guardar nota"**. Verás un badge verde ✓ en el formulario.\n\n**Paso 5 —** Guarda la tarea normalmente.`,
+    opciones: ["🗒️ Nota independiente", "📝 Volver a notas", "↩️ Volver al inicio"],
+  },
+
+  notas_independiente: {
+    texto: `🗒️ **Nota independiente:**\n\n**Paso 1 —** Haz clic en **"Notas"** en el sidebar izquierdo.\n\n**Paso 2 —** Pulsa **"+ Nueva nota"** en el panel.\n\n**Paso 3 —** Escribe el título y el contenido en el editor enriquecido.\n\n**Paso 4 —** Pulsa **"Guardar nota"**.\n\nLa nota aparecerá en la lista con fecha y vista previa. El badge del sidebar muestra el conteo total.`,
+    opciones: ["✏️ Editar una nota", "🗑️ Eliminar una nota", "📝 Volver a notas", "↩️ Volver al inicio"],
+  },
+
+  notas_editar: {
+    texto: `✏️ **Editar una nota:**\n\n**Paso 1 —** Haz clic en **"Notas"** en el sidebar.\n\n**Paso 2 —** Localiza la nota en la lista.\n\n**Paso 3 —** Pulsa el botón **"✏️ Editar"** en la tarjeta.\n\n**Paso 4 —** Modifica el contenido en el editor.\n\n**Paso 5 —** Pulsa **"Guardar nota"**. Verás un toast verde de confirmación.`,
+    opciones: ["🗑️ Eliminar una nota", "📝 Volver a notas", "↩️ Volver al inicio"],
+  },
+
+  notas_eliminar: {
+    texto: `🗑️ **Eliminar una nota:**\n\n**Paso 1 —** Abre el panel de **"Notas"** desde el sidebar.\n\n**Paso 2 —** Localiza la nota en la lista.\n\n**Paso 3 —** Pulsa **"🗑️ Eliminar"** en la tarjeta.\n\n**Paso 4 —** Confirma en el diálogo.\n\n⚠️ Esta acción no se puede deshacer.`,
+    opciones: ["📝 Volver a notas", "↩️ Volver al inicio"],
+  },
+
+  archivos: {
+    texto: `📂 **Los archivos** se adjuntan a tareas y puedes descargarlos cuando los necesites.\n\n¿Qué quieres hacer?`,
+    opciones: ["⬆️ Subir un archivo", "⬇️ Descargar un archivo", "🗑️ Eliminar un archivo", "↩️ Volver al inicio"],
+  },
+
+  archivos_subir: {
+    texto: `⬆️ **Subir un archivo:**\n\n**Paso 1 —** Haz clic en **"Archivos"** en el sidebar.\n\n**Paso 2 —** En la zona de carga puedes:\n• Pulsar **"Seleccionar archivo"** para buscar en tu equipo\n• O **arrastrar y soltar** el archivo sobre la zona punteada\n\n**Paso 3 —** Elige la **tarea** a la que quieres asociar el archivo.\n\n**Paso 4 —** La barra de progreso muestra el avance. Al terminar verás **"¡Subido! ✓"**.\n\n📌 Formatos soportados: imágenes, PDF, Word, Excel, ZIP y más.`,
+    opciones: ["⬇️ Descargar un archivo", "🗑️ Eliminar un archivo", "📂 Volver a archivos", "↩️ Volver al inicio"],
+  },
+
+  archivos_descargar: {
+    texto: `⬇️ **Descargar un archivo:**\n\n**Paso 1 —** Abre **"Archivos"** desde el sidebar.\n\n**Paso 2 —** Localiza el archivo en la lista. Verás nombre, tamaño, tarea asociada y fecha.\n\n**Paso 3 —** Haz clic en **"⬇️ Descargar"** a la derecha de la tarjeta.\n\nEl archivo se descargará directamente a tu equipo.`,
+    opciones: ["🗑️ Eliminar un archivo", "📂 Volver a archivos", "↩️ Volver al inicio"],
+  },
+
+  archivos_eliminar: {
+    texto: `🗑️ **Eliminar un archivo:**\n\n**Paso 1 —** Abre **"Archivos"** desde el sidebar.\n\n**Paso 2 —** Localiza el archivo en la lista.\n\n**Paso 3 —** Pulsa **"🗑️ Eliminar"** en la tarjeta.\n\n**Paso 4 —** Confirma en el diálogo.\n\n⚠️ El archivo se elimina permanentemente del servidor.`,
+    opciones: ["📂 Volver a archivos", "↩️ Volver al inicio"],
+  },
+
+  recordatorios: {
+    texto: `🔔 **Recordatorios:**\n\nMyAgenda te avisa antes de que venza una tarea con una **notificación flotante** en pantalla.\n\n**Cómo activarlo:**\n\n**Paso 1 —** Al crear una tarea, asigna una **fecha y hora** (la hora es obligatoria).\n\n**Paso 2 —** Activa la casilla **"🔔 Activar recordatorio"**.\n\n**Paso 3 —** Elige la antelación:\n• 5 · 15 · 30 minutos antes\n• 1 hora · 2 horas · 1 día antes\n\n**Paso 4 —** Guarda la tarea.\n\nCuando llegue el momento aparecerá la notificación en la esquina inferior derecha. Ciérrala con la **✕**.`,
+    opciones: ["📋 Cómo crear tareas", "↩️ Volver al inicio"],
+  },
+
+  filtros: {
+    texto: `🔍 **Filtros y categorías:**\n\nLos filtros del sidebar organizan y muestran/ocultan tareas por categoría.\n\n**Crear un filtro:**\n1. Haz clic en el **"+"** junto a "Filtros" en el sidebar\n2. Escribe un nombre (ej: Trabajo, Casa, Gym)\n3. Elige un color y un emoji\n4. Pulsa **"Guardar"**\n\n**Activar/desactivar:**\nMarca o desmarca el checkbox del filtro para mostrar u ocultar esas tareas.\n\n**Editar o eliminar:**\nPasa el cursor sobre el filtro para ver los botones ✏️ y 🗑️.\n\n💡 Al crear una tarea, elige la **categoría** en el formulario para asignarla a un filtro.`,
+    opciones: ["📋 Cómo crear tareas", "↩️ Volver al inicio"],
+  },
+
+  ia: {
+    texto: `🤖 **Sobre Aria:**\n\nSoy el asistente de ayuda integrado en MyAgenda. Puedo:\n\n✅ Guiarte **paso a paso** sobre cómo usar la app\n✅ Responder preguntas sobre tareas, notas y archivos\n✅ Explicar cualquier función de la plataforma\n\n**Cómo usarme:**\n• Escribe tu pregunta en el campo de texto\n• O pulsa uno de los botones de respuesta rápida\n\n💡 **Tip:** Escribe **"inicio"** en cualquier momento para volver al menú principal.`,
+    opciones: ["📋 Cómo crear tareas", "📝 Cómo crear notas", "📂 Cómo subir archivos", "↩️ Volver al inicio"],
+  },
+};
+
+function detectarClave(msg: string): string {
+  const m = msg.toLowerCase();
+
+  if (["inicio", "menu", "menú", "volver", "hola", "ayuda", "help", "start", "↩️ volver al inicio"].some(w => m.includes(w))) return "inicio";
+
+  if (m.includes("▶️ ver detalle") || m.includes("ver detalle") || m.includes("ver tarea")) return "tareas_ver";
+  if (m.includes("🗑️ eliminar una tarea") || (m.includes("eliminar") && m.includes("tarea"))) return "tareas_eliminar";
+  if (m.includes("📋 volver a tareas") || m.includes("volver a tareas")) return "tareas";
+  if (m.includes("tarea") || m.includes("📋")) return "tareas";
+
+  if (m.includes("📌 nota adjunta") || m.includes("nota adjunta")) return "notas_adjunta";
+  if (m.includes("🗒️ nota independiente") || m.includes("nota independiente")) return "notas_independiente";
+  if (m.includes("✏️ editar una nota") || m.includes("editar una nota") || (m.includes("editar") && m.includes("nota"))) return "notas_editar";
+  if (m.includes("🗑️ eliminar una nota") || (m.includes("eliminar") && m.includes("nota"))) return "notas_eliminar";
+  if (m.includes("📝 volver a notas") || m.includes("volver a notas")) return "notas";
+  if (m.includes("nota") || m.includes("📝")) return "notas";
+
+  if (m.includes("⬆️ subir") || m.includes("subir")) return "archivos_subir";
+  if (m.includes("⬇️ descargar") || m.includes("descargar")) return "archivos_descargar";
+  if (m.includes("🗑️ eliminar un archivo") || (m.includes("eliminar") && m.includes("archivo"))) return "archivos_eliminar";
+  if (m.includes("📂 volver a archivos") || m.includes("volver a archivos")) return "archivos";
+  if (m.includes("archivo") || m.includes("📂")) return "archivos";
+
+  if (m.includes("recordatorio") || m.includes("🔔") || m.includes("alerta") || m.includes("notificacion") || m.includes("notificación")) return "recordatorios";
+  if (m.includes("filtro") || m.includes("categoría") || m.includes("categoria") || m.includes("🔍")) return "filtros";
+  if (m.includes("aria") || m.includes("🤖 sobre aria") || m.includes("asistente") || m.includes("sobre aria")) return "ia";
+
+  return "inicio";
+}
+
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const {
-      mensaje: msgOriginal,
-      estado = { menu: "inicio" },
-      datos = {},
-    } = await request.json();
- 
-    const mensaje = msgOriginal.toLowerCase().trim();
-    const menu = estado.menu || "inicio";
- 
-    // ── Volver al menú principal ──
-    if (["menu", "volver", "inicio", "principal"].some(w => mensaje.includes(w))) {
-      return respuesta(
-        "👋 ¡Hola! Soy **Aria**.\n\n¿Qué deseas hacer?",
-        ["Crear tarea", "Ver mis tareas", "Crear nota", "Ver mis notas", "Resumen"]
-      );
-    }
- 
-    // ═══════════════════════════════════════════
-    // CREAR TAREA — paso 1: pedir título
-    // ═══════════════════════════════════════════
-    if (menu === "inicio" && mensaje.includes("crear tarea")) {
-      return respuesta(
-        "¡Vamos! ¿Cuál es el **título** de la tarea?",
-        [],
-        "crear_tarea_titulo"
-      );
-    }
- 
-    // Paso 2: recibir título, pedir prioridad
-    if (menu === "crear_tarea_titulo") {
-      const titulo = msgOriginal.trim();
-      if (titulo.length < 2) {
-        return respuesta("Por favor escribe un título más claro:", [], "crear_tarea_titulo");
-      }
-      return respuesta(
-        `Título: **${titulo}**\n\n¿Cuál es la prioridad?`,
-        ["Alta 🔴", "Media 🟡", "Baja 🔵"],
-        "crear_tarea_prioridad",
-        null,
-        { titulo } // ← retornamos el título para que el frontend lo acumule
-      );
-    }
- 
-    // Paso 3: recibir prioridad, pedir fecha
-    if (menu === "crear_tarea_prioridad") {
-      let prioridad = "media";
-      if (mensaje.includes("alta")) prioridad = "alta";
-      else if (mensaje.includes("baja")) prioridad = "baja";
- 
-      return respuesta(
-        `Prioridad: **${prioridad}**\n\n¿Para qué fecha?`,
-        ["Hoy", "Mañana", "Esta semana"],
-        "crear_tarea_fecha",
-        null,
-        { ...datos, prioridad } // ← acumulamos prioridad junto a lo anterior
-      );
-    }
- 
-    // Paso 4: recibir fecha, mostrar confirmación
-    if (menu === "crear_tarea_fecha") {
-      let fecha_inicio: string;
- 
-      if (mensaje.includes("hoy")) {
-        fecha_inicio = new Date().toISOString().split("T")[0];
-      } else if (mensaje.includes("mañana") || mensaje.includes("manana")) {
-        const manana = new Date();
-        manana.setDate(manana.getDate() + 1);
-        fecha_inicio = manana.toISOString().split("T")[0];
-      } else if (mensaje.includes("semana")) {
-        const semana = new Date();
-        semana.setDate(semana.getDate() + 7);
-        fecha_inicio = semana.toISOString().split("T")[0];
-      } else {
-        const match = msgOriginal.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
-        if (match) {
-          const [, d, m, y] = match;
-          fecha_inicio = `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
-        } else {
-          return respuesta(
-            "Escribe la fecha en formato **DD/MM/AAAA** o elige una opción:",
-            ["Hoy", "Mañana", "Esta semana"],
-            "crear_tarea_fecha"
-          );
-        }
-      }
- 
-      const titulo = datos.titulo || "Sin título";
-      const prioridad = datos.prioridad || "media";
-      const prioEmoji = prioridad === "alta" ? "🔴" : prioridad === "media" ? "🟡" : "🔵";
- 
-      return respuesta(
-        `¿Confirmas esta tarea?\n\n📌 **${titulo}**\n${prioEmoji} Prioridad: ${prioridad}\n📅 Fecha: ${fecha_inicio}`,
-        ["✅ Sí, crear", "❌ Cancelar"],
-        "crear_tarea_confirmacion",
-        null,
-        { ...datos, fecha_inicio } // ← acumulamos fecha_inicio
-      );
-    }
- 
-    // Paso 5: confirmación final → insertar en DB
-    if (menu === "crear_tarea_confirmacion") {
-      if (!mensaje.includes("sí") && !mensaje.includes("si") && !mensaje.includes("crear")) {
-        return respuesta("Creación cancelada. ¿Qué deseas hacer?", ["Crear tarea", "Ver mis tareas"]);
-      }
- 
-      const titulo = datos.titulo;
-      const prioridad = datos.prioridad || "media";
-      const fecha_inicio = datos.fecha_inicio || new Date().toISOString().split("T")[0];
- 
-      if (!titulo || titulo.length < 2) {
-        return respuesta(
-          "No pude recuperar el título. Por favor empieza de nuevo.",
-          ["Crear tarea"]
-        );
-      }
- 
-      await pool.query(
-        `INSERT INTO tarea (titulo, descripcion, fecha_inicio, prioridad, estado)
-         VALUES ($1, '', $2, $3, 'pendiente')`,
-        [titulo, fecha_inicio, prioridad]
-      );
- 
-      return respuesta(
-        `✅ **¡Tarea creada!**\n\n📌 ${titulo}\n📅 ${fecha_inicio}`,
-        ["Crear otra tarea", "Ver mis tareas"],
-        "inicio",
-        "tarea_creada"
-      );
-    }
- 
-    // ═══════════════════════════════════════════
-    // VER TAREAS
-    // ═══════════════════════════════════════════
-    if (mensaje.includes("ver mis tareas") || mensaje.includes("mis tareas")) {
-      const { rows } = await pool.query(`
-        SELECT titulo, prioridad, fecha_inicio, hora_inicio
-        FROM tarea
-        WHERE deleted_at IS NULL
-        ORDER BY fecha_inicio DESC, hora_inicio DESC
-        LIMIT 10
-      `);
- 
-      if (rows.length === 0) {
-        return respuesta("No tienes tareas aún.", ["Crear tarea"]);
-      }
- 
-      const lista = rows
-        .map((t: any) => {
-          const prio = t.prioridad === "alta" ? "🔴" : t.prioridad === "media" ? "🟡" : "🔵";
-          const fecha = t.fecha_inicio
-            ? new Date(t.fecha_inicio).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })
-            : "Sin fecha";
-          const hora = t.hora_inicio ? ` · ${t.hora_inicio}` : "";
-          return `${prio} **${t.titulo}**\n   ${fecha}${hora}`;
-        })
-        .join("\n\n");
- 
-      return respuesta(`**Tus últimas tareas:**\n\n${lista}`, ["Crear tarea", "Volver al menú"]);
-    }
- 
-    // ═══════════════════════════════════════════
-    // RESUMEN
-    // ═══════════════════════════════════════════
-    if (mensaje.includes("resumen")) {
-      const { rows } = await pool.query(`
-        SELECT
-          COUNT(*) FILTER (WHERE estado = 'pendiente') AS pendientes,
-          COUNT(*) FILTER (WHERE estado = 'completada') AS completadas,
-          COUNT(*) FILTER (WHERE fecha_inicio = CURRENT_DATE) AS hoy
-        FROM tarea
-        WHERE deleted_at IS NULL
-      `);
-      const r = rows[0];
-      return respuesta(
-        `📊 **Resumen de tu agenda**\n\n` +
-        `📌 Pendientes: **${r.pendientes}**\n` +
-        `✅ Completadas: **${r.completadas}**\n` +
-        `📅 Para hoy: **${r.hoy}**`,
-        ["Ver mis tareas", "Crear tarea"]
-      );
-    }
- 
-    // ═══════════════════════════════════════════
-    // MENÚ INICIAL / FALLBACK
-    // ═══════════════════════════════════════════
-    return respuesta(
-      "¿Qué deseas hacer?",
-      ["Crear tarea", "Ver mis tareas", "Resumen"]
-    );
- 
-  } catch (err: any) {
-    console.error("[Chatbot Error]", err);
+    const body = await request.json();
+    const msg  = String(body.mensaje ?? "").trim();
+    const clave = detectarClave(msg);
+    const nodo  = AYUDA[clave] ?? AYUDA["inicio"];
+    return r(nodo.texto, nodo.opciones);
+  } catch {
     return new Response(
-      JSON.stringify({ success: false, texto: "❌ Error interno. Inténtalo de nuevo.", opciones: [] }),
+      JSON.stringify({ success: false, texto: "❌ Error interno. Intenta de nuevo." }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   }
