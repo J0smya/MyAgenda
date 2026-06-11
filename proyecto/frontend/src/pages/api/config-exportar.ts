@@ -15,7 +15,7 @@ export const GET: APIRoute = async ({ request }) => {
     // Tareas del usuario (a través de sus proyectos)
     const tareasRes = await pool.query(`
       SELECT t.titulo, t.descripcion, t.estado, t.prioridad,
-             t.fecha_inicio, t.fecha_vencimiento, t.categoria,
+             t.fecha_inicio, t.fecha_vencimiento,
              t.hora_inicio, t.hora_fin, t.fecha_creacion
       FROM   public.tarea t
       LEFT JOIN public.proyecto p ON p.id_proyecto = t.id_proyecto

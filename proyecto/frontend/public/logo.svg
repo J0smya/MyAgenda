@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="55%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="white" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0ea5e9" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="40" height="40" rx="10" fill="url(#bg)" filter="url(#shadow)"/>
+
+  <!-- Top shine overlay for depth -->
+  <rect x="0" y="0" width="40" height="22" rx="10" fill="url(#shine)"/>
+
+  <!-- Ring pins (calendar binding) -->
+  <rect x="12.5" y="5" width="2.8" height="9" rx="1.4" fill="rgba(255,255,255,0.92)"/>
+  <rect x="24.7" y="5" width="2.8" height="9" rx="1.4" fill="rgba(255,255,255,0.92)"/>
+
+  <!-- Calendar body frame -->
+  <rect x="5" y="10" width="30" height="25" rx="4.5"
+        fill="rgba(255,255,255,0.13)"
+        stroke="rgba(255,255,255,0.88)"
+        stroke-width="1.8"/>
+
+  <!-- Header divider -->
+  <line x1="5" y1="17.5" x2="35" y2="17.5"
+        stroke="rgba(255,255,255,0.5)" stroke-width="1.4"/>
+
+  <!-- Checkmark — main visual element -->
+  <path d="M 11 26 L 17.5 32 L 29 20"
+        stroke="white"
+        stroke-width="3.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"/>
+</svg>
