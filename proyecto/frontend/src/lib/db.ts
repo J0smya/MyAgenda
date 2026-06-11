@@ -1,17 +1,19 @@
 import pkg from "pg";
 const { Pool } = pkg;
 
-// VALIDACIÓN: Si no hay DATABASE_URL en Render, el servidor te avisará de inmediato.
-if (!process.env.DATABASE_URL && process.env.NODE_ENV === 'production') {
-  console.error("ERROR CRÍTICO: La variable DATABASE_URL no está configurada en el entorno.");
+const isProduction = process.env.NODE_ENV === "production";
+
+if (!process.env.DATABASE_URL && isProduction) {
+  throw new Error("DATABASE_URL no está configurada en producción.");
 }
 
-// Configuración dinámica
-// Si estamos en producción (Render), usamos DATABASE_URL. Si no, usamos la local.
-const config = process.env.DATABASE_URL 
-  ? { 
+const config = process.env.DATABASE_URL
+  ? {
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false } // NECESARIO para conexiones externas como Neon/Postgres remoto
+      ssl: { rejectUnauthorized: false },
+      max: 10,
+      idleTimeoutMillis: 30_000,
+      connectionTimeoutMillis: 10_000,
     }
   : {
       host: "localhost",
@@ -23,6 +25,17 @@ const config = process.env.DATABASE_URL
 
 export const pool = new Pool(config);
 
-pool.connect()
-  .then(() => console.log("Conectado a la base de datos ✅"))
-  .catch(err => console.error("Error al conectar a la base de datos ❌", err));
+pool.on("error", (err) => {
+  console.error("Error inesperado en el pool de PostgreSQL:", err);
+});
+
+export async function verificarConexionDB() {
+  const client = await pool.connect();
+
+  try {
+    await client.query("SELECT 1");
+    console.log("Conectado a la base de datos");
+  } finally {
+    client.release();
+  }
+}

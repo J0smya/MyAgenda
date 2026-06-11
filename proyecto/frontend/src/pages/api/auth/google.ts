@@ -1,38 +1,39 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { Google } from "arctic";
-
-const google = new Google(
-  import.meta.env.GOOGLE_CLIENT_ID,
-  import.meta.env.GOOGLE_CLIENT_SECRET,
-  "http://localhost:4321/api/auth/google/callback"
-);
+import { generateCodeVerifier, generateState } from "arctic";
+import { getGoogleOAuthClient, isSecureSite } from "../../../lib/google-oauth";
 
 export const GET: APIRoute = async ({ cookies, redirect }) => {
-  const state        = Math.random().toString(36).slice(2);
-  const codeVerifier = Math.random().toString(36).slice(2) +
-                       Math.random().toString(36).slice(2);
+  try {
+    const google = getGoogleOAuthClient();
+    const state = generateState();
+    const codeVerifier = generateCodeVerifier();
+    const authorizationUrl = google.createAuthorizationURL(state, codeVerifier, [
+      "openid",
+      "profile",
+      "email",
+    ]);
 
-  cookies.set("google_state", state, {
-    httpOnly: true,
-    path: "/",
-    maxAge: 60 * 10,
-    sameSite: "lax",
-  });
+    cookies.set("google_state", state, {
+      path: "/",
+      httpOnly: true,
+      secure: isSecureSite,
+      sameSite: "lax",
+      maxAge: 60 * 10,
+    });
 
-  cookies.set("google_code_verifier", codeVerifier, {
-    httpOnly: true,
-    path: "/",
-    maxAge: 60 * 10,
-    sameSite: "lax",
-  });
+    cookies.set("google_code_verifier", codeVerifier, {
+      path: "/",
+      httpOnly: true,
+      secure: isSecureSite,
+      sameSite: "lax",
+      maxAge: 60 * 10,
+    });
 
-  // Sin el objeto {scopes} — se pasan directo como array
-  const url = await google.createAuthorizationURL(state, codeVerifier, [
-    "email",
-    "profile",
-  ]);
-
-  return redirect(url.toString());
+    return redirect(authorizationUrl.toString());
+  } catch (error: any) {
+    console.error("ERROR GOOGLE LOGIN:", error.message);
+    return redirect("/login?error=google_config");
+  }
 };
