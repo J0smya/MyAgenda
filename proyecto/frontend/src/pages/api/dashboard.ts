@@ -277,7 +277,7 @@ export const PUT: APIRoute = async ({ request }) => {
            titulo       = COALESCE(NULLIF($1,''), titulo),
            descripcion  = COALESCE(NULLIF($2,''), descripcion),
            hora_inicio  = COALESCE(NULLIF($3,'')::time without time zone, hora_inicio),
-           prioridad    = COALESCE(NULLIF($4,''), prioridad),
+           prioridad    = COALESCE(NULLIF($4,'')::public.prioridad_tarea, prioridad),
            fecha_inicio = COALESCE($5::date, fecha_inicio),
            estado       = COALESCE(NULLIF($7,'')::public.estado_tarea, estado)
          WHERE id_tarea = $6`,
