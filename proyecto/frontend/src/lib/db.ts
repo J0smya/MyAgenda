@@ -24,5 +24,17 @@ const config = process.env.DATABASE_URL
 export const pool = new Pool(config);
 
 pool.connect()
-  .then(() => console.log("Conectado a la base de datos ✅"))
+  .then(async (client) => {
+    console.log("Conectado a la base de datos ✅");
+    try {
+      await client.query(`
+        ALTER TABLE public.tarea
+        ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) DEFAULT 'personal'
+      `);
+      console.log("Columna 'categoria' verificada ✅");
+    } catch (_) {
+      // Si la tabla aún no existe, se ignora el error
+    }
+    client.release();
+  })
   .catch(err => console.error("Error al conectar a la base de datos ❌", err));

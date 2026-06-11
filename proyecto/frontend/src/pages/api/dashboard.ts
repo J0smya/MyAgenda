@@ -109,14 +109,15 @@ export const POST: APIRoute = async ({ request }) => {
       for (let i = 0; i < fechas.length; i++) {
         const { rows: [tarea] } = await client.query(
           `INSERT INTO public.tarea
-             (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion)
-           VALUES ($1,$2,$3,$4,$5,'pendiente',NOW()) RETURNING *`,
+             (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, categoria, estado, fecha_creacion)
+           VALUES ($1,$2,$3,$4,$5,$6,'pendiente',NOW()) RETURNING *`,
           [
             body.titulo.trim(),
             body.descripcion?.trim() || "",
             fechas[i],
             body.hora || null,
             body.prioridad || "media",
+            body.categoria || "personal",
           ]
         );
  
@@ -145,14 +146,15 @@ export const POST: APIRoute = async ({ request }) => {
     // ── Tarea simple ──────────────────────────────────────────────────────
     const { rows: [nuevaTarea] } = await client.query(
       `INSERT INTO public.tarea
-         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion)
-       VALUES ($1,$2,$3,$4,$5,'pendiente',NOW()) RETURNING *`,
+         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, categoria, estado, fecha_creacion)
+       VALUES ($1,$2,$3,$4,$5,$6,'pendiente',NOW()) RETURNING *`,
       [
         body.titulo.trim(),
         body.descripcion?.trim() || "",
         body.fecha  || null,
         body.hora   || null,
         body.prioridad || "media",
+        body.categoria || "personal",
       ]
     );
  
@@ -229,8 +231,9 @@ export const PUT: APIRoute = async ({ request }) => {
          SET
            titulo      = COALESCE(NULLIF($1,''), t.titulo),
            descripcion = COALESCE(NULLIF($2,''), t.descripcion),
-           hora_inicio = COALESCE(NULLIF($3,''), t.hora_inicio),
-           prioridad   = COALESCE(NULLIF($4,''), t.prioridad)
+           hora_inicio = COALESCE(NULLIF($3,'')::time without time zone, t.hora_inicio),
+           prioridad   = COALESCE(NULLIF($4,''), t.prioridad),
+           categoria   = COALESCE(NULLIF($6,''), t.categoria)
          FROM public.recurrencia_instancia ri
          WHERE ri.id_tarea = t.id_tarea
            AND ri.id_serie = $5
@@ -241,6 +244,7 @@ export const PUT: APIRoute = async ({ request }) => {
           campos.hora        || null,
           campos.prioridad   || null,
           inst.id_serie,
+          campos.categoria   || null,
         ]
       );
     } else {
@@ -249,9 +253,10 @@ export const PUT: APIRoute = async ({ request }) => {
          SET
            titulo       = COALESCE(NULLIF($1,''), titulo),
            descripcion  = COALESCE(NULLIF($2,''), descripcion),
-           hora_inicio  = COALESCE(NULLIF($3,''), hora_inicio),
+           hora_inicio  = COALESCE(NULLIF($3,'')::time without time zone, hora_inicio),
            prioridad    = COALESCE(NULLIF($4,''), prioridad),
-           fecha_inicio = COALESCE($5::date,       fecha_inicio)
+           fecha_inicio = COALESCE($5::date,       fecha_inicio),
+           categoria    = COALESCE(NULLIF($7,''), categoria)
          WHERE id_tarea = $6`,
         [
           campos.titulo      || null,
@@ -260,6 +265,7 @@ export const PUT: APIRoute = async ({ request }) => {
           campos.prioridad   || null,
           campos.fecha       || null,
           id_tarea,
+          campos.categoria   || null,
         ]
       );
     }
