@@ -3,6 +3,7 @@ export const prerender = false;
 import type { APIRoute } from "astro";
 import { pool } from "../../lib/db";
 import bcrypt from "bcryptjs";
+import { crearSesion, cookieSesion } from "../../lib/sesion";
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -41,9 +42,14 @@ export const POST: APIRoute = async ({ request }) => {
       }, { status: 401 });
     }
 
-    // Aquí van las cookies
-    return Response.json({
-      success: true
+    const token = await crearSesion(user.id_usuario);
+
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Set-Cookie": cookieSesion(token),
+      },
     });
 
   } catch (error) {

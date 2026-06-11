@@ -1,7 +1,6 @@
 ---
-import '../styles/global.css'
-import '../styles/recuperarcontrasena.css'
-import Layout from "../layouts/Layout.astro";
+export const prerender = false;
+import '../styles/recuperarcontrasena.css';
 ---
 
 <!DOCTYPE html>
@@ -9,10 +8,9 @@ import Layout from "../layouts/Layout.astro";
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Recuperar contraseña - My Agenda</title>
+  <title>Recuperar contraseña — My Agenda</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/src/styles/recuperarcontrasena.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
 
@@ -21,8 +19,8 @@ import Layout from "../layouts/Layout.astro";
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
         <line x1="16" y1="2" x2="16" y2="6"/>
-        <line x1="8" y1="2" x2="8" y2="6"/>
-        <line x1="3" y1="10" x2="21" y2="10"/>
+        <line x1="8"  y1="2" x2="8"  y2="6"/>
+        <line x1="3"  y1="10" x2="21" y2="10"/>
       </svg>
       My Agenda
     </a>
@@ -30,7 +28,7 @@ import Layout from "../layouts/Layout.astro";
 
   <main class="pagina">
     <div class="tarjeta">
-      
+
       <div class="encabezado">
         <div class="burbuja">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -42,188 +40,518 @@ import Layout from "../layouts/Layout.astro";
         <p>Verifica tu identidad para volver a<br/>acceder a tu cuenta.</p>
       </div>
 
+      <!-- Indicador de pasos -->
       <div class="pasos">
-        <div class="paso activo" id="paso-1"><div class="paso-circulo">1</div><span class="paso-label">Método</span></div>
-        <div class="paso" id="paso-2"><div class="paso-circulo">2</div><span class="paso-label">Código</span></div>
-        <div class="paso" id="paso-3"><div class="paso-circulo">3</div><span class="paso-label">Nueva</span></div>
+        <div class="paso activo" id="paso-1">
+          <div class="paso-circulo">1</div>
+          <span class="paso-label">Método</span>
+        </div>
+        <div class="paso-linea"></div>
+        <div class="paso" id="paso-2">
+          <div class="paso-circulo">2</div>
+          <span class="paso-label">Código</span>
+        </div>
+        <div class="paso-linea"></div>
+        <div class="paso" id="paso-3">
+          <div class="paso-circulo">3</div>
+          <span class="paso-label">Nueva</span>
+        </div>
       </div>
 
+      <!-- PANEL 1: Elegir método -->
       <div class="panel activo" id="panel-1">
         <div class="campo">
           <label>¿Cómo quieres recuperarla?</label>
           <div class="selector">
-            <button class="btn-metodo seleccionado" id="btn-correo" onclick="seleccionarMetodo('email')">Correo</button>
-            <button class="btn-metodo" id="btn-sms" onclick="seleccionarMetodo('sms')">SMS</button>
+            <button class="btn-metodo seleccionado" id="btn-correo" type="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Correo
+            </button>
+            <button class="btn-metodo" id="btn-sms" type="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              SMS
+            </button>
           </div>
         </div>
+
         <div class="campo" id="campo-correo">
           <label for="input-correo">Correo electrónico</label>
           <div class="wrap-input">
-            <input type="email" id="input-correo" placeholder="ejemplo@correo.com" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="input-correo" placeholder="tu@correo.com" autocomplete="email" />
           </div>
         </div>
+
         <div class="campo oculto" id="campo-tel">
           <label for="input-tel">Número de teléfono</label>
           <div class="wrap-input">
-            <input type="tel" id="input-tel" placeholder="300 123 4567" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            <input type="tel" id="input-tel" placeholder="+57 300 123 4567" autocomplete="tel" />
           </div>
         </div>
-        <button class="btn-ok" id="btn-enviar" onclick="enviarCodigo()">Enviar código de verificación</button>
+
+        <button class="btn-ok" id="btn-enviar" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Enviar código de verificación
+        </button>
+
         <div class="ir-login">¿Recordaste tu contraseña? <a href="/login">Iniciar sesión</a></div>
       </div>
 
+      <!-- PANEL 2: Verificar OTP -->
       <div class="panel" id="panel-2">
-        <button class="btn-volver" onclick="irAPaso(1)">Volver</button>
-        <div class="mascara"><div class="punto"></div><span id="texto-mascara">Código enviado...</span></div>
+        <button class="btn-volver" id="btn-volver-paso1" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+          Volver
+        </button>
+
+        <div class="mascara">
+          <div class="punto"></div>
+          <span id="texto-mascara">Código enviado…</span>
+        </div>
+
         <div class="campo">
           <label>Código de 6 dígitos</label>
-          <div class="otp-fila">
-            <input class="otp-caja" type="text" maxlength="1" />
-            <input class="otp-caja" type="text" maxlength="1" />
-            <input class="otp-caja" type="text" maxlength="1" />
-            <input class="otp-caja" type="text" maxlength="1" />
-            <input class="otp-caja" type="text" maxlength="1" />
-            <input class="otp-caja" type="text" maxlength="1" />
+          <div class="otp-fila" id="otp-fila">
+            <input class="otp-caja" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+            <input class="otp-caja" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+            <input class="otp-caja" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+            <input class="otp-caja" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+            <input class="otp-caja" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+            <input class="otp-caja" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
           </div>
-          <p class="msg info">El código expira en <span id="timer">2:00</span></p>
+
+          <!-- Hint de modo desarrollo (solo aparece si no hay email/SMS configurado) -->
+          <div id="dev-hint" class="dev-hint" style="display:none">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Modo dev — tu código es: <strong id="dev-codigo" class="dev-codigo"></strong></span>
+          </div>
+
+          <div class="timer-row">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Expira en <strong id="timer">10:00</strong>
+          </div>
         </div>
-        <button class="btn-ok" id="btn-verificar" onclick="verificarCodigo()" disabled>Verificar código</button>
+
+        <button class="btn-ok" id="btn-verificar" type="button" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Verificar código
+        </button>
+
+        <button class="btn-reenviar" id="btn-reenviar" type="button" disabled>
+          Reenviar código <span id="reenviar-timer"></span>
+        </button>
       </div>
 
+      <!-- PANEL 3: Nueva contraseña -->
       <div class="panel" id="panel-3">
         <div class="campo">
           <label for="input-nueva">Nueva contraseña</label>
-          <div class="wrap-input"><input type="password" id="input-nueva" placeholder="Mínimo 8 caracteres" oninput="verificarConfirmacion()" /></div>
+          <div class="wrap-input">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="input-nueva" placeholder="Mínimo 8 caracteres" />
+          </div>
+          <div class="pass-strength" id="pass-strength"></div>
         </div>
         <div class="campo">
           <label for="input-confirmar">Confirmar contraseña</label>
-          <div class="wrap-input"><input type="password" id="input-confirmar" placeholder="Repite la contraseña" oninput="verificarConfirmacion()" /></div>
+          <div class="wrap-input">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="input-confirmar" placeholder="Repite la contraseña" />
+          </div>
           <p class="msg" id="msg-confirmar"></p>
         </div>
-        <button class="btn-ok" id="btn-guardar" onclick="guardarContrasena()" disabled>Guardar nueva contraseña</button>
+        <button class="btn-ok" id="btn-guardar" type="button" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Guardar nueva contraseña
+        </button>
       </div>
 
+      <!-- PANEL 4: Éxito -->
       <div class="panel" id="panel-4">
-        <div style="text-align:center;">
+        <div class="panel-exito">
+          <div class="exito-icono">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
           <h2>¡Contraseña actualizada!</h2>
           <p>Ya puedes iniciar sesión con tu nueva contraseña.</p>
-          <a href="/login"><button class="btn-ok">Ir a iniciar sesión</button></a>
+          <a href="/login"><button class="btn-ok" type="button">Ir a iniciar sesión</button></a>
         </div>
       </div>
 
     </div>
   </main>
 
+  <!-- Contenedor de toasts -->
+  <div id="rc-toast-container" class="rc-toast-container"></div>
+
   <script is:inline>
-    let correoActual = "";
-    let timerInterval = null;
+    // ── Estado ────────────────────────────────────────────────────
+    let metodoActual     = 'email';
+    let contactoActual   = '';
+    let otpToken         = '';   // token firmado que contiene el OTP (viene del servidor)
+    let resetToken       = '';   // token para cambiar la clave (viene tras verificar OTP)
+    let timerInterval    = null;
+    let reenviarInterval = null;
 
-    window.seleccionarMetodo = (metodo) => {
-      document.getElementById("btn-correo").classList.toggle("seleccionado", metodo === 'email');
-      document.getElementById("btn-sms").classList.toggle("seleccionado", metodo === 'sms');
-      document.getElementById("campo-correo").classList.toggle("oculto", metodo !== 'email');
-      document.getElementById("campo-tel").classList.toggle("oculto", metodo !== 'sms');
-    };
+    // ── Toast ─────────────────────────────────────────────────────
+    function mostrarToast(titulo, subtitulo, tipo = 'success') {
+      const container = document.getElementById('rc-toast-container');
+      const claseExtra =
+        tipo === 'error'   ? ' rc-toast--error'   :
+        tipo === 'warning' ? ' rc-toast--warning'  :
+        tipo === 'info'    ? ' rc-toast--info'     : '';
 
-    window.irAPaso = (numPaso) => {
-      document.querySelectorAll(".panel").forEach(p => p.classList.remove("activo"));
-      document.getElementById(`panel-${numPaso}`).classList.add("activo");
-      
-      document.querySelectorAll(".paso").forEach(p => p.classList.remove("activo", "completado"));
+      const iconSvg =
+        tipo === 'error' || tipo === 'warning'
+          ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+          : tipo === 'info'
+          ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
+          : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+      const toast = document.createElement('div');
+      toast.className = `rc-toast${claseExtra}`;
+      toast.innerHTML = `
+        <div class="rc-toast-icon">${iconSvg}</div>
+        <div class="rc-toast-body">
+          <div class="rc-toast-title">${titulo}</div>
+          <div class="rc-toast-sub">${subtitulo}</div>
+        </div>
+        <button class="rc-toast-close" title="Cerrar">✕</button>
+      `;
+      toast.querySelector('.rc-toast-close').addEventListener('click', () => cerrarToast(toast));
+      container.appendChild(toast);
+      setTimeout(() => cerrarToast(toast), 4500);
+    }
+
+    function cerrarToast(toast) {
+      toast.classList.add('rc-toast--out');
+      toast.addEventListener('animationend', () => toast.remove(), { once: true });
+    }
+
+    // ── Cambiar paso ──────────────────────────────────────────────
+    function irAPaso(num) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('activo'));
+      document.getElementById('panel-' + num).classList.add('activo');
       for (let i = 1; i <= 3; i++) {
-        const pasoUI = document.getElementById(`paso-${i}`);
-        if (i < numPaso) pasoUI.classList.add("completado");
-        else if (i === numPaso) pasoUI.classList.add("activo");
+        const el = document.getElementById('paso-' + i);
+        if (!el) continue;
+        el.classList.remove('activo', 'completado');
+        if (i < num)      el.classList.add('completado');
+        else if (i === num) el.classList.add('activo');
       }
-    };
+    }
 
-    window.enviarCodigo = async () => {
-      correoActual = document.getElementById("input-correo").value;
-      if (!correoActual) return alert("Ingresa tu correo.");
-      
-      const btn = document.getElementById("btn-enviar");
-      btn.textContent = "Enviando..."; btn.disabled = true;
+    // ── Seleccionar método ────────────────────────────────────────
+    document.getElementById('btn-correo').addEventListener('click', () => seleccionarMetodo('email'));
+    document.getElementById('btn-sms').addEventListener('click',    () => seleccionarMetodo('sms'));
+
+    function seleccionarMetodo(metodo) {
+      metodoActual = metodo;
+      document.getElementById('btn-correo').classList.toggle('seleccionado', metodo === 'email');
+      document.getElementById('btn-sms').classList.toggle('seleccionado',    metodo === 'sms');
+      document.getElementById('campo-correo').classList.toggle('oculto', metodo !== 'email');
+      document.getElementById('campo-tel').classList.toggle('oculto',    metodo !== 'sms');
+      // Enfocar el campo activo
+      setTimeout(() => {
+        const id = metodo === 'email' ? 'input-correo' : 'input-tel';
+        document.getElementById(id)?.focus();
+      }, 50);
+    }
+
+    // ── PASO 1: Enviar código ─────────────────────────────────────
+    document.getElementById('btn-enviar').addEventListener('click', enviarCodigo);
+    document.getElementById('input-correo').addEventListener('keydown', e => { if (e.key === 'Enter') enviarCodigo(); });
+    document.getElementById('input-tel').addEventListener('keydown',    e => { if (e.key === 'Enter') enviarCodigo(); });
+
+    async function enviarCodigo() {
+      const emailVal = document.getElementById('input-correo').value.trim();
+      const telVal   = document.getElementById('input-tel').value.trim();
+
+      if (metodoActual === 'email' && !emailVal) {
+        mostrarToast('Campo requerido', 'Ingresa tu correo electrónico.', 'error');
+        document.getElementById('input-correo').focus();
+        return;
+      }
+      if (metodoActual === 'sms' && !telVal) {
+        mostrarToast('Campo requerido', 'Ingresa tu número de teléfono.', 'error');
+        document.getElementById('input-tel').focus();
+        return;
+      }
+
+      contactoActual = metodoActual === 'email' ? emailVal : telVal;
+
+      const btn = document.getElementById('btn-enviar');
+      btn.innerHTML = '<span class="btn-spinner"></span> Enviando…';
+      btn.disabled = true;
 
       try {
-        const res = await fetch('/api/recuperarcontrasena', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ accion: 'enviar_codigo', email: correoActual })
+        const body = { accion: 'enviar_codigo', metodo: metodoActual };
+        if (metodoActual === 'email') body.email    = emailVal;
+        else                          body.telefono = telVal;
+
+        const res  = await fetch('/api/recuperarcontrasena', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
         });
         const data = await res.json();
-        if (res.ok) {
-          document.getElementById("texto-mascara").textContent = `Código enviado a ${correoActual}`;
-          window.irAPaso(2); iniciarTemporizador();
-        } else alert(data.error);
-      } catch (e) { alert("Error de conexión."); } 
-      finally { btn.textContent = "Enviar código"; btn.disabled = false; }
-    };
 
-    const otpInputs = document.querySelectorAll(".otp-caja");
+        if (!res.ok) {
+          mostrarToast('No se pudo enviar', data.error || 'Verifica los datos ingresados.', 'error');
+          return;
+        }
+
+        otpToken = data.otpToken;
+        document.getElementById('texto-mascara').textContent =
+          `Código enviado a ${data.destino}`;
+        irAPaso(2);
+        iniciarTemporizador(600);
+        iniciarReenviar(60);
+
+        // Modo dev: mostrar código en pantalla cuando no hay email/SMS configurado
+        if (data.devCodigo) {
+          const hint    = document.getElementById('dev-hint');
+          const codigoEl = document.getElementById('dev-codigo');
+          if (hint && codigoEl) {
+            codigoEl.textContent = data.devCodigo;
+            hint.style.display   = 'flex';
+            // Autocompletar las cajas para mayor comodidad
+            const cajas = document.querySelectorAll('.otp-caja');
+            [...data.devCodigo].forEach((d, i) => { if (cajas[i]) cajas[i].value = d; });
+            document.getElementById('btn-verificar').disabled = false;
+          }
+          mostrarToast('Modo desarrollo', `Sin SMTP/SMS: código → ${data.devCodigo}`, 'warning');
+        } else {
+          mostrarToast('Código enviado', `Revisa ${metodoActual === 'email' ? 'tu bandeja de entrada' : 'tus mensajes SMS'}.`, 'info');
+        }
+
+      } catch {
+        mostrarToast('Error de conexión', 'Verifica tu red e intenta de nuevo.', 'error');
+      } finally {
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar código de verificación';
+        btn.disabled = false;
+      }
+    }
+
+    // ── OTP inputs ────────────────────────────────────────────────
+    const otpInputs = document.querySelectorAll('.otp-caja');
     otpInputs.forEach((input, index) => {
-      input.addEventListener("input", () => {
-        input.value = input.value.replace(/[^0-9]/g, "");
+      input.addEventListener('input', () => {
+        input.value = input.value.replace(/[^0-9]/g, '');
         if (input.value && index < 5) otpInputs[index + 1].focus();
-        document.getElementById("btn-verificar").disabled = !Array.from(otpInputs).every(i => i.value);
+        document.getElementById('btn-verificar').disabled =
+          !Array.from(otpInputs).every(i => i.value);
       });
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Backspace" && !input.value && index > 0) otpInputs[index - 1].focus();
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Backspace' && !input.value && index > 0)
+          otpInputs[index - 1].focus();
+      });
+      input.addEventListener('paste', e => {
+        e.preventDefault();
+        const text = (e.clipboardData?.getData('text') ?? '').replace(/\D/g, '').slice(0, 6);
+        [...text].forEach((ch, i) => { if (otpInputs[i]) otpInputs[i].value = ch; });
+        const next = Math.min(text.length, 5);
+        otpInputs[next]?.focus();
+        document.getElementById('btn-verificar').disabled =
+          !Array.from(otpInputs).every(i => i.value);
       });
     });
 
-    window.verificarCodigo = async () => {
-      let codigoDigitado = Array.from(otpInputs).map(i => i.value).join('');
-      const btn = document.getElementById("btn-verificar");
-      btn.textContent = "Verificando..."; btn.disabled = true;
+    // ── PASO 2: Verificar código ──────────────────────────────────
+    document.getElementById('btn-verificar').addEventListener('click', verificarCodigo);
+    document.getElementById('btn-volver-paso1').addEventListener('click', () => {
+      detenerTemporizador(); irAPaso(1);
+    });
+
+    async function verificarCodigo() {
+      const codigo = Array.from(otpInputs).map(i => i.value).join('');
+      const btn    = document.getElementById('btn-verificar');
+      btn.innerHTML = '<span class="btn-spinner"></span> Verificando…';
+      btn.disabled = true;
 
       try {
-        const res = await fetch('/recuperarcontrasena', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ accion: 'verificar_codigo', codigo: codigoDigitado })
+        const body = { accion: 'verificar_codigo', otpToken, codigo };
+
+        const res  = await fetch('/api/recuperarcontrasena', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
         });
-        if (res.ok) {
-          detenerTemporizador(); window.irAPaso(3);
-        } else {
-          alert("Código incorrecto."); otpInputs.forEach(i => i.value = ""); otpInputs[0].focus();
+        const data = await res.json();
+
+        if (!res.ok) {
+          mostrarToast('Código incorrecto', data.error || 'Verifica el código e intenta de nuevo.', 'error');
+          otpInputs.forEach(i => { i.value = ''; i.classList.add('otp-error'); });
+          otpInputs[0].focus();
+          setTimeout(() => otpInputs.forEach(i => i.classList.remove('otp-error')), 600);
+          btn.disabled = false;
+          btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Verificar código';
+          return;
         }
-      } catch (e) { alert("Error al verificar."); } 
-      finally { btn.textContent = "Verificar código"; btn.disabled = false; }
-    };
 
-    window.verificarConfirmacion = () => {
-      const p1 = document.getElementById("input-nueva").value;
-      const p2 = document.getElementById("input-confirmar").value;
-      const btn = document.getElementById("btn-guardar"), msg = document.getElementById("msg-confirmar");
-      
-      if (!p2) { msg.textContent = ""; btn.disabled = true; return; }
-      if (p1 === p2 && p1.length >= 8) { msg.textContent = "Coinciden"; msg.style.color = "green"; btn.disabled = false; } 
-      else { msg.textContent = "No coinciden"; msg.style.color = "red"; btn.disabled = true; }
-    };
+        resetToken = data.resetToken;
+        detenerTemporizador();
+        irAPaso(3);
+        document.getElementById('input-nueva').focus();
 
-    window.guardarContrasena = async () => {
-      const nuevaClave = document.getElementById("input-nueva").value;
-      const btn = document.getElementById("btn-guardar");
-      btn.textContent = "Guardando..."; btn.disabled = true;
+      } catch {
+        mostrarToast('Error de conexión', 'Verifica tu red e intenta de nuevo.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Verificar código';
+      }
+    }
+
+    // ── Reenviar código ───────────────────────────────────────────
+    document.getElementById('btn-reenviar').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-reenviar');
+      btn.disabled = true;
+      try {
+        const body = { accion: 'enviar_codigo', metodo: metodoActual };
+        if (metodoActual === 'email') body.email    = contactoActual;
+        else                          body.telefono = contactoActual;
+        const res  = await fetch('/api/recuperarcontrasena', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          otpToken = data.otpToken;
+          otpInputs.forEach(i => i.value = '');
+          iniciarTemporizador(600);
+          iniciarReenviar(60);
+          if (data.devCodigo) {
+            const codigoEl = document.getElementById('dev-codigo');
+            if (codigoEl) codigoEl.textContent = data.devCodigo;
+            document.getElementById('dev-hint').style.display = 'flex';
+            [...data.devCodigo].forEach((d, i) => { if (otpInputs[i]) otpInputs[i].value = d; });
+            document.getElementById('btn-verificar').disabled = false;
+            mostrarToast('Modo desarrollo', `Nuevo código → ${data.devCodigo}`, 'warning');
+          } else {
+            otpInputs[0].focus();
+            mostrarToast('Código reenviado', 'Se envió un nuevo código.', 'info');
+          }
+        } else {
+          mostrarToast('Error', data.error || 'No se pudo reenviar.', 'error');
+          btn.disabled = false;
+        }
+      } catch {
+        mostrarToast('Error de conexión', 'Verifica tu red.', 'error');
+        btn.disabled = false;
+      }
+    });
+
+    // ── PASO 3: Nueva contraseña ──────────────────────────────────
+    document.getElementById('input-nueva').addEventListener('input', verificarConfirmacion);
+    document.getElementById('input-confirmar').addEventListener('input', verificarConfirmacion);
+
+    function verificarConfirmacion() {
+      const p1  = document.getElementById('input-nueva').value;
+      const p2  = document.getElementById('input-confirmar').value;
+      const btn = document.getElementById('btn-guardar');
+      const msg = document.getElementById('msg-confirmar');
+
+      // Indicador de fortaleza
+      const strengthEl = document.getElementById('pass-strength');
+      if (p1.length === 0) {
+        strengthEl.innerHTML = '';
+      } else {
+        const nivel = p1.length < 8 ? 0 : p1.length < 12 ? 1 : /[A-Z]/.test(p1) && /[0-9]/.test(p1) && /[^A-Za-z0-9]/.test(p1) ? 3 : 2;
+        const labels = ['Muy corta', 'Débil', 'Aceptable', 'Fuerte'];
+        const colors = ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e'];
+        const widths = ['25%', '50%', '75%', '100%'];
+        strengthEl.innerHTML = `
+          <div class="strength-bar"><div style="width:${widths[nivel]};background:${colors[nivel]};height:100%;border-radius:4px;transition:width .3s,background .3s"></div></div>
+          <span style="font-size:11px;color:${colors[nivel]};font-weight:600">${labels[nivel]}</span>
+        `;
+      }
+
+      if (!p2) { msg.textContent = ''; btn.disabled = true; return; }
+      if (p1 === p2 && p1.length >= 8) {
+        msg.className   = 'msg msg-ok';
+        msg.innerHTML   = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Las contraseñas coinciden';
+        btn.disabled = false;
+      } else {
+        msg.className   = 'msg msg-err';
+        msg.innerHTML   = p1.length < 8
+          ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Mínimo 8 caracteres'
+          : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> No coinciden';
+        btn.disabled = true;
+      }
+    }
+
+    document.getElementById('btn-guardar').addEventListener('click', guardarContrasena);
+
+    async function guardarContrasena() {
+      const nuevaClave = document.getElementById('input-nueva').value;
+      const btn        = document.getElementById('btn-guardar');
+      btn.innerHTML    = '<span class="btn-spinner"></span> Guardando…';
+      btn.disabled     = true;
 
       try {
-        const res = await fetch('/api/recuperarcontrasena', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ accion: 'actualizar_contrasena', email: correoActual, nuevaContrasena: nuevaClave })
+        const res  = await fetch('/api/recuperarcontrasena', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accion: 'actualizar_contrasena', nuevaContrasena: nuevaClave, resetToken })
         });
-        if (res.ok) window.irAPaso(4);
-        else alert("Error al actualizar.");
-      } catch (e) { alert("Error de red."); } 
-      finally { btn.textContent = "Guardar"; btn.disabled = false; }
-    };
+        const data = await res.json();
 
-    function iniciarTemporizador() {
-      let tiempo = 120; const display = document.getElementById("timer");
+        if (!res.ok) {
+          mostrarToast('Error', data.error || 'No se pudo actualizar la contraseña.', 'error');
+          btn.disabled = false;
+          btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar nueva contraseña';
+          return;
+        }
+
+        irAPaso(4);
+
+      } catch {
+        mostrarToast('Error de conexión', 'Verifica tu red e intenta de nuevo.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = 'Guardar nueva contraseña';
+      }
+    }
+
+    // ── Temporizadores ────────────────────────────────────────────
+    function iniciarTemporizador(segundos) {
+      let s = segundos;
+      const display = document.getElementById('timer');
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(() => {
-        tiempo--; display.textContent = `${Math.floor(tiempo / 60)}:${(tiempo % 60).toString().padStart(2, '0')}`;
-        if (tiempo <= 0) clearInterval(timerInterval);
+        s--;
+        const m = Math.floor(s / 60);
+        const sec = (s % 60).toString().padStart(2, '0');
+        display.textContent = `${m}:${sec}`;
+        if (s <= 0) {
+          clearInterval(timerInterval);
+          display.textContent = '0:00';
+          display.style.color = '#ef4444';
+        }
       }, 1000);
     }
-    function detenerTemporizador() { if (timerInterval) clearInterval(timerInterval); }
+
+    function iniciarReenviar(segundos) {
+      let s = segundos;
+      const btn  = document.getElementById('btn-reenviar');
+      const span = document.getElementById('reenviar-timer');
+      btn.disabled = true;
+      if (reenviarInterval) clearInterval(reenviarInterval);
+      reenviarInterval = setInterval(() => {
+        s--;
+        span.textContent = `(${s}s)`;
+        if (s <= 0) {
+          clearInterval(reenviarInterval);
+          span.textContent = '';
+          btn.disabled = false;
+        }
+      }, 1000);
+    }
+
+    function detenerTemporizador() {
+      if (timerInterval)  { clearInterval(timerInterval);  timerInterval  = null; }
+      if (reenviarInterval) { clearInterval(reenviarInterval); reenviarInterval = null; }
+    }
   </script>
+
 </body>
 </html>
