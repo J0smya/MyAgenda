@@ -5,6 +5,17 @@ import type { APIRoute } from "astro";
 import { pool } from "../../lib/db";
  
 // ─── helpers ──────────────────────────────────────────────────────────────
+let _columnaMigrada = false;
+async function asegurarColumnaCategoria(client: any) {
+  if (_columnaMigrada) return;
+  try {
+    await client.query(
+      `ALTER TABLE public.tarea ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) DEFAULT 'personal'`
+    );
+  } catch (_) {}
+  _columnaMigrada = true;
+}
+
 function res(body: object, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -65,6 +76,7 @@ function generarFechas({
 export const POST: APIRoute = async ({ request }) => {
   const client = await pool.connect();
   try {
+    await asegurarColumnaCategoria(client);
     const body = await request.json();
  
     if (!body.titulo?.trim())
@@ -208,6 +220,7 @@ export const GET: APIRoute = async () => {
 export const PUT: APIRoute = async ({ request }) => {
   const client = await pool.connect();
   try {
+    await asegurarColumnaCategoria(client);
     const body = await request.json();
     const { id_tarea, modo, ...campos } = body;
  
