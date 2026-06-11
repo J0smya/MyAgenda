@@ -1,4 +1,3 @@
-
 export const prerender = false;
 
 import type { APIRoute } from "astro";
@@ -35,50 +34,6 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({ success: false, message: "El título es obligatorio." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
-
-      const fechas = generarFechas({
-        fechaInicio : body.fecha,
-        frecuencia  : body.frecuencia,
-        intervalo   : body.intervalo || 1,
-        fechaFin    : body.fecha_fin || null,
-        totalOcurr  : body.total_ocurr || 10,
-        diasSemana  : body.dias_semana || null,
-      });
-
-      const tareasCreadas = [];
-      for (let i = 0; i < fechas.length; i++) {
-        const { rows: [tarea] } = await client.query(
-          `INSERT INTO public.tarea
-             (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion)
-           VALUES ($1,$2,$3,$4,$5,'pendiente',NOW()) RETURNING *`,
-          [
-            body.titulo.trim(),
-            body.descripcion?.trim() || "",
-            fechas[i],
-            body.hora      || null,
-            body.prioridad || "media",
-          ]
-        );
-
-        await client.query(
-          `INSERT INTO public.recurrencia_instancia (id_serie, id_tarea, ocurrencia_num)
-           VALUES ($1,$2,$3)`,
-          [serie.id_serie, tarea.id_tarea, i + 1]
-        );
-
-        if (i === 0 && body.nota_contenido) {
-          await client.query(
-            `INSERT INTO public.nota (id_tarea, contenido, fecha_creacion)
-             VALUES ($1,$2,NOW())`,
-            [tarea.id_tarea, body.nota_contenido]
-          );
-        }
-
-        tareasCreadas.push(tarea);
-      }
-
-      await client.query("COMMIT");
-      return res({ success: true, recurrente: true, serie, tareas: tareasCreadas });
     }
 
     await client.query("BEGIN");
@@ -169,18 +124,11 @@ export const DELETE: APIRoute = async ({ request, url }) => {
 
   const client = await pool.connect();
   try {
-    const id   = url.searchParams.get("id");
-    const modo = url.searchParams.get("modo") ?? "simple";
-
-    if (!id) return res({ success: false, message: "ID no proporcionado." }, 400);
-
-    await client.query("BEGIN");
-
-    const hayTablas = await tablaRecurrenciaExiste();
-
-    if (modo === "serie" && hayTablas) {
-      const { rows: [inst] } = await client.query(
-        `SELECT id_serie FROM public.recurrencia_instancia WHERE id_tarea = $1`, [id]
+    const id = url.searchParams.get("id");
+    if (!id) {
+      return new Response(
+        JSON.stringify({ success: false, message: "ID no proporcionado" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -197,11 +145,6 @@ export const DELETE: APIRoute = async ({ request, url }) => {
         JSON.stringify({ success: false, message: "Tarea no encontrada o sin permiso" }),
         { status: 404, headers: { "Content-Type": "application/json" } }
       );
-
-      if (rowCount === 0) {
-        await client.query("ROLLBACK");
-        return res({ success: false, message: "Tarea no encontrada." }, 404);
-      }
     }
 
     await client.query(`DELETE FROM public.nota  WHERE id_tarea   = $1`, [id]);
