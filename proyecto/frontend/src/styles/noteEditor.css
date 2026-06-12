@@ -306,32 +306,79 @@
 }
 
 /* ════════════════════════════════════════════
-   TOAST INTERNO DEL EDITOR
+   TOAST DEL EDITOR (mismo diseño que config)
 ════════════════════════════════════════════ */
-.ne-toast {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 9px 20px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  z-index: 10;
-  display: none;
-  animation: ne-toast-in 0.2s ease;
-  font-family: inherit;
+.ne-toast-container {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
 }
-.ne-toast.show        { display: block; }
-.ne-toast.ne-toast-ok  { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
-.ne-toast.ne-toast-err { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 
-@keyframes ne-toast-in {
-  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+.ne-toast-item {
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  min-width: 280px;
+  max-width: 360px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06);
+  border-left: 4px solid var(--ne-toast-color, #22c55e);
+  animation: ne-toast-in 0.4s cubic-bezier(0.21,1.02,0.73,1) forwards;
+  position: relative;
+  overflow: hidden;
 }
+.ne-toast-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 3px; width: 100%;
+  background: var(--ne-toast-color, #22c55e);
+  animation: ne-toast-bar 3s linear forwards;
+}
+.ne-toast-out {
+  animation: ne-toast-out 0.3s ease forwards !important;
+}
+.ne-toast-icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.ne-toast-body  { flex: 1; min-width: 0; }
+.ne-toast-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+}
+.ne-toast-sub {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+  font-weight: 500;
+}
+.ne-toast-close {
+  background: none; border: none;
+  color: #cbd5e1; font-size: 16px;
+  cursor: pointer; padding: 2px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+}
+.ne-toast-close:hover { background: #f1f5f9; color: #475569; }
+
+@keyframes ne-toast-in  { from { opacity:0; transform:translateX(60px) scale(0.95); } to { opacity:1; transform:translateX(0) scale(1); } }
+@keyframes ne-toast-out { from { opacity:1; transform:translateX(0) scale(1); } to { opacity:0; transform:translateX(60px) scale(0.95); } }
+@keyframes ne-toast-bar  { from { width:100%; } to { width:0%; } }
 
 /* ════════════════════════════════════════════
    MODAL VER TODAS LAS NOTAS

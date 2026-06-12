@@ -117,6 +117,72 @@ export const GET: APIRoute = async ({ request }) => {
   }
 };
 
+// --- PUT: ACTUALIZAR TAREA (estado, titulo, etc.) ----------------------------
+export const PUT: APIRoute = async ({ request }) => {
+  const idUsuario = await getUsuarioId(request);
+  if (!idUsuario) return noAutorizado();
+
+  const client = await pool.connect();
+  try {
+    const body = await request.json();
+    const { id_tarea, estado, titulo, descripcion, fecha_inicio, hora_inicio, prioridad } = body;
+
+    if (!id_tarea) {
+      return new Response(
+        JSON.stringify({ success: false, message: "ID de tarea requerido" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Verificar que la tarea pertenece al usuario
+    const check = await client.query(
+      `SELECT id_tarea FROM public.tarea WHERE id_tarea = $1 AND id_usuario = $2`,
+      [id_tarea, idUsuario]
+    );
+    if (check.rowCount === 0) {
+      return new Response(
+        JSON.stringify({ success: false, message: "Tarea no encontrada o sin permiso" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const result = await client.query(
+      `UPDATE public.tarea SET
+         estado       = COALESCE($1::estado_tarea, estado),
+         titulo       = COALESCE($2, titulo),
+         descripcion  = COALESCE($3, descripcion),
+         fecha_inicio = COALESCE($4::date, fecha_inicio),
+         hora_inicio  = COALESCE($5::time, hora_inicio),
+         prioridad    = COALESCE($6::prioridad_tarea, prioridad)
+       WHERE id_tarea = $7 AND id_usuario = $8
+       RETURNING *`,
+      [
+        estado   || null,
+        titulo   || null,
+        descripcion !== undefined ? descripcion : null,
+        fecha_inicio || null,
+        hora_inicio  || null,
+        prioridad    || null,
+        id_tarea,
+        idUsuario,
+      ]
+    );
+
+    return new Response(
+      JSON.stringify({ success: true, tarea: result.rows[0] }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error: any) {
+    console.error("[dashboard PUT] Error:", error.message);
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  } finally {
+    client.release();
+  }
+};
+
 // --- DELETE: ELIMINAR TAREA (solo si pertenece al usuario autenticado) -------
 export const DELETE: APIRoute = async ({ request, url }) => {
   const idUsuario = await getUsuarioId(request);

@@ -125,35 +125,70 @@ body {
 .db-header-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+}
+
+/* Grupo de flechas agrupadas */
+.db-nav-group {
+  display: flex;
+  align-items: center;
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+}
+
+/* Botón "Hoy" */
+.db-btn-hoy {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6366f1;
+  background: #eef2ff;
+  border: 1.5px solid #c7d2fe;
+  border-radius: 8px;
+  padding: 5px 13px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.db-btn-hoy:hover {
+  background: #e0e7ff;
+  border-color: #818cf8;
+  color: #4338ca;
 }
 
 /* Botones prev/next fecha */
 .db-nav-arrow {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1.5px solid #e5e7eb;
-  background: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition: background 0.15s, color 0.15s;
   color: #6b7280;
 }
 .db-nav-arrow:hover {
-  border-color: #0ea5e9;
-  background: #f0f9ff;
-  color: #0ea5e9;
+  background: #e5e7eb;
+  color: #111827;
 }
 
 /* Título de fecha */
+.db-date-title-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
 .db-date-title {
-  font-size: 1.05rem;
+  font-size: 1.45rem;
   font-weight: 800;
-  color: #111827;
-  letter-spacing: -0.01em;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  line-height: 1;
 }
 
 /* Controles de vista + botón nueva tarea */
@@ -193,7 +228,10 @@ body {
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
-/* Botón "+ Nueva tarea" */
+/* Botón "+ Crear" con dropdown */
+.db-crear-wrap {
+  position: relative;
+}
 .db-btn-add {
   display: flex;
   align-items: center;
@@ -202,7 +240,7 @@ body {
   color: #ffffff;
   border: none;
   border-radius: 10px;
-  padding: 9px 18px;
+  padding: 9px 16px;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -212,6 +250,49 @@ body {
 }
 .db-btn-add:hover  { background: #0284c7; }
 .db-btn-add:active { transform: scale(0.97); }
+.db-btn-add-caret  { transition: transform 0.2s; opacity: 0.85; }
+.db-crear-dropdown.open ~ * .db-btn-add-caret,
+#crear-wrap:has(.db-crear-dropdown.open) .db-btn-add-caret { transform: rotate(180deg); }
+
+.db-crear-dropdown {
+  position: absolute;
+  top: calc(100% + 7px);
+  right: 0;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+  min-width: 148px;
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+  z-index: 600;
+  animation: crear-drop-in 0.18s cubic-bezier(0.21,1.02,0.73,1) forwards;
+}
+.db-crear-dropdown.open { display: flex; }
+@keyframes crear-drop-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.db-crear-opt {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  text-align: left;
+  white-space: nowrap;
+}
+.db-crear-opt:first-child { border-radius: 10px 10px 0 0; }
+.db-crear-opt:last-child  { border-radius: 0 0 10px 10px; }
+.db-crear-opt:hover { background: #f0f9ff; color: #0ea5e9; }
+.db-crear-opt svg   { flex-shrink: 0; }
 
 /* ── Contenido principal ── */
 .db-view-container {
@@ -364,6 +445,129 @@ body {
   font-weight: 700;
   color: #374151;
 }
+
+/* Hoy — fondo gris transparente para que el usuario identifique el día actual */
+.db-month-day--hoy {
+  background: rgba(148, 163, 184, 0.18) !important;
+  border: 1px solid rgba(148, 163, 184, 0.35) !important;
+}
+.db-month-day-num--hoy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: #334155;
+  color: #ffffff !important;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* Celda seleccionada con 1 click */
+.db-month-day--selected {
+  background: rgba(99, 102, 241, 0.09) !important;
+  border: 1.5px solid rgba(99, 102, 241, 0.35) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+/* ── Mini modal: qué quieres crear ── */
+.db-qc-box {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px 22px 20px;
+  width: 100%;
+  max-width: 300px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: db-qc-in 0.25s cubic-bezier(0.21,1.02,0.73,1) both;
+}
+@keyframes db-qc-in {
+  from { opacity:0; transform:scale(0.92) translateY(10px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+.db-qc-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.db-qc-icon {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: #eef2ff;
+  color: #6366f1;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.db-qc-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.3;
+}
+.db-qc-date {
+  font-size: 12px;
+  color: #6366f1;
+  font-weight: 600;
+  margin: 2px 0 0;
+}
+.db-qc-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.db-qc-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 10px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.db-qc-btn--tarea {
+  background: #f0fdf4;
+  color: #16a34a;
+  border-color: #bbf7d0;
+}
+.db-qc-btn--tarea:hover {
+  background: #dcfce7;
+  border-color: #4ade80;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(34,197,94,0.2);
+}
+.db-qc-btn--nota {
+  background: #fefce8;
+  color: #ca8a04;
+  border-color: #fde68a;
+}
+.db-qc-btn--nota:hover {
+  background: #fef9c3;
+  border-color: #facc15;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(234,179,8,0.2);
+}
+.db-qc-cancel {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  padding: 4px;
+  transition: color 0.15s;
+}
+.db-qc-cancel:hover { color: #64748b; }
 
 .db-month-dot {
   height: 6px;
@@ -3808,3 +4012,6 @@ body {
 
 body.dark-mode .db-sidebar-toggle { background: #374151; color: #e5e7eb; }
 body.dark-mode .db-sidebar-toggle:hover { background: #4b5563; }
+body.dark-mode .db-crear-dropdown { background: #1e293b; border-color: #334155; box-shadow: 0 8px 28px rgba(0,0,0,0.4); }
+body.dark-mode .db-crear-opt { color: #e2e8f0; }
+body.dark-mode .db-crear-opt:hover { background: #0c2e44; color: #38bdf8; }

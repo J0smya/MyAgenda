@@ -170,7 +170,9 @@ async function enviarWhatsAppGreenApi(telefono: string, mensaje: string): Promis
   // Green-API requiere solo dígitos + "@c.us"  (ej: "573001234567@c.us")
   const chatId = telefono.replace(/\D/g, '') + '@c.us';
 
-  const url = `https://api.green-api.com/waInstance${instanceId}/sendMessage/${token}`;
+  // El subdominio es los primeros 4 dígitos del instanceId (ej: 7107650362 → 7107.api.green-api.com)
+  const subdomain = instanceId.slice(0, 4);
+  const url = `https://${subdomain}.api.green-api.com/waInstance${instanceId}/sendMessage/${token}`;
 
   const resp = await fetch(url, {
     method: 'POST',

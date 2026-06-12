@@ -40,7 +40,7 @@ import '../styles/noteEditor.css';
         <span>Completadas</span>
         <span id="completadas-count-badge" class="db-completadas-count-badge" style="display:none"></span>
       </button>
-      <button id="btn-ver-notas" class="db-sidebar-notes-btn">
+      <button id="btn-ver-notas" class="db-sidebar-notes-btn" style="display:none">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14 2 14 8 20 8"/>
@@ -75,13 +75,18 @@ import '../styles/noteEditor.css';
             <line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
-        <button id="prev-date" class="db-nav-arrow" title="Anterior">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
-        </button>
-        <button id="next-date" class="db-nav-arrow" title="Siguiente">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
-        </button>
-        <h2 id="header-title" class="db-date-title"></h2>
+        <div class="db-nav-group">
+          <button id="prev-date" class="db-nav-arrow" title="Anterior">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button id="next-date" class="db-nav-arrow" title="Siguiente">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+        <button id="btn-ir-hoy" class="db-btn-hoy" title="Ir a hoy">Hoy</button>
+        <div class="db-date-title-wrap">
+          <h2 id="header-title" class="db-date-title"></h2>
+        </div>
       </div>
       <div class="db-header-right">
         <div class="db-view-tabs">
@@ -89,10 +94,23 @@ import '../styles/noteEditor.css';
           <button data-v="semana" class="db-view-btn nav-btn">Semana</button>
           <button data-v="mes"    class="db-view-btn nav-btn">Mes</button>
         </div>
-        <button id="btn-add" class="db-btn-add">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span class="db-btn-add-text">Nueva tarea</span>
-        </button>
+        <div class="db-crear-wrap" id="crear-wrap">
+          <button id="btn-add" class="db-btn-add">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span class="db-btn-add-text">Crear</span>
+            <svg class="db-btn-add-caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="db-crear-dropdown" id="crear-dropdown">
+            <button class="db-crear-opt" id="crear-opt-tarea">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              Tarea
+            </button>
+            <button class="db-crear-opt" id="crear-opt-nota">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Nota
+            </button>
+          </div>
+        </div>
       </div>
     </header>
     <div class="db-view-container" id="view-container"></div>
@@ -523,7 +541,7 @@ import '../styles/noteEditor.css';
   </div>
 
   <!-- MODAL CONFIRMACIÓN PERSONALIZADO -->
-  <div id="modal-confirmar" class="db-modal-backdrop" style="z-index:270;">
+  <div id="modal-confirmar" class="db-modal-backdrop" style="z-index:500;">
     <div class="db-confirm-box">
       <div class="db-confirm-icon" id="confirm-icon"></div>
       <p class="db-confirm-msg" id="confirm-msg"></p>
@@ -535,13 +553,39 @@ import '../styles/noteEditor.css';
   </div>
 
   <!-- MODAL ALERTA PERSONALIZADO -->
-  <div id="modal-alerta" class="db-modal-backdrop" style="z-index:275;">
+  <div id="modal-alerta" class="db-modal-backdrop" style="z-index:505;">
     <div class="db-confirm-box">
       <div class="db-confirm-icon" id="alerta-icon"></div>
       <p class="db-confirm-msg" id="alerta-msg"></p>
       <div class="db-confirm-actions">
         <button id="alerta-ok" class="db-btn-submit" style="max-width:160px;">Entendido</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MINI MODAL: ¿Qué quieres crear? (doble click en día) -->
+  <div id="modal-quick-create" class="db-modal-backdrop" style="z-index:510;display:none;">
+    <div class="db-qc-box">
+      <div class="db-qc-header">
+        <div class="db-qc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div>
+          <p class="db-qc-title">¿Qué quieres crear?</p>
+          <p class="db-qc-date" id="qc-date-label"></p>
+        </div>
+      </div>
+      <div class="db-qc-btns">
+        <button id="qc-btn-tarea" class="db-qc-btn db-qc-btn--tarea">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Tarea
+        </button>
+        <button id="qc-btn-nota" class="db-qc-btn db-qc-btn--nota">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Nota
+        </button>
+      </div>
+      <button id="qc-btn-cancelar" class="db-qc-cancel">Cancelar</button>
     </div>
   </div>
 
@@ -992,7 +1036,7 @@ import '../styles/noteEditor.css';
   const neEditor        = document.getElementById('ne-editor')         as HTMLDivElement;
   const neTitleInput    = document.getElementById('ne-title')          as HTMLInputElement;
   const neWords         = document.getElementById('ne-words')          as HTMLSpanElement;
-  const neToast         = document.getElementById('ne-toast')          as HTMLDivElement;
+  const neToast         = document.getElementById('ne-toast-container') as HTMLDivElement;
   const notaBadge       = document.getElementById('nota-badge')        as HTMLDivElement;
   const notaBadgeTitle  = document.getElementById('nota-badge-title')  as HTMLElement;
   const btnAgregarNota  = document.getElementById('btn-agregar-nota')  as HTMLButtonElement;
@@ -1304,16 +1348,15 @@ import '../styles/noteEditor.css';
   aiInput?.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();enviarMensajeAI();} });
  
   /* ─────────────────── MODAL TAREA ─────────────────── */
-  function openModalTarea(modo:'nueva'|'editar'='nueva', tarea?:Tarea) {
+  function openModalTarea(modo:'nueva'|'editar'='nueva', tarea?:Tarea, fechaPresel?:string) {
     const tituloLabel = document.getElementById('modal-titulo-label')!;
     const submitBtn   = document.getElementById('btn-submit-tarea') as HTMLButtonElement;
- 
+
     if (modo==='editar' && tarea) {
       modoEdicion    = true;
       tareaEditandoId = tarea.id;
       tituloLabel.textContent  = 'Editar tarea';
       submitBtn.textContent    = 'Guardar cambios';
-      // Rellenar campos con datos existentes
       (document.getElementById('t-titulo')      as HTMLInputElement).value   = tarea.titulo;
       (document.getElementById('t-desc')        as HTMLTextAreaElement).value = tarea.descripcion||'';
       (document.getElementById('t-fecha')       as HTMLInputElement).value   = tarea.fecha;
@@ -1322,7 +1365,6 @@ import '../styles/noteEditor.css';
       actualizarSelectCategoria();
       (document.getElementById('t-cat') as HTMLSelectElement).value = tarea.categoria;
       actualizarDots();
-      // Ocultar recurrencia en modo edición (se maneja por separado)
       document.getElementById('recurrencia-wrap')!.style.display = 'none';
     } else {
       modoEdicion    = false;
@@ -1330,8 +1372,8 @@ import '../styles/noteEditor.css';
       tituloLabel.textContent = 'Nueva tarea';
       submitBtn.textContent   = 'Guardar tarea';
       taskForm.reset();
-      const hoy=[viewDate.getFullYear(),String(viewDate.getMonth()+1).padStart(2,'0'),String(viewDate.getDate()).padStart(2,'0')].join('-');
-      (document.getElementById('t-fecha') as HTMLInputElement).value = hoy;
+      const fechaDefault = fechaPresel || [viewDate.getFullYear(),String(viewDate.getMonth()+1).padStart(2,'0'),String(viewDate.getDate()).padStart(2,'0')].join('-');
+      (document.getElementById('t-fecha') as HTMLInputElement).value = fechaDefault;
       const avisoGuardado=localStorage.getItem('conf_aviso');
       if (avisoGuardado) (document.getElementById('t-minutos-antes') as HTMLSelectElement).value=avisoGuardado;
       actualizarSelectCategoria();
@@ -1351,7 +1393,34 @@ import '../styles/noteEditor.css';
     document.getElementById('recurrencia-wrap')!.style.display='';
   }
  
-  document.getElementById('btn-add')?.addEventListener('click',()=>openModalTarea('nueva'));
+  /* ── Dropdown Crear ── */
+  const crearDropdown = document.getElementById('crear-dropdown') as HTMLDivElement;
+  const btnAddCaret   = document.querySelector('.db-btn-add-caret') as SVGElement;
+  document.getElementById('btn-add')?.addEventListener('click', e => {
+    e.stopPropagation();
+    const abierto = crearDropdown.classList.toggle('open');
+    if (btnAddCaret) btnAddCaret.style.transform = abierto ? 'rotate(180deg)' : '';
+  });
+  document.getElementById('crear-opt-tarea')?.addEventListener('click', () => {
+    crearDropdown.classList.remove('open');
+    openModalTarea('nueva');
+  });
+  document.getElementById('crear-opt-nota')?.addEventListener('click', () => {
+    crearDropdown.classList.remove('open');
+    editorMode = 'sidebar-new';
+    notaSidebarEditandoId = null;
+    neEditor.innerHTML = '';
+    neTitleInput.value = '';
+    neWords.textContent = '0 palabras';
+    modalNota.classList.add('ne-open');
+    setTimeout(() => neEditor.focus(), 150);
+  });
+  document.addEventListener('click', e => {
+    if (!(e.target as HTMLElement).closest('#crear-wrap')) {
+      crearDropdown.classList.remove('open');
+      if (btnAddCaret) btnAddCaret.style.transform = '';
+    }
+  });
   document.getElementById('close-modal')?.addEventListener('click',closeModalTarea);
   modalCreate.addEventListener('click', e => { if (e.target === modalCreate) closeModalTarea(); });
   document.getElementById('t-prioridad')?.addEventListener('change', actualizarDots);
@@ -1396,8 +1465,8 @@ import '../styles/noteEditor.css';
       try {
         const r=await fetch('/api/noteEditor',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_nota:notaSidebarEditandoId,contenido:html,nota_titulo:neTitleInput.value.trim()||'Nota sin título'})});
         const d=await r.json();
-        if(d.success){showNeToast('Nota guardada',true);await cargarTodasLasNotas();setTimeout(()=>closeEditorNota(),700);}
-        else showNeToast('Error al guardar',false);
+        if(d.success){showNeToast('Nota guardada',true,'Los cambios se guardaron correctamente');await cargarTodasLasNotas();setTimeout(()=>closeEditorNota(),700);}
+        else showNeToast('Error al guardar',false,'No se pudo guardar. Intenta de nuevo.');
       } catch{showNeToast('Error al guardar',false);}
       return;
     }
@@ -1405,8 +1474,8 @@ import '../styles/noteEditor.css';
       try {
         const r=await fetch('/api/noteEditor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nota_titulo:neTitleInput.value.trim()||'Nota sin título',contenido:html})});
         const d=await r.json();
-        if(d.success){showNeToast('Nota creada',true);await cargarTodasLasNotas();actualizarBadgeNotas();setTimeout(()=>closeEditorNota(),700);}
-        else showNeToast('Error al guardar',false);
+        if(d.success){showNeToast('Nota creada',true,'La nota se guardó en tu agenda');await cargarTodasLasNotas();actualizarBadgeNotas();setTimeout(()=>closeEditorNota(),700);}
+        else showNeToast('Error al guardar',false,'No se pudo crear la nota. Intenta de nuevo.');
       } catch{showNeToast('Error al guardar',false);}
       return;
     }
@@ -1442,9 +1511,32 @@ import '../styles/noteEditor.css';
       if(e.key==='u'){e.preventDefault();document.execCommand('underline');}
     }
   });
-  function showNeToast(msg:string,ok:boolean){
-    neToast.textContent=msg; neToast.className=`ne-toast show ${ok?'ne-toast-ok':'ne-toast-err'}`;
-    setTimeout(()=>{neToast.className='ne-toast';},2500);
+  function showNeToast(msg: string, ok: boolean, sub = '') {
+    const tipo  = ok ? 'success' : 'error';
+    const color = ok ? '#22c55e' : '#ef4444';
+    const iconBg = ok ? '#f0fdf4' : '#fef2f2';
+    const iconSvg = ok
+      ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+      : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+
+    const toast = document.createElement('div');
+    toast.className = `ne-toast-item ne-toast-${tipo}`;
+    toast.style.setProperty('--ne-toast-color', color);
+    toast.innerHTML = `
+      <div class="ne-toast-icon" style="background:${iconBg};color:${color}">${iconSvg}</div>
+      <div class="ne-toast-body">
+        <div class="ne-toast-title">${msg}</div>
+        ${sub ? `<div class="ne-toast-sub">${sub}</div>` : ''}
+      </div>
+      <button class="ne-toast-close" title="Cerrar">✕</button>`;
+
+    toast.querySelector('.ne-toast-close')!.addEventListener('click', () => cerrarNeToast(toast));
+    neToast.appendChild(toast);
+    setTimeout(() => cerrarNeToast(toast), 3000);
+  }
+  function cerrarNeToast(t: HTMLElement) {
+    t.classList.add('ne-toast-out');
+    t.addEventListener('animationend', () => t.remove(), { once: true });
   }
  
   /* ─────────────────── BADGES ─────────────────── */
@@ -1983,13 +2075,18 @@ import '../styles/noteEditor.css';
     const y=viewDate.getFullYear(),m=viewDate.getMonth();
     hTitle.textContent=viewDate.toLocaleDateString('es-ES',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
     const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),off=first===0?6:first-1;
+    const ahora=new Date(); ahora.setHours(0,0,0,0);
+    const todayStr=`${ahora.getFullYear()}-${String(ahora.getMonth()+1).padStart(2,'0')}-${String(ahora.getDate()).padStart(2,'0')}`;
     let html='<div class="db-month-grid">';
     ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].forEach(d=>html+=`<div class="db-month-header-cell">${d}</div>`);
     for(let i=0;i<off;i++) html+='<div></div>';
     for(let d=1;d<=days;d++){
       const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       const dt=filtered.filter(t=>t.fecha===ds);
-      html+=`<div class="db-month-day"><div class="db-month-day-num">${d}</div>${dt.map(t=>`<div onclick="window.verDetalle('${t.id}')" class="db-month-dot" style="background:${getColorTarea(t)}" title="${t.titulo}"></div>`).join('')}</div>`;
+      const esHoy = ds===todayStr;
+      const extraClass = esHoy ? ' db-month-day--hoy' : '';
+      const numClass   = esHoy ? ' db-month-day-num--hoy' : '';
+      html+=`<div class="db-month-day${extraClass}" data-date="${ds}"><div class="db-month-day-num${numClass}">${d}</div>${dt.map(t=>`<div onclick="window.verDetalle('${t.id}')" class="db-month-dot" style="background:${getColorTarea(t)}" title="${t.titulo}"></div>`).join('')}</div>`;
     }
     container.innerHTML=html+'</div>';
   }
@@ -2017,6 +2114,63 @@ import '../styles/noteEditor.css';
     if(currentView==='mes') viewDate.setMonth(viewDate.getMonth()+1);
     else viewDate.setDate(viewDate.getDate()+(currentView==='semana'?7:1));
     render();
+  });
+  document.getElementById('btn-ir-hoy')?.addEventListener('click',()=>{
+    viewDate = new Date();
+    render();
+  });
+
+  /* ─────────────────── CLICK EN DÍA DEL MES ─────────────────── */
+  let qcFechaSeleccionada = '';
+  const modalQC = document.getElementById('modal-quick-create') as HTMLDivElement;
+
+  function cerrarModalQC() {
+    modalQC.style.display = 'none';
+    // quita el highlight de la celda seleccionada
+    container.querySelectorAll('.db-month-day--selected').forEach(el=>el.classList.remove('db-month-day--selected'));
+  }
+
+  // Delegación de eventos en el contenedor del calendario
+  container.addEventListener('click', e => {
+    if (currentView !== 'mes') return;
+    const cell = (e.target as HTMLElement).closest<HTMLElement>('.db-month-day');
+    if (!cell || !cell.dataset.date) return;
+    // 1 click → highlight
+    container.querySelectorAll('.db-month-day--selected').forEach(el=>el.classList.remove('db-month-day--selected'));
+    cell.classList.add('db-month-day--selected');
+  });
+
+  container.addEventListener('dblclick', e => {
+    if (currentView !== 'mes') return;
+    const cell = (e.target as HTMLElement).closest<HTMLElement>('.db-month-day');
+    if (!cell || !cell.dataset.date) return;
+    qcFechaSeleccionada = cell.dataset.date;
+    // Formatear fecha legible
+    const [fy, fm, fd] = qcFechaSeleccionada.split('-').map(Number);
+    const fechaLabel = new Date(fy, fm-1, fd).toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
+    document.getElementById('qc-date-label')!.textContent = fechaLabel.replace(/^\w/, c=>c.toUpperCase());
+    modalQC.style.display = 'flex';
+  });
+
+  modalQC.addEventListener('click', e => { if (e.target === modalQC) cerrarModalQC(); });
+
+  document.getElementById('qc-btn-cancelar')?.addEventListener('click', cerrarModalQC);
+
+  document.getElementById('qc-btn-tarea')?.addEventListener('click', () => {
+    cerrarModalQC();
+    openModalTarea('nueva', undefined, qcFechaSeleccionada);
+  });
+
+  document.getElementById('qc-btn-nota')?.addEventListener('click', () => {
+    cerrarModalQC();
+    // Abrir editor de nota en modo standalone
+    editorMode = 'sidebar-new';
+    neEditor.innerHTML = '';
+    neTitleInput.value = '';
+    neWords.textContent = '0 palabras';
+    notaSidebarEditandoId = null;
+    modalNota.classList.add('ne-open');
+    setTimeout(() => neEditor.focus(), 150);
   });
  
   /* ─────────────────── ETIQUETAS ─────────────────── */

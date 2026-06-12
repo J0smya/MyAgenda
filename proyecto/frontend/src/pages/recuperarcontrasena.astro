@@ -273,8 +273,8 @@ import '../styles/recuperarcontrasena.css';
         document.getElementById('input-correo').focus();
         return;
       }
-      if (metodoActual === 'sms' && !telVal) {
-        mostrarToast('Campo requerido', 'Ingresa tu número de teléfono.', 'error');
+      if (metodoActual === 'whatsapp' && !telVal) {
+        mostrarToast('Campo requerido', 'Ingresa tu número de WhatsApp.', 'error');
         document.getElementById('input-tel').focus();
         return;
       }
