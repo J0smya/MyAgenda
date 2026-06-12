@@ -61,26 +61,4 @@ if (token) {
   </div>
 </div>
 
-<div id="modal-cambiar-cuenta" class="modal-overlay hidden">
-  <div class="perfil-modal-box">
-    <h3 class="perfil-modal-title">Cambiar de cuenta</h3>
-    <p style="font-size: 14px; text-align: center; color: #64748b; margin-bottom: 20px;">¿Deseas cerrar la sesión actual y cambiar de cuenta?</p>
-    <div class="perfil-modal-actions">
-      <button type="button" class="btn-cancelar" onclick="document.getElementById('modal-cambiar-cuenta').classList.add('hidden')">Cancelar</button>
-      <button type="button" class="btn-guardar" id="btn-confirmar-cambio">Cambiar</button>
-    </div>
-  </div>
-</div>
-
-<div id="modal-cerrar-sesion" class="modal-overlay hidden">
-  <div class="perfil-modal-box">
-    <h3 class="perfil-modal-title">Cerrar sesión</h3>
-    <p style="font-size: 14px; text-align: center; color: #64748b; margin-bottom: 20px;">¿Estás seguro de que deseas salir de My Agenda?</p>
-    <div class="perfil-modal-actions">
-      <button type="button" class="btn-cancelar" onclick="document.getElementById('modal-cerrar-sesion').classList.add('hidden')">Cancelar</button>
-      <button type="button" class="btn-guardar" style="background: #ef4444;" id="btn-confirmar-cerrar">Cerrar sesión</button>
-    </div>
-  </div>
-</div>
-
 <script src="../pages/api/perfil.ts"></script>
