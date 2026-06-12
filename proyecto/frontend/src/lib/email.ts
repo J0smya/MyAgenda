@@ -89,70 +89,69 @@ export async function enviarOtpEmail(
   });
 }
 
-// ── Notificaciones de tareas (Gmail SMTP) ────────────────────────────────────
+// ── Notificaciones de tareas (Resend) ────────────────────────────────────────
+
+async function enviarConResend(to: string, subject: string, html: string): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn('[DEV] RESEND_API_KEY no configurada. Email no enviado:', subject);
+    return;
+  }
+  const resp = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: process.env.RESEND_FROM ?? 'My Agenda <onboarding@resend.dev>',
+      to: [to],
+      subject,
+      html,
+    }),
+  });
+  if (!resp.ok) console.error('[Resend] Error:', await resp.text());
+}
 
 export async function enviarNotificacionCreacion(
   email: string,
   tarea: { titulo: string; fecha_inicio?: string | null; hora_inicio?: string | null; prioridad?: string | null }
 ): Promise<void> {
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.warn('[DEV] SMTP no configurado. Notificación creación no enviada para:', tarea.titulo);
-    return;
-  }
-  const fecha    = tarea.fecha_inicio ? tarea.fecha_inicio.toString().slice(0, 10) : 'Sin fecha';
-  const hora     = tarea.hora_inicio  ? tarea.hora_inicio.toString().slice(0, 5)   : 'Sin hora';
+  const fecha     = tarea.fecha_inicio ? tarea.fecha_inicio.toString().slice(0, 10) : 'Sin fecha';
+  const hora      = tarea.hora_inicio  ? tarea.hora_inicio.toString().slice(0, 5)   : 'Sin hora';
   const prioridad = tarea.prioridad ?? 'media';
 
-  const transporter = crearTransporter();
-  await transporter.sendMail({
-    from: `"My Agenda" <${process.env.SMTP_USER}>`,
-    to: email,
-    subject: `Nueva tarea: ${tarea.titulo}`,
-    html: `
-      <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;">
-        <h2 style="color:#0f172a;margin:0 0 6px;">Tarea creada en My Agenda</h2>
-        <p style="color:#64748b;margin:0 0 24px;font-size:14px;">Se registró una nueva tarea en tu agenda.</p>
-        <div style="background:#f8fafc;border-radius:12px;padding:20px;margin-bottom:24px;">
-          <h3 style="color:#0f172a;margin:0 0 14px;font-size:18px;">${tarea.titulo}</h3>
-          <p style="margin:6px 0;color:#64748b;font-size:14px;">📅 Fecha: <strong style="color:#0f172a;">${fecha}</strong></p>
-          <p style="margin:6px 0;color:#64748b;font-size:14px;">🕐 Hora: <strong style="color:#0f172a;">${hora}</strong></p>
-          <p style="margin:6px 0;color:#64748b;font-size:14px;">⚡ Prioridad: <strong style="color:#0f172a;">${prioridad}</strong></p>
-        </div>
-        <p style="font-size:12px;color:#94a3b8;text-align:center;margin:0;">My Agenda — Tu agenda personal inteligente</p>
+  await enviarConResend(email, `Nueva tarea: ${tarea.titulo}`, `
+    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;">
+      <h2 style="color:#0f172a;margin:0 0 6px;">Tarea creada en My Agenda</h2>
+      <p style="color:#64748b;margin:0 0 24px;font-size:14px;">Se registró una nueva tarea en tu agenda.</p>
+      <div style="background:#f8fafc;border-radius:12px;padding:20px;margin-bottom:24px;">
+        <h3 style="color:#0f172a;margin:0 0 14px;font-size:18px;">${tarea.titulo}</h3>
+        <p style="margin:6px 0;color:#64748b;font-size:14px;">📅 Fecha: <strong style="color:#0f172a;">${fecha}</strong></p>
+        <p style="margin:6px 0;color:#64748b;font-size:14px;">🕐 Hora: <strong style="color:#0f172a;">${hora}</strong></p>
+        <p style="margin:6px 0;color:#64748b;font-size:14px;">⚡ Prioridad: <strong style="color:#0f172a;">${prioridad}</strong></p>
       </div>
-    `,
-  });
+      <p style="font-size:12px;color:#94a3b8;text-align:center;margin:0;">My Agenda — Tu agenda personal inteligente</p>
+    </div>
+  `);
 }
 
 export async function enviarRecordatorioVencimiento(
   email: string,
   tarea: { titulo: string; fecha_inicio?: string | null; hora_inicio?: string | null; prioridad?: string | null }
 ): Promise<void> {
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.warn('[DEV] SMTP no configurado. Recordatorio no enviado para:', tarea.titulo);
-    return;
-  }
   const hora      = tarea.hora_inicio  ? tarea.hora_inicio.toString().slice(0, 5) : 'Sin hora definida';
   const prioridad = tarea.prioridad ?? 'media';
 
-  const transporter = crearTransporter();
-  await transporter.sendMail({
-    from: `"My Agenda" <${process.env.SMTP_USER}>`,
-    to: email,
-    subject: `Recordatorio: ${tarea.titulo}`,
-    html: `
-      <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;">
-        <h2 style="color:#0f172a;margin:0 0 6px;">Recordatorio de tarea</h2>
-        <p style="color:#64748b;margin:0 0 24px;font-size:14px;">Tienes una tarea programada para hoy en My Agenda.</p>
-        <div style="background:#fef9ec;border:1px solid #fde68a;border-radius:12px;padding:20px;margin-bottom:24px;">
-          <h3 style="color:#0f172a;margin:0 0 14px;font-size:18px;">${tarea.titulo}</h3>
-          <p style="margin:6px 0;color:#64748b;font-size:14px;">🕐 Hora: <strong style="color:#0f172a;">${hora}</strong></p>
-          <p style="margin:6px 0;color:#64748b;font-size:14px;">⚡ Prioridad: <strong style="color:#0f172a;">${prioridad}</strong></p>
-        </div>
-        <p style="font-size:12px;color:#94a3b8;text-align:center;margin:0;">My Agenda — Tu agenda personal inteligente</p>
+  await enviarConResend(email, `Recordatorio: ${tarea.titulo}`, `
+    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;">
+      <h2 style="color:#0f172a;margin:0 0 6px;">Recordatorio de tarea</h2>
+      <p style="color:#64748b;margin:0 0 24px;font-size:14px;">Tienes una tarea programada para hoy en My Agenda.</p>
+      <div style="background:#fef9ec;border:1px solid #fde68a;border-radius:12px;padding:20px;margin-bottom:24px;">
+        <h3 style="color:#0f172a;margin:0 0 14px;font-size:18px;">${tarea.titulo}</h3>
+        <p style="margin:6px 0;color:#64748b;font-size:14px;">🕐 Hora: <strong style="color:#0f172a;">${hora}</strong></p>
+        <p style="margin:6px 0;color:#64748b;font-size:14px;">⚡ Prioridad: <strong style="color:#0f172a;">${prioridad}</strong></p>
       </div>
-    `,
-  });
+      <p style="font-size:12px;color:#94a3b8;text-align:center;margin:0;">My Agenda — Tu agenda personal inteligente</p>
+    </div>
+  `);
 }
 
 export async function enviarSmsTelefono(
