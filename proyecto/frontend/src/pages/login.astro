@@ -104,6 +104,17 @@ import Layout from "../layouts/Layout.astro";
     const form     = document.getElementById('login-form')    as HTMLFormElement;
     const errorDiv = document.getElementById('error-message') as HTMLDivElement;
 
+    // Mostrar error de Google OAuth si viene en la URL
+    const params = new URLSearchParams(window.location.search);
+    const errorParam = params.get('error');
+    if (errorParam === 'google_cookies') {
+      errorDiv.textContent = 'Tu navegador bloqueó las cookies necesarias para Google. Intenta en modo normal (no incógnito) o usa otro navegador.';
+      errorDiv.classList.remove('hidden');
+    } else if (errorParam === 'google' || errorParam === 'google_config') {
+      errorDiv.textContent = 'Error al iniciar sesión con Google. Inténtalo de nuevo.';
+      errorDiv.classList.remove('hidden');
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorDiv.classList.add('hidden');

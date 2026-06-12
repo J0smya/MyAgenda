@@ -14,16 +14,20 @@ export const GET: APIRoute = async ({ url, cookies, redirect }) => {
     const storedState    = cookies.get("google_state")?.value;
     const storedVerifier = cookies.get("google_code_verifier")?.value;
 
+    console.log("[GOOGLE CB] code:", !!code, "state:", !!state, "storedState:", !!storedState, "verifier:", !!storedVerifier);
+
     // Limpiar cookies temporales
     cookies.delete("google_state",         { path: "/" });
     cookies.delete("google_code_verifier", { path: "/" });
 
     if (!code || !state || !storedState || !storedVerifier) {
-      return new Response("Parámetros inválidos.", { status: 400 });
+      console.error("[GOOGLE CB] Cookies faltantes — posiblemente bloqueadas por el navegador.");
+      return redirect("/login?error=google_cookies");
     }
 
     if (state !== storedState) {
-      return new Response("State no coincide.", { status: 400 });
+      console.error("[GOOGLE CB] State mismatch");
+      return redirect("/login?error=google");
     }
 
     // Intercambiar código por tokens
