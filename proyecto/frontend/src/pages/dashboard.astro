@@ -2039,7 +2039,7 @@ import '../styles/noteEditor.css';
         const mapped=d.tareas.map((t:any)=>({
           id:t.id_tarea, titulo:t.titulo, descripcion:t.descripcion,
           fecha:t.fecha_inicio?new Date(t.fecha_inicio).toISOString().split('T')[0]:'',
-          hora:t.hora_inicio, prioridad:t.prioridad, categoria:t.categoria||'personal',
+          hora:t.hora_inicio?t.hora_inicio.slice(0,5):null, prioridad:t.prioridad, categoria:t.categoria||'personal',
           estado:t.estado||'pendiente',
           es_recurrente:t.es_recurrente||false, id_serie:t.id_serie||null,
         }));
