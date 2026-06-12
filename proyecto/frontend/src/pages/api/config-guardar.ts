@@ -3,8 +3,6 @@ export const prerender = false;
 import type { APIRoute } from 'astro';
 import { pool } from '../../lib/db';
 import { obtenerTokenDeCookie, obtenerSesion } from '../../lib/sesion';
-import path from 'path';
-import fs from 'fs/promises';
 
 export const POST: APIRoute = async ({ request }) => {
   const token = obtenerTokenDeCookie(request.headers.get('cookie'));
@@ -25,13 +23,13 @@ export const POST: APIRoute = async ({ request }) => {
     let fotoPerfil: string | undefined;
 
     if (fotoFile && fotoFile.size > 0) {
-      const ext = (fotoFile.name.split('.').pop() || 'jpg').toLowerCase();
-      const nombreArchivo = `perfil_${sesion.id_usuario}.${ext}`;
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-      await fs.mkdir(uploadsDir, { recursive: true });
+      if (fotoFile.size > 2 * 1024 * 1024) {
+        return json({ ok: false, error: 'La imagen no puede superar 2 MB' }, 400);
+      }
+      const ext  = (fotoFile.name.split('.').pop() || 'jpg').toLowerCase();
+      const mime = ext === 'png' ? 'image/png' : ext === 'gif' ? 'image/gif' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
       const buffer = Buffer.from(await fotoFile.arrayBuffer());
-      await fs.writeFile(path.join(uploadsDir, nombreArchivo), buffer);
-      fotoPerfil = `/uploads/${nombreArchivo}`;
+      fotoPerfil = `data:${mime};base64,${buffer.toString('base64')}`;
     }
 
     if (fotoPerfil) {

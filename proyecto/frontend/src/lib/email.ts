@@ -66,8 +66,8 @@ export async function enviarOtpEmail(
   email: string,
   codigo: string
 ): Promise<void> {
-  const smtpUser = import.meta.env.SMTP_USER ?? process.env.SMTP_USER;
-  const smtpPass = import.meta.env.SMTP_PASS ?? process.env.SMTP_PASS;
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
 
   if (!smtpUser || !smtpPass) {
     console.warn(`[DEV] SMTP no configurado. OTP para ${email}: ${codigo}`);
@@ -75,8 +75,8 @@ export async function enviarOtpEmail(
   }
 
   const transporter = nodemailer.createTransport({
-    host: import.meta.env.SMTP_HOST ?? process.env.SMTP_HOST ?? 'smtp.gmail.com',
-    port: parseInt(import.meta.env.SMTP_PORT ?? process.env.SMTP_PORT ?? '587'),
+    host: process.env.SMTP_HOST ?? 'smtp.gmail.com',
+    port: parseInt(process.env.SMTP_PORT ?? '587'),
     secure: false,
     auth: { user: smtpUser, pass: smtpPass },
   });
@@ -151,8 +151,8 @@ export async function enviarRecordatorioEmail(
     minutos_antes: number;
   }
 ): Promise<void> {
-  const smtpUser = import.meta.env.SMTP_USER ?? process.env.SMTP_USER;
-  const smtpPass = import.meta.env.SMTP_PASS ?? process.env.SMTP_PASS;
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
 
   if (!smtpUser || !smtpPass) {
     console.warn(`[DEV] Recordatorio para ${email}: "${tarea.titulo}" (SMTP no configurado)`);
@@ -160,8 +160,8 @@ export async function enviarRecordatorioEmail(
   }
 
   const transporter = nodemailer.createTransport({
-    host:   import.meta.env.SMTP_HOST  ?? process.env.SMTP_HOST  ?? 'smtp.gmail.com',
-    port:   parseInt(import.meta.env.SMTP_PORT ?? process.env.SMTP_PORT ?? '587'),
+    host:   process.env.SMTP_HOST  ?? 'smtp.gmail.com',
+    port:   parseInt(process.env.SMTP_PORT ?? '587'),
     secure: false,
     auth:   { user: smtpUser, pass: smtpPass },
   });

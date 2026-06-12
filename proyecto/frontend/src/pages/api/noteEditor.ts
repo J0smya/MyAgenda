@@ -86,8 +86,8 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const { rows } = await pool.query(
-      `INSERT INTO nota (id_nota, nota_titulo, contenido, id_tarea)
-       VALUES (gen_random_uuid(), $1, $2, $3)
+      `INSERT INTO nota (nota_titulo, contenido, id_tarea, fecha_creacion)
+       VALUES ($1, $2, $3, NOW())
        RETURNING id_nota, nota_titulo, contenido, fecha_creacion, id_tarea`,
       [notaTitulo, contenido, idTarea || null]
     );
