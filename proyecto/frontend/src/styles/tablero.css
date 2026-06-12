@@ -471,6 +471,18 @@ body {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
   transition: background 0.15s, border-color 0.15s;
 }
+.db-day-row--selected {
+  background: rgba(99, 102, 241, 0.07) !important;
+  border-left: 3px solid rgba(99, 102, 241, 0.5) !important;
+  transition: background 0.15s;
+}
+.db-week-col--selected {
+  background: rgba(99, 102, 241, 0.07) !important;
+  outline: 2px solid rgba(99, 102, 241, 0.35);
+  outline-offset: -2px;
+  border-radius: 14px;
+  transition: background 0.15s;
+}
 
 /* ── Mini modal: qué quieres crear ── */
 .db-qc-box {

@@ -1446,7 +1446,7 @@ import '../styles/noteEditor.css';
   aiInput?.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();enviarMensajeAI();} });
  
   /* ─────────────────── MODAL TAREA ─────────────────── */
-  function openModalTarea(modo:'nueva'|'editar'='nueva', tarea?:Tarea, fechaPresel?:string) {
+  function openModalTarea(modo:'nueva'|'editar'='nueva', tarea?:Tarea, fechaPresel?:string, horaPresel?:string) {
     const tituloLabel = document.getElementById('modal-titulo-label')!;
     const submitBtn   = document.getElementById('btn-submit-tarea') as HTMLButtonElement;
 
@@ -1480,6 +1480,7 @@ import '../styles/noteEditor.css';
       taskForm.reset();
       const fechaDefault = fechaPresel || [viewDate.getFullYear(),String(viewDate.getMonth()+1).padStart(2,'0'),String(viewDate.getDate()).padStart(2,'0')].join('-');
       (document.getElementById('t-fecha') as HTMLInputElement).value = fechaDefault;
+      if (horaPresel) (document.getElementById('t-hora-inicio') as HTMLInputElement).value = horaPresel;
       const avisoGuardado=localStorage.getItem('conf_aviso');
       if (avisoGuardado) (document.getElementById('t-minutos-antes') as HTMLSelectElement).value=avisoGuardado;
       actualizarSelectCategoria();
@@ -2175,7 +2176,7 @@ import '../styles/noteEditor.css';
     for(let i=0;i<24;i++){
       const h=i.toString().padStart(2,'0');
       const tasks=filtered.filter(t=>t.fecha===dStr&&t.hora?.startsWith(h+':'));
-      html+=`<div class="db-day-row"><div class="db-hour-label">${formatearHora(i)}</div><div class="db-hour-tasks">${tasks.map(crearCard).join('')}</div></div>`;
+      html+=`<div class="db-day-row" data-date="${dStr}" data-hora="${h}:00"><div class="db-hour-label">${formatearHora(i)}</div><div class="db-hour-tasks">${tasks.map(crearCard).join('')}</div></div>`;
     }
     container.innerHTML=html+'</div>';
   }
@@ -2187,7 +2188,7 @@ import '../styles/noteEditor.css';
     for(let i=0;i<7;i++){
       const d=new Date(start); d.setDate(start.getDate()+i);
       const ds=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
-      html+=`<div class="db-week-col"><div class="db-week-col-header"><div class="db-week-col-day">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div><div class="db-week-col-num">${d.getDate()}</div></div>${filtered.filter(t=>t.fecha===ds).map(crearCard).join('')}</div>`;
+      html+=`<div class="db-week-col" data-date="${ds}"><div class="db-week-col-header"><div class="db-week-col-day">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div><div class="db-week-col-num">${d.getDate()}</div></div>${filtered.filter(t=>t.fecha===ds).map(crearCard).join('')}</div>`;
     }
     container.innerHTML=html+'</div>';
   }
@@ -2243,55 +2244,95 @@ import '../styles/noteEditor.css';
 
   /* ─────────────────── CLICK EN DÍA DEL MES ─────────────────── */
   let qcFechaSeleccionada = '';
+  let qcHoraSeleccionada  = '';
   const modalQC = document.getElementById('modal-quick-create') as HTMLDivElement;
 
   function cerrarModalQC() {
     modalQC.style.display = 'none';
-    // quita el highlight de la celda seleccionada
-    container.querySelectorAll('.db-month-day--selected').forEach(el=>el.classList.remove('db-month-day--selected'));
+    container.querySelectorAll('.db-month-day--selected,.db-day-row--selected,.db-week-col--selected')
+      .forEach(el=>el.classList.remove('db-month-day--selected','db-day-row--selected','db-week-col--selected'));
   }
 
-  // Delegación de eventos en el contenedor del calendario
+  // Delegación de eventos en el contenedor del calendario — 1 click → highlight
   container.addEventListener('click', e => {
-    if (currentView !== 'mes') return;
-    const cell = (e.target as HTMLElement).closest<HTMLElement>('.db-month-day');
-    if (!cell || !cell.dataset.date) return;
-    // 1 click → highlight
-    container.querySelectorAll('.db-month-day--selected').forEach(el=>el.classList.remove('db-month-day--selected'));
-    cell.classList.add('db-month-day--selected');
+    const target = e.target as HTMLElement;
+    if (currentView === 'mes') {
+      const cell = target.closest<HTMLElement>('.db-month-day');
+      if (!cell || !cell.dataset.date) return;
+      container.querySelectorAll('.db-month-day--selected').forEach(el=>el.classList.remove('db-month-day--selected'));
+      cell.classList.add('db-month-day--selected');
+    } else if (currentView === 'dia') {
+      if (target.closest('.db-task-card')) return;
+      const row = target.closest<HTMLElement>('.db-day-row');
+      if (!row || !row.dataset.date) return;
+      container.querySelectorAll('.db-day-row--selected').forEach(el=>el.classList.remove('db-day-row--selected'));
+      row.classList.add('db-day-row--selected');
+    } else if (currentView === 'semana') {
+      if (target.closest('.db-task-card')) return;
+      const col = target.closest<HTMLElement>('.db-week-col');
+      if (!col || !col.dataset.date) return;
+      container.querySelectorAll('.db-week-col--selected').forEach(el=>el.classList.remove('db-week-col--selected'));
+      col.classList.add('db-week-col--selected');
+    }
   });
 
-  // dblclick en desktop
+  // dblclick en desktop → abrir quick-create
   container.addEventListener('dblclick', e => {
-    if (currentView !== 'mes') return;
-    const cell = (e.target as HTMLElement).closest<HTMLElement>('.db-month-day');
-    if (!cell || !cell.dataset.date) return;
-    abrirQCenCelda(cell);
+    const target = e.target as HTMLElement;
+    if (currentView === 'mes') {
+      const cell = target.closest<HTMLElement>('.db-month-day');
+      if (!cell || !cell.dataset.date) return;
+      abrirQCenCelda(cell);
+    } else if (currentView === 'dia') {
+      if (target.closest('.db-task-card')) return;
+      const row = target.closest<HTMLElement>('.db-day-row');
+      if (!row || !row.dataset.date) return;
+      abrirQCenCelda(row, row.dataset.hora);
+    } else if (currentView === 'semana') {
+      if (target.closest('.db-task-card')) return;
+      const col = target.closest<HTMLElement>('.db-week-col');
+      if (!col || !col.dataset.date) return;
+      abrirQCenCelda(col);
+    }
   });
 
-  // doble toque en móvil
+  // doble toque en móvil → abrir quick-create
   let _lastTap = 0;
-  let _lastCell: HTMLElement | null = null;
+  let _lastEl: HTMLElement | null = null;
   container.addEventListener('touchend', e => {
-    if (currentView !== 'mes') return;
-    const cell = (e.target as HTMLElement).closest<HTMLElement>('.db-month-day');
-    if (!cell || !cell.dataset.date) return;
+    const target = e.target as HTMLElement;
     const now = Date.now();
-    if (now - _lastTap < 350 && _lastCell === cell) {
-      e.preventDefault();
-      abrirQCenCelda(cell);
-      _lastTap = 0;
-    } else {
-      _lastTap = now;
-      _lastCell = cell;
+
+    if (currentView === 'mes') {
+      const cell = target.closest<HTMLElement>('.db-month-day');
+      if (!cell || !cell.dataset.date) return;
+      if (now - _lastTap < 350 && _lastEl === cell) {
+        e.preventDefault(); abrirQCenCelda(cell); _lastTap = 0;
+      } else { _lastTap = now; _lastEl = cell; }
+    } else if (currentView === 'dia') {
+      if (target.closest('.db-task-card')) return;
+      const row = target.closest<HTMLElement>('.db-day-row');
+      if (!row || !row.dataset.date) return;
+      if (now - _lastTap < 350 && _lastEl === row) {
+        e.preventDefault(); abrirQCenCelda(row, row.dataset.hora); _lastTap = 0;
+      } else { _lastTap = now; _lastEl = row; }
+    } else if (currentView === 'semana') {
+      if (target.closest('.db-task-card')) return;
+      const col = target.closest<HTMLElement>('.db-week-col');
+      if (!col || !col.dataset.date) return;
+      if (now - _lastTap < 350 && _lastEl === col) {
+        e.preventDefault(); abrirQCenCelda(col); _lastTap = 0;
+      } else { _lastTap = now; _lastEl = col; }
     }
   }, { passive: false });
 
-  function abrirQCenCelda(cell: HTMLElement) {
+  function abrirQCenCelda(cell: HTMLElement, hora?: string) {
     qcFechaSeleccionada = cell.dataset.date!;
+    qcHoraSeleccionada  = hora || '';
     const [fy, fm, fd] = qcFechaSeleccionada.split('-').map(Number);
     const fechaLabel = new Date(fy, fm-1, fd).toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
-    document.getElementById('qc-date-label')!.textContent = fechaLabel.replace(/^\w/, c=>c.toUpperCase());
+    const horaLabel  = hora ? ` · ${hora}` : '';
+    document.getElementById('qc-date-label')!.textContent = fechaLabel.replace(/^\w/, c=>c.toUpperCase()) + horaLabel;
     modalQC.style.display = 'flex';
   }
 
@@ -2301,7 +2342,7 @@ import '../styles/noteEditor.css';
 
   document.getElementById('qc-btn-tarea')?.addEventListener('click', () => {
     cerrarModalQC();
-    openModalTarea('nueva', undefined, qcFechaSeleccionada);
+    openModalTarea('nueva', undefined, qcFechaSeleccionada, qcHoraSeleccionada);
   });
 
   document.getElementById('qc-btn-nota')?.addEventListener('click', () => {
