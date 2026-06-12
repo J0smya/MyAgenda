@@ -2,10 +2,13 @@
   "name": "myagenda",
   "type": "module",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=20.11.0"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "start": "HOST=0.0.0.0 node ./dist/server/entry.mjs",
+    "start": "HOST=0.0.0.0 PORT=${PORT:-4321} node ./dist/server/entry.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },

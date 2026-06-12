@@ -1,22 +1,14 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { Google } from "arctic";
 import { pool } from "../../../../lib/db";
+import { getGoogleOAuthClient } from "../../../../lib/google-oauth";
 import { crearSesion, cookieSesion } from "../../../../lib/sesion";
-
-// ✅ URL dinámica según entorno — nunca más hardcodeado a localhost
-const SITE = import.meta.env.SITE ?? "http://localhost:4321";
-const CALLBACK_URL = `${SITE}/api/auth/google/callback`;
-
-const google = new Google(
-  import.meta.env.GOOGLE_CLIENT_ID,
-  import.meta.env.GOOGLE_CLIENT_SECRET,
-  CALLBACK_URL
-);
 
 export const GET: APIRoute = async ({ url, cookies, redirect }) => {
   try {
+    const google = getGoogleOAuthClient();
+
     const code           = url.searchParams.get("code");
     const state          = url.searchParams.get("state");
     const storedState    = cookies.get("google_state")?.value;
@@ -110,6 +102,10 @@ export const GET: APIRoute = async ({ url, cookies, redirect }) => {
 
   } catch (error: any) {
     console.error("ERROR GOOGLE CALLBACK:", error.message);
-    return redirect("/login?error=google");
+    const errorCode = error.message?.includes("GOOGLE_CLIENT")
+      ? "google_config"
+      : "google";
+
+    return redirect(`/login?error=${errorCode}`);
   }
 };

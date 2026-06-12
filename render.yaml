@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: myagenda
+    runtime: node
+    rootDir: proyecto/frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.1
+      - key: SITE
+        value: https://myagenda-2.onrender.com
+      - key: PUBLIC_SITE_URL
+        value: https://myagenda-2.onrender.com
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false

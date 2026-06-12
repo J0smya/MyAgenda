@@ -1,389 +1,168 @@
-
 export const prerender = false;
 
 import type { APIRoute } from "astro";
 import { pool } from "../../lib/db";
+import { obtenerTokenDeCookie, obtenerSesion } from "../../lib/sesion";
 
-// ── helpers ────────────────────────────────────────────────────────────────
-function res(body: object, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
+// ── Helper: obtener id_usuario desde la cookie de sesión ──────────────────────
+async function getUsuarioId(request: Request): Promise<string | null> {
+  const token = obtenerTokenDeCookie(request.headers.get("cookie"));
+  if (!token) return null;
+  const sesion = await obtenerSesion(token);
+  return sesion?.id_usuario ?? null;
 }
 
-function parseFecha(iso: string): Date {
-  const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y, m - 1, d);
-}
-function toISO(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-function isoDay(d: Date): number {
-  return d.getDay() === 0 ? 7 : d.getDay();
-}
-
-function generarFechas({
-  fechaInicio, frecuencia, intervalo, fechaFin, totalOcurr, diasSemana,
-}: {
-  fechaInicio: string;
-  frecuencia: string;
-  intervalo: number;
-  fechaFin: string | null;
-  totalOcurr: number | null;
-  diasSemana: string | null;
-}): string[] {
-  const MAX   = totalOcurr ?? 10;
-  const fechas: string[] = [];
-  let   cur   = parseFecha(fechaInicio);
-  const lim   = fechaFin ? parseFecha(fechaFin) : null;
-  const dias  = diasSemana ? diasSemana.split(",").map(Number) : null;
-
-  while (fechas.length < MAX) {
-    if (lim && cur > lim) break;
-    if (!dias || dias.includes(isoDay(cur))) fechas.push(toISO(cur));
-
-    if (frecuencia === "diaria") {
-      cur.setDate(cur.getDate() + intervalo);
-    } else if (frecuencia === "semanal") {
-      if (dias) {
-        cur.setDate(cur.getDate() + 1);
-        if (isoDay(cur) === 1 && intervalo > 1)
-          cur.setDate(cur.getDate() + (intervalo - 1) * 7);
-      } else {
-        cur.setDate(cur.getDate() + intervalo * 7);
-      }
-    } else {
-      cur.setMonth(cur.getMonth() + intervalo);
-    }
-  }
-  return fechas;
-}
-
-// ── Verificar si las tablas de recurrencia existen ─────────────────────────
-async function tablaRecurrenciaExiste(): Promise<boolean> {
-  const r = await pool.query(
-    `SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='recurrencia_serie'`
+// ── Helper: respuesta no autorizada ──────────────────────────────────────────
+function noAutorizado() {
+  return new Response(
+    JSON.stringify({ success: false, error: "No autorizado. Inicia sesión." }),
+    { status: 401, headers: { "Content-Type": "application/json" } }
   );
-  return r.rowCount! > 0;
 }
 
-// ─── POST ─────────────────────────────────────────────────────────────────
+// --- POST: CREAR TAREA (vinculada al usuario autenticado) --------------------
 export const POST: APIRoute = async ({ request }) => {
-  let client: any;
+  const idUsuario = await getUsuarioId(request);
+  if (!idUsuario) return noAutorizado();
+
+  const client = await pool.connect();
   try {
-    client = await pool.connect();
     const body = await request.json();
 
-    if (!body.titulo?.trim())
-      return res({ success: false, message: "El título es obligatorio." }, 400);
+    if (!body.titulo || body.titulo.trim() === "") {
+      return new Response(
+        JSON.stringify({ success: false, message: "El título es obligatorio." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
     await client.query("BEGIN");
 
-    // ── Tarea recurrente ──────────────────────────────────────────────────
-    if (body.frecuencia) {
-      if (!["diaria", "semanal", "mensual"].includes(body.frecuencia)) {
-        await client.query("ROLLBACK");
-        return res({ success: false, message: "Frecuencia inválida." }, 400);
-      }
-
-      const hayTablas = await tablaRecurrenciaExiste();
-      if (!hayTablas) {
-        await client.query("ROLLBACK");
-        return res({
-          success: false,
-          message: "Las tablas de recurrencia no están creadas en la base de datos. Pide al administrador que ejecute la migración.",
-        }, 500);
-      }
-
-      const { rows: [serie] } = await client.query(
-        `INSERT INTO public.recurrencia_serie
-           (frecuencia, intervalo, fecha_inicio, fecha_fin, dias_semana, total_ocurr, fecha_creacion)
-         VALUES ($1,$2,$3,$4,$5,$6,NOW()) RETURNING *`,
-        [
-          body.frecuencia,
-          body.intervalo   || 1,
-          body.fecha       || null,
-          body.fecha_fin   || null,
-          body.dias_semana || null,
-          body.total_ocurr || null,
-        ]
-      );
-
-      const fechas = generarFechas({
-        fechaInicio : body.fecha,
-        frecuencia  : body.frecuencia,
-        intervalo   : body.intervalo || 1,
-        fechaFin    : body.fecha_fin || null,
-        totalOcurr  : body.total_ocurr || 10,
-        diasSemana  : body.dias_semana || null,
-      });
-
-      const tareasCreadas = [];
-      for (let i = 0; i < fechas.length; i++) {
-        const { rows: [tarea] } = await client.query(
-          `INSERT INTO public.tarea
-             (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, categoria, fecha_creacion)
-           VALUES ($1,$2,$3,$4,$5,'pendiente',$6,NOW()) RETURNING *`,
-          [
-            body.titulo.trim(),
-            body.descripcion?.trim() || "",
-            fechas[i],
-            body.hora       || null,
-            body.prioridad  || "media",
-            body.categoria  || "personal",
-          ]
-        );
-
-        await client.query(
-          `INSERT INTO public.recurrencia_instancia (id_serie, id_tarea, ocurrencia_num)
-           VALUES ($1,$2,$3)`,
-          [serie.id_serie, tarea.id_tarea, i + 1]
-        );
-
-        if (body.nota_contenido) {
-          await client.query(
-            `INSERT INTO public.nota (id_tarea, contenido, fecha_creacion)
-             VALUES ($1,$2,NOW())`,
-            [tarea.id_tarea, body.nota_contenido]
-          );
-        }
-
-        tareasCreadas.push(tarea);
-      }
-
-      await client.query("COMMIT");
-      return res({ success: true, recurrente: true, serie, tareas: tareasCreadas });
-    }
-
-    // ── Tarea simple ──────────────────────────────────────────────────────
-    const { rows: [nuevaTarea] } = await client.query(
+    const resultTarea = await client.query(
       `INSERT INTO public.tarea
-         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, categoria, fecha_creacion)
-       VALUES ($1,$2,$3,$4,$5,'pendiente',$6,NOW()) RETURNING *`,
+         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion, id_usuario)
+       VALUES ($1, $2, $3, $4, $5, 'pendiente', NOW(), $6)
+       RETURNING *`,
       [
         body.titulo.trim(),
         body.descripcion?.trim() || "",
-        body.fecha      || null,
-        body.hora       || null,
-        body.prioridad  || "media",
-        body.categoria  || "personal",
+        body.fecha  || null,
+        body.hora   || null,
+        body.prioridad || "media",
+        idUsuario,
       ]
     );
+    const nuevaTarea = resultTarea.rows[0];
 
     if (body.nota_contenido) {
       await client.query(
-        `INSERT INTO public.nota (id_tarea, contenido, fecha_creacion)
-         VALUES ($1,$2,NOW())`,
-        [nuevaTarea.id_tarea, body.nota_contenido]
+        `INSERT INTO public.nota (id_tarea, nota_titulo, contenido, fecha_creacion)
+         VALUES ($1, $2, $3, NOW())`,
+        [nuevaTarea.id_tarea, body.nota_titulo || "Nota sin título", body.nota_contenido]
       );
     }
 
     await client.query("COMMIT");
-    return res({ success: true, tarea: nuevaTarea });
-
+    return new Response(
+      JSON.stringify({ success: true, tarea: nuevaTarea }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
   } catch (error: any) {
-    try { await client?.query("ROLLBACK"); } catch {}
-    console.error("Error al crear tarea:", error.message);
-    return res({ success: false, error: error.message }, 500);
+    await client.query("ROLLBACK");
+    console.error("[dashboard POST] Error:", error.message);
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   } finally {
-    client?.release();
+    client.release();
   }
 };
 
-// ─── GET ──────────────────────────────────────────────────────────────────
-export const GET: APIRoute = async () => {
+// --- GET: OBTENER TAREAS (solo las del usuario autenticado) ------------------
+// TO_CHAR evita que pg convierta date → Date JS con desfase UTC-5 (Colombia).
+// WHERE id_usuario = $1 garantiza aislamiento total entre usuarios.
+export const GET: APIRoute = async ({ request }) => {
+  const idUsuario = await getUsuarioId(request);
+  if (!idUsuario) return noAutorizado();
+
   try {
-    const hayTablas = await tablaRecurrenciaExiste();
+    const result = await pool.query(
+      `SELECT
+         id_tarea,
+         titulo,
+         descripcion,
+         TO_CHAR(fecha_inicio, 'YYYY-MM-DD') AS fecha_inicio,
+         hora_inicio,
+         prioridad,
+         estado,
+         fecha_creacion
+       FROM public.tarea
+       WHERE id_usuario  = $1
+         AND deleted_at  IS NULL
+       ORDER BY fecha_creacion DESC`,
+      [idUsuario]
+    );
 
-    let result;
-    if (hayTablas) {
-      result = await pool.query(`
-        SELECT * FROM (
-          SELECT DISTINCT ON (t.id_tarea)
-            t.*,
-            ri.id_serie,
-            ri.ocurrencia_num,
-            rs.frecuencia,
-            rs.intervalo,
-            rs.fecha_fin   AS serie_fecha_fin,
-            rs.dias_semana AS serie_dias_semana,
-            CASE WHEN ri.id_serie IS NOT NULL THEN TRUE ELSE FALSE END AS es_recurrente
-          FROM public.tarea t
-          LEFT JOIN public.recurrencia_instancia ri ON ri.id_tarea = t.id_tarea
-          LEFT JOIN public.recurrencia_serie      rs ON rs.id_serie = ri.id_serie
-          WHERE t.deleted_at IS NULL
-          ORDER BY t.id_tarea, t.fecha_creacion DESC
-        ) sub
-        ORDER BY fecha_creacion DESC
-      `);
-    } else {
-      result = await pool.query(`
-        SELECT *, FALSE AS es_recurrente
-        FROM public.tarea
-        WHERE deleted_at IS NULL
-        ORDER BY fecha_creacion DESC
-      `);
-    }
-
-    return res({ success: true, tareas: result.rows });
+    return new Response(
+      JSON.stringify({ success: true, tareas: result.rows }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
   } catch (error: any) {
-    console.error("Error al obtener tareas:", error.message);
-    return res({ success: false, error: error.message }, 500);
+    console.error("[dashboard GET] Error:", error.message);
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 };
 
-// ─── PUT ──────────────────────────────────────────────────────────────────
-export const PUT: APIRoute = async ({ request }) => {
-  let client: any;
-  try {
-    client = await pool.connect();
-    const body = await request.json();
-    const { id_tarea, modo, ...campos } = body;
+// --- DELETE: ELIMINAR TAREA (solo si pertenece al usuario autenticado) -------
+export const DELETE: APIRoute = async ({ request, url }) => {
+  const idUsuario = await getUsuarioId(request);
+  if (!idUsuario) return noAutorizado();
 
-    if (!id_tarea)
-      return res({ success: false, message: "id_tarea requerido." }, 400);
+  const client = await pool.connect();
+  try {
+    const id = url.searchParams.get("id");
+    if (!id) {
+      return new Response(
+        JSON.stringify({ success: false, message: "ID no proporcionado" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
     await client.query("BEGIN");
 
-    const hayTablas = await tablaRecurrenciaExiste();
-
-    if (modo === "serie" && hayTablas) {
-      const { rows: [inst] } = await client.query(
-        `SELECT id_serie FROM public.recurrencia_instancia WHERE id_tarea = $1`, [id_tarea]
-      );
-
-      if (!inst?.id_serie) {
-        await client.query("ROLLBACK");
-        return res({ success: false, message: "Esta tarea no pertenece a una serie." }, 400);
-      }
-
-      await client.query(
-        `UPDATE public.tarea t
-         SET
-           titulo      = COALESCE(NULLIF($1,''), t.titulo),
-           descripcion = COALESCE(NULLIF($2,''), t.descripcion),
-           hora_inicio = COALESCE(NULLIF($3,'')::time without time zone, t.hora_inicio),
-           prioridad   = COALESCE(NULLIF($4,''), t.prioridad)
-         FROM public.recurrencia_instancia ri
-         WHERE ri.id_tarea = t.id_tarea
-           AND ri.id_serie = $5
-           AND t.fecha_inicio >= CURRENT_DATE`,
-        [
-          campos.titulo      || null,
-          campos.descripcion || null,
-          campos.hora        || null,
-          campos.prioridad   || null,
-          inst.id_serie,
-        ]
-      );
-    } else {
-      await client.query(
-        `UPDATE public.tarea
-         SET
-           titulo       = COALESCE(NULLIF($1,''), titulo),
-           descripcion  = COALESCE(NULLIF($2,''), descripcion),
-           hora_inicio  = COALESCE(NULLIF($3,'')::time without time zone, hora_inicio),
-           prioridad    = COALESCE(NULLIF($4,'')::public.prioridad_tarea, prioridad),
-           fecha_inicio = COALESCE($5::date, fecha_inicio),
-           estado       = COALESCE(NULLIF($7,'')::public.estado_tarea, estado),
-           categoria    = COALESCE(NULLIF($8,''), categoria)
-         WHERE id_tarea = $6`,
-        [
-          campos.titulo      || null,
-          campos.descripcion || null,
-          campos.hora        || null,
-          campos.prioridad   || null,
-          campos.fecha       || null,
-          id_tarea,
-          campos.estado      || null,
-          campos.categoria   || null,
-        ]
+    // Verificar que la tarea pertenece al usuario antes de eliminar
+    const check = await client.query(
+      `SELECT id_tarea FROM public.tarea WHERE id_tarea = $1 AND id_usuario = $2`,
+      [id, idUsuario]
+    );
+    if (check.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return new Response(
+        JSON.stringify({ success: false, message: "Tarea no encontrada o sin permiso" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    await client.query("COMMIT");
-    return res({ success: true, modo: modo ?? "simple" });
-
-  } catch (error: any) {
-    try { await client?.query("ROLLBACK"); } catch {}
-    console.error("Error al editar tarea:", error.message);
-    return res({ success: false, error: error.message }, 500);
-  } finally {
-    client?.release();
-  }
-};
-
-// ─── DELETE ───────────────────────────────────────────────────────────────
-export const DELETE: APIRoute = async ({ url }) => {
-  let client: any;
-  try {
-    client = await pool.connect();
-    const id   = url.searchParams.get("id");
-    const modo = url.searchParams.get("modo") ?? "simple";
-
-    if (!id) return res({ success: false, message: "ID no proporcionado." }, 400);
-
-    await client.query("BEGIN");
-
-    const hayTablas = await tablaRecurrenciaExiste();
-
-    if (modo === "serie" && hayTablas) {
-      const { rows: [inst] } = await client.query(
-        `SELECT id_serie FROM public.recurrencia_instancia WHERE id_tarea = $1`, [id]
-      );
-
-      if (inst?.id_serie) {
-        const { rows: instancias } = await client.query(
-          `SELECT id_tarea FROM public.recurrencia_instancia WHERE id_serie = $1`,
-          [inst.id_serie]
-        );
-        const ids = instancias.map((r: any) => r.id_tarea);
-
-        if (ids.length) {
-          await client.query(
-            `DELETE FROM public.nota WHERE id_tarea = ANY($1::uuid[])`, [ids]
-          );
-        }
-
-        await client.query(
-          `DELETE FROM public.recurrencia_instancia WHERE id_serie = $1`, [inst.id_serie]
-        );
-        await client.query(
-          `DELETE FROM public.recurrencia_serie WHERE id_serie = $1`, [inst.id_serie]
-        );
-
-        if (ids.length) {
-          await client.query(
-            `DELETE FROM public.tarea WHERE id_tarea = ANY($1::uuid[])`, [ids]
-          );
-        }
-      }
-    } else {
-      await client.query(`DELETE FROM public.nota WHERE id_tarea = $1`, [id]);
-
-      if (hayTablas) {
-        await client.query(`DELETE FROM public.recurrencia_instancia WHERE id_tarea = $1`, [id]);
-      }
-
-      const { rowCount } = await client.query(
-        `DELETE FROM public.tarea WHERE id_tarea = $1 RETURNING *`, [id]
-      );
-
-      if (rowCount === 0) {
-        await client.query("ROLLBACK");
-        return res({ success: false, message: "Tarea no encontrada." }, 404);
-      }
-    }
+    await client.query(`DELETE FROM public.nota  WHERE id_tarea   = $1`, [id]);
+    await client.query(`DELETE FROM public.tarea WHERE id_tarea   = $1`, [id]);
 
     await client.query("COMMIT");
-    return res({ success: true, message: "Eliminada correctamente." });
-
+    return new Response(
+      JSON.stringify({ success: true, message: "Tarea eliminada correctamente" }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
   } catch (error: any) {
-    try { await client?.query("ROLLBACK"); } catch {}
-    console.error("Error al eliminar tarea:", error.message);
-    return res({ success: false, error: error.message }, 500);
+    await client.query("ROLLBACK");
+    console.error("[dashboard DELETE] Error:", error.message);
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   } finally {
-    client?.release();
+    client.release();
   }
 };
