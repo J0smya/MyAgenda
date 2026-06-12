@@ -66,44 +66,44 @@ export async function enviarOtpEmail(
   email: string,
   codigo: string
 ): Promise<void> {
-  const _key = import.meta.env.RESEND_API_KEY ?? process.env.RESEND_API_KEY;
-  if (!_key) {
-    console.warn(`[DEV] RESEND_API_KEY no configurada. OTP para ${email}: ${codigo}`);
+  const smtpUser = import.meta.env.SMTP_USER ?? process.env.SMTP_USER;
+  const smtpPass = import.meta.env.SMTP_PASS ?? process.env.SMTP_PASS;
+
+  if (!smtpUser || !smtpPass) {
+    console.warn(`[DEV] SMTP no configurado. OTP para ${email}: ${codigo}`);
     return;
   }
 
-  await enviarConResend(
-    email,
-    'Código de verificación — My Agenda',
-    `<!DOCTYPE html>
+  const transporter = nodemailer.createTransport({
+    host: import.meta.env.SMTP_HOST ?? process.env.SMTP_HOST ?? 'smtp.gmail.com',
+    port: parseInt(import.meta.env.SMTP_PORT ?? process.env.SMTP_PORT ?? '587'),
+    secure: false,
+    auth: { user: smtpUser, pass: smtpPass },
+  });
+
+  await transporter.sendMail({
+    from: `"My Agenda" <${smtpUser}>`,
+    to: email,
+    subject: 'Código de verificación — My Agenda',
+    html: `<!DOCTYPE html>
 <html lang="es">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
 <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 16px;">
     <tr><td align="center">
       <table width="520" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden;max-width:520px;width:100%;">
-
-        <!-- Header -->
         <tr>
           <td style="background:linear-gradient(135deg,#0ea5e9,#6366f1);padding:32px 32px 28px;text-align:center;">
-            <div style="display:inline-block;background:rgba(255,255,255,0.18);border-radius:14px;padding:12px 16px;margin-bottom:14px;">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            </div>
             <h1 style="margin:0;font-size:22px;font-weight:800;color:#ffffff;letter-spacing:-0.3px;">My Agenda</h1>
             <p style="margin:6px 0 0;font-size:14px;color:rgba(255,255,255,0.80);">Código de verificación</p>
           </td>
         </tr>
-
-        <!-- Body -->
         <tr>
           <td style="padding:36px 36px 28px;">
-            <p style="margin:0 0 6px;font-size:15px;color:#374151;font-weight:600;">Hola,</p>
             <p style="margin:0 0 28px;font-size:14px;color:#64748b;line-height:1.6;">
               Usa el siguiente código para verificar tu identidad en <strong style="color:#0f172a;">My Agenda</strong>.
               Si no fuiste tú, ignora este mensaje.
             </p>
-
-            <!-- OTP box -->
             <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
               <tr>
                 <td align="center" style="background:#f0f9ff;border:2px solid #bae6fd;border-radius:16px;padding:28px 20px;">
@@ -112,38 +112,30 @@ export async function enviarOtpEmail(
                 </td>
               </tr>
             </table>
-
-            <!-- Warning -->
             <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
               <tr>
                 <td style="background:#fefce8;border:1px solid #fde68a;border-radius:12px;padding:14px 16px;">
                   <p style="margin:0;font-size:13px;color:#854d0e;line-height:1.5;">
                     <strong>Expira en 10 minutos.</strong> Nunca compartas este código con nadie.
-                    My Agenda nunca te pedirá tu código por otro canal.
                   </p>
                 </td>
               </tr>
             </table>
-
-            <p style="margin:0;font-size:13px;color:#94a3b8;text-align:center;">
-              Si no solicitaste este código, puedes ignorar este correo de forma segura.
-            </p>
           </td>
         </tr>
-
-        <!-- Footer -->
         <tr>
           <td style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:18px 36px;text-align:center;">
             <p style="margin:0;font-size:12px;color:#94a3b8;">My Agenda &mdash; Tu agenda personal inteligente</p>
           </td>
         </tr>
-
       </table>
     </td></tr>
   </table>
 </body>
-</html>`
-  );
+</html>`,
+  });
+
+  console.log('[SMTP] Enviado OK a', email);
 }
 
 // ── Notificaciones de tareas (Resend) ────────────────────────────────────────
