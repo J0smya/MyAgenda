@@ -4145,10 +4145,7 @@ body.dark-mode .db-crear-opt { color: #e2e8f0; }
 
 /* ── Teléfono pequeño ── */
 @media (max-width: 480px) {
-  .db-header { padding: 8px 10px; }
   .db-nav-arrow { width: 30px !important; height: 30px !important; }
-  .db-date-title { font-size: 13px !important; }
-  .db-month-day { min-height: 44px; }
   .db-month-task-pill { display: none; }
   .db-month-day-num { font-size: 11px; }
 
@@ -4159,4 +4156,93 @@ body.dark-mode .db-crear-opt { color: #e2e8f0; }
   }
   .btn-submit-tarea { min-height: 48px; font-size: 16px; }
 }
+
+/* ═══════════════════════════════════════════════
+   MÓVIL PEQUEÑO — Header 2 filas + calendarios
+═══════════════════════════════════════════════ */
+@media (max-width: 600px) {
+  /* ── Header: fila 1 = nav+fecha, fila 2 = tabs+crear ── */
+  .db-header {
+    flex-wrap: wrap !important;
+    padding: 10px 12px !important;
+    gap: 6px 8px !important;
+  }
+  .db-header-left {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    gap: 5px !important;
+    overflow: hidden !important;
+  }
+  .db-date-title-wrap {
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+  .db-date-title {
+    font-size: 13px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .db-header-right {
+    width: 100% !important;
+    flex-shrink: 0 !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+  }
+  .db-view-tabs {
+    flex: 1 !important;
+    justify-content: space-around !important;
+  }
+  .db-view-btn {
+    flex: 1 !important;
+    padding: 7px 4px !important;
+    font-size: 11px !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+  .db-btn-add-text { display: none !important; }
+  .db-btn-add { padding: 8px 12px !important; }
+  .db-crear-wrap { flex-shrink: 0 !important; }
+
+  /* ── View container: menos padding para aprovechar pantalla ── */
+  .db-view-container {
+    padding: 12px 8px !important;
+    overflow-x: hidden;
+  }
+
+  /* ── Vista Mes: celdas más altas ── */
+  .db-month-grid {
+    gap: 4px !important;
+    padding: 8px !important;
+  }
+  .db-month-day {
+    min-height: 72px !important;
+    padding: 6px 4px !important;
+  }
+  .db-month-day-num { font-size: 12px !important; }
+  .db-weekday-header { font-size: 10px; padding: 5px 0; }
+
+  /* ── Vista Semana: scroll horizontal con columnas anchas ── */
+  .db-view-container:has(.db-week-grid) {
+    overflow-x: auto !important;
+  }
+  .db-week-grid {
+    grid-template-columns: repeat(7, minmax(88px, 1fr)) !important;
+    gap: 6px !important;
+    min-width: 616px;
+  }
+  .db-week-col {
+    min-width: 88px !important;
+    padding: 10px 7px !important;
+    min-height: 420px !important;
+  }
+  .db-week-col-num { font-size: 1.1rem !important; }
+  .db-week-col-day { font-size: 9px !important; }
+
+  /* ── Vista Día: etiqueta de hora compacta ── */
+  .db-day-row { grid-template-columns: 44px 1fr !important; }
+  .db-hour-label { font-size: 9px !important; min-width: 44px !important; }
+}
+
 body.dark-mode .db-crear-opt:hover { background: #0c2e44; color: #38bdf8; }
