@@ -168,7 +168,8 @@ import Layout from "../layouts/Layout.astro";
         <div class="reg-otp-header">
           <div class="reg-otp-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
             </svg>
           </div>
           <h2 class="reg-otp-title">Verifica tu identidad</h2>
@@ -218,8 +219,8 @@ import Layout from "../layouts/Layout.astro";
   const toastOk     = document.getElementById('toast-success') as HTMLDivElement;
   const togglePass  = document.getElementById('toggle-pass')   as HTMLButtonElement;
   const passInput   = form.querySelector('input[name="password"]') as HTMLInputElement;
-  const eyeOpen     = document.getElementById('eye-open')      as SVGElement;
-  const eyeClosed   = document.getElementById('eye-closed')    as SVGElement;
+  const eyeOpen     = document.getElementById('eye-open')      as unknown as SVGElement;
+  const eyeClosed   = document.getElementById('eye-closed')    as unknown as SVGElement;
 
   togglePass.addEventListener('click', () => {
     const show = passInput.type === 'password';
