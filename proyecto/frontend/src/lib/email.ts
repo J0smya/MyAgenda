@@ -66,7 +66,8 @@ export async function enviarOtpEmail(
   email: string,
   codigo: string
 ): Promise<void> {
-  if (!process.env.RESEND_API_KEY) {
+  const _key = import.meta.env.RESEND_API_KEY ?? process.env.RESEND_API_KEY;
+  if (!_key) {
     console.warn(`[DEV] RESEND_API_KEY no configurada. OTP para ${email}: ${codigo}`);
     return;
   }
@@ -148,20 +149,16 @@ export async function enviarOtpEmail(
 // ── Notificaciones de tareas (Resend) ────────────────────────────────────────
 
 async function enviarConResend(to: string, subject: string, html: string): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = import.meta.env.RESEND_API_KEY ?? process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.warn('[DEV] RESEND_API_KEY no configurada. Email no enviado:', subject);
     return;
   }
+  const from = import.meta.env.RESEND_FROM ?? process.env.RESEND_FROM ?? 'My Agenda <onboarding@resend.dev>';
   const resp = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: process.env.RESEND_FROM ?? 'My Agenda <onboarding@resend.dev>',
-      to: [to],
-      subject,
-      html,
-    }),
+    body: JSON.stringify({ from, to: [to], subject, html }),
   });
   const resBody = await resp.text();
   if (!resp.ok) {
