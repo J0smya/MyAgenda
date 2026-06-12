@@ -1,7 +1,13 @@
 import { defineMiddleware } from 'astro:middleware';
-import { iniciarScheduler } from './lib/scheduler';
+
+let schedulerIniciado = false;
 
 export const onRequest = defineMiddleware(async (_ctx, next) => {
-  iniciarScheduler();
+  if (!schedulerIniciado) {
+    schedulerIniciado = true;
+    import('./lib/scheduler')
+      .then(({ iniciarScheduler }) => iniciarScheduler())
+      .catch((e: any) => console.error('[middleware] Scheduler no cargó:', e.message));
+  }
   return next();
 });
