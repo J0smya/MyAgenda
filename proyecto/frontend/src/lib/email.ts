@@ -89,46 +89,23 @@ export async function enviarOtpEmail(
   });
 }
 
-// ── Resend: notificaciones de tareas ─────────────────────────────────────────
-
-async function enviarConResend(opts: {
-  to: string;
-  subject: string;
-  html: string;
-}): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.warn('[DEV] RESEND_API_KEY no configurada. Email no enviado:', opts.subject, '->', opts.to);
-    return;
-  }
-  const resp = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: process.env.RESEND_FROM ?? 'My Agenda <onboarding@resend.dev>',
-      to: [opts.to],
-      subject: opts.subject,
-      html: opts.html,
-    }),
-  });
-  if (!resp.ok) {
-    const text = await resp.text();
-    console.error('[Resend] Error:', text);
-  }
-}
+// ── Notificaciones de tareas (Gmail SMTP) ────────────────────────────────────
 
 export async function enviarNotificacionCreacion(
   email: string,
   tarea: { titulo: string; fecha_inicio?: string | null; hora_inicio?: string | null; prioridad?: string | null }
 ): Promise<void> {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn('[DEV] SMTP no configurado. Notificación creación no enviada para:', tarea.titulo);
+    return;
+  }
   const fecha    = tarea.fecha_inicio ? tarea.fecha_inicio.toString().slice(0, 10) : 'Sin fecha';
   const hora     = tarea.hora_inicio  ? tarea.hora_inicio.toString().slice(0, 5)   : 'Sin hora';
   const prioridad = tarea.prioridad ?? 'media';
 
-  await enviarConResend({
+  const transporter = crearTransporter();
+  await transporter.sendMail({
+    from: `"My Agenda" <${process.env.SMTP_USER}>`,
     to: email,
     subject: `Nueva tarea: ${tarea.titulo}`,
     html: `
@@ -151,10 +128,16 @@ export async function enviarRecordatorioVencimiento(
   email: string,
   tarea: { titulo: string; fecha_inicio?: string | null; hora_inicio?: string | null; prioridad?: string | null }
 ): Promise<void> {
-  const hora     = tarea.hora_inicio  ? tarea.hora_inicio.toString().slice(0, 5) : 'hoy';
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn('[DEV] SMTP no configurado. Recordatorio no enviado para:', tarea.titulo);
+    return;
+  }
+  const hora      = tarea.hora_inicio  ? tarea.hora_inicio.toString().slice(0, 5) : 'Sin hora definida';
   const prioridad = tarea.prioridad ?? 'media';
 
-  await enviarConResend({
+  const transporter = crearTransporter();
+  await transporter.sendMail({
+    from: `"My Agenda" <${process.env.SMTP_USER}>`,
     to: email,
     subject: `Recordatorio: ${tarea.titulo}`,
     html: `
