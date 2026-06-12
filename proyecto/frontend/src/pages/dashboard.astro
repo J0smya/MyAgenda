@@ -901,7 +901,7 @@ import '../styles/noteEditor.css';
       dotPrio.style.background = PRIORIDAD_COLORS[prioEl.value] || '#94a3b8';
     }
     if (dotCat && catEl) {
-      const f = filtros.find(x => x.id === catEl.value);
+      const f = filtros.find(x => x.nombre === catEl.value);
       dotCat.style.background = f ? f.color : '#94a3b8';
     }
   }
@@ -2038,7 +2038,7 @@ import '../styles/noteEditor.css';
  
   function getColorTarea(t:Tarea):string {
     if (t.estado === 'completada') return '#9ca3af';
-    const f=filtros.find(x=>x.id===t.categoria); if(f) return f.color;
+    const f=filtros.find(x=>x.nombre===t.categoria); if(f) return f.color;
     return t.prioridad==='alta'?'#ef4444':t.prioridad==='media'?'#f59e0b':'#0ea5e9';
   }
  

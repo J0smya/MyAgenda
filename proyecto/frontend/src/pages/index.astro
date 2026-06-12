@@ -1,15 +1,7 @@
 ---
-export const prerender = false;
 import '../styles/global.css'
 import '../styles/landing.css'
 import Layout from "../layouts/Layout.astro";
-import { obtenerSesion } from '../lib/sesion';
-
-const token = Astro.cookies.get('session')?.value;
-if (token) {
-  const sesion = await obtenerSesion(token);
-  if (sesion) return Astro.redirect('/dashboard', 302);
-}
 ---
 
 <!DOCTYPE html>
