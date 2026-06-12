@@ -90,12 +90,27 @@ import '../styles/recuperarcontrasena.css';
         </div>
 
         <div class="campo oculto" id="campo-tel">
-          <label for="input-tel">Número de WhatsApp</label>
-          <div class="wrap-input">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#9ca3af" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            <input type="tel" id="input-tel" placeholder="+57 300 123 4567" autocomplete="tel" />
+          <label>Número de WhatsApp</label>
+          <div class="wrap-input rc-tel-wrap" id="rc-tel-wrap">
+            <div class="rc-prefijo-box" id="rc-prefijo-box">
+              <span id="rc-prefijo-flag">🇨🇴</span>
+              <span id="rc-prefijo-code">+57</span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="rc-prefijo-sep"></div>
+            <input
+              type="tel"
+              id="input-tel"
+              placeholder="3001234567"
+              maxlength="10"
+              inputmode="numeric"
+              autocomplete="tel"
+            />
           </div>
-          <p style="font-size:11px;color:#6b7280;margin:4px 0 0;padding-left:2px;">Incluye el código de país, ej: +57</p>
+          <div id="rc-prefijo-dropdown" class="rc-prefijo-dropdown hidden">
+            <input type="text" id="rc-prefijo-search" class="rc-prefijo-search" placeholder="Buscar país..." />
+            <div id="rc-prefijo-list" class="rc-prefijo-list"></div>
+          </div>
         </div>
 
         <button class="btn-ok" id="btn-enviar" type="button">
@@ -194,6 +209,73 @@ import '../styles/recuperarcontrasena.css';
   <div id="rc-toast-container" class="rc-toast-container"></div>
 
   <script is:inline>
+    // ── Selector de prefijo (WhatsApp) ───────────────────────────
+    const RC_PAISES = [
+      { flag:'🇨🇴', name:'Colombia',        code:'+57'  },
+      { flag:'🇺🇸', name:'Estados Unidos',  code:'+1'   },
+      { flag:'🇲🇽', name:'México',          code:'+52'  },
+      { flag:'🇦🇷', name:'Argentina',       code:'+54'  },
+      { flag:'🇨🇱', name:'Chile',           code:'+56'  },
+      { flag:'🇵🇪', name:'Perú',            code:'+51'  },
+      { flag:'🇻🇪', name:'Venezuela',       code:'+58'  },
+      { flag:'🇪🇨', name:'Ecuador',         code:'+593' },
+      { flag:'🇧🇴', name:'Bolivia',         code:'+591' },
+      { flag:'🇵🇾', name:'Paraguay',        code:'+595' },
+      { flag:'🇺🇾', name:'Uruguay',         code:'+598' },
+      { flag:'🇵🇦', name:'Panamá',          code:'+507' },
+      { flag:'🇨🇷', name:'Costa Rica',      code:'+506' },
+      { flag:'🇸🇻', name:'El Salvador',     code:'+503' },
+      { flag:'🇬🇹', name:'Guatemala',       code:'+502' },
+      { flag:'🇩🇴', name:'Rep. Dominicana', code:'+1'   },
+      { flag:'🇪🇸', name:'España',          code:'+34'  },
+      { flag:'🇬🇧', name:'Reino Unido',     code:'+44'  },
+      { flag:'🇧🇷', name:'Brasil',          code:'+55'  },
+    ];
+    let rcPaisSeleccionado = RC_PAISES[0];
+
+    function rcRenderPaises(filtro = '') {
+      const lista = document.getElementById('rc-prefijo-list');
+      const filtrados = RC_PAISES.filter(p =>
+        p.name.toLowerCase().includes(filtro.toLowerCase()) || p.code.includes(filtro)
+      );
+      lista.innerHTML = filtrados.map((p, i) => `
+        <div class="rc-prefijo-option${p === rcPaisSeleccionado ? ' selected' : ''}" data-code="${p.code}" data-flag="${p.flag}">
+          <span>${p.flag}</span>
+          <span style="flex:1">${p.name}</span>
+          <span style="color:#9ca3af">${p.code}</span>
+        </div>
+      `).join('');
+      lista.querySelectorAll('.rc-prefijo-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          rcPaisSeleccionado = RC_PAISES.find(p => p.code === opt.dataset.code && p.flag === opt.dataset.flag) || RC_PAISES[0];
+          document.getElementById('rc-prefijo-flag').textContent = rcPaisSeleccionado.flag;
+          document.getElementById('rc-prefijo-code').textContent = rcPaisSeleccionado.code;
+          document.getElementById('rc-prefijo-dropdown').classList.add('hidden');
+          document.getElementById('input-tel').focus();
+        });
+      });
+    }
+
+    document.getElementById('rc-prefijo-box').addEventListener('click', e => {
+      e.stopPropagation();
+      const dd = document.getElementById('rc-prefijo-dropdown');
+      if (dd.classList.contains('hidden')) {
+        dd.classList.remove('hidden');
+        document.getElementById('rc-prefijo-search').value = '';
+        rcRenderPaises();
+        setTimeout(() => document.getElementById('rc-prefijo-search').focus(), 50);
+      } else {
+        dd.classList.add('hidden');
+      }
+    });
+    document.getElementById('rc-prefijo-search').addEventListener('input', e => rcRenderPaises(e.target.value));
+    document.getElementById('rc-prefijo-search').addEventListener('click', e => e.stopPropagation());
+    document.addEventListener('click', () => document.getElementById('rc-prefijo-dropdown')?.classList.add('hidden'));
+    document.getElementById('input-tel').addEventListener('input', e => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 12);
+    });
+    rcRenderPaises();
+
     // ── Estado ────────────────────────────────────────────────────
     let metodoActual     = 'email';
     let contactoActual   = '';
@@ -272,15 +354,16 @@ import '../styles/recuperarcontrasena.css';
     document.getElementById('input-tel').addEventListener('keydown',    e => { if (e.key === 'Enter') enviarCodigo(); });
 
     async function enviarCodigo() {
-      const emailVal = document.getElementById('input-correo').value.trim();
-      const telVal   = document.getElementById('input-tel').value.trim();
+      const emailVal  = document.getElementById('input-correo').value.trim();
+      const telRaw    = document.getElementById('input-tel').value.trim();
+      const telVal    = telRaw ? `${rcPaisSeleccionado.code}${telRaw}` : '';
 
       if (metodoActual === 'email' && !emailVal) {
         mostrarToast('Campo requerido', 'Ingresa tu correo electrónico.', 'error');
         document.getElementById('input-correo').focus();
         return;
       }
-      if (metodoActual === 'whatsapp' && !telVal) {
+      if (metodoActual === 'whatsapp' && !telRaw) {
         mostrarToast('Campo requerido', 'Ingresa tu número de WhatsApp.', 'error');
         document.getElementById('input-tel').focus();
         return;

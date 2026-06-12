@@ -501,6 +501,36 @@ body.dark-mode .g-confirm-desc  { color: #94a3b8 !important; }
 body.dark-mode .g-confirm-cancel { background: #334155 !important; color: #94a3b8 !important; }
 body.dark-mode .g-confirm-cancel:hover { background: #475569 !important; }
 
+/* ── Nav de autenticación (login / registro) ── */
+.auth-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  height: 60px;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.auth-nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.auth-nav__brand-text {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #60c8ff 0%, #b78cff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* ── Badges de conteo en modo oscuro ── */
 body.dark-mode .db-pendientes-count-badge  { background: rgba(251,146,60,0.18) !important; color: #fb923c !important; border-color: rgba(251,146,60,0.4) !important; }
 body.dark-mode .db-completadas-count-badge { background: rgba(20,184,166,0.18) !important; color: #2dd4bf !important; border-color: rgba(20,184,166,0.4) !important; }

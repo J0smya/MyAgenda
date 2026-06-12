@@ -969,8 +969,8 @@ import '../styles/noteEditor.css';
   function actualizarSelectCategoria() {
     const sel = document.getElementById('t-cat') as HTMLSelectElement; if (!sel) return;
     const val = sel.value;
-    sel.innerHTML = filtros.map(f=>`<option value="${f.id}">${f.nombre}</option>`).join('');
-    if (filtros.find(f=>f.id===val)) sel.value = val;
+    sel.innerHTML = filtros.map(f=>`<option value="${f.nombre}">${f.nombre}</option>`).join('');
+    if (filtros.find(f=>f.nombre===val)) sel.value = val;
     actualizarDots();
   }
  
@@ -1363,7 +1363,8 @@ import '../styles/noteEditor.css';
       (document.getElementById('t-hora-inicio') as HTMLInputElement).value   = tarea.hora||'';
       (document.getElementById('t-prioridad')   as HTMLSelectElement).value  = tarea.prioridad;
       actualizarSelectCategoria();
-      (document.getElementById('t-cat') as HTMLSelectElement).value = tarea.categoria;
+      // categoria guardada en DB es el nombre del filtro
+      (document.getElementById('t-cat') as HTMLSelectElement).value = tarea.categoria || '';
       actualizarDots();
       document.getElementById('recurrencia-wrap')!.style.display = 'none';
     } else {
@@ -1643,7 +1644,7 @@ import '../styles/noteEditor.css';
   (window as any).verDetalle = (id:string)=>{
     selectedTaskId=id;
     const t=allTasks.find(x=>String(x.id)===String(id)); if(!t) return;
-    const filtro=filtros.find(f=>f.id===t.categoria);
+    const filtro=filtros.find(f=>f.nombre===t.categoria);
     const prioColor=t.prioridad==='alta'?'#ef4444':t.prioridad==='media'?'#f59e0b':'#0ea5e9';
     const recBadge=t.es_recurrente?`<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#059669;background:#ecfdf5;border:1px solid #bbf7d0;border-radius:20px;padding:2px 10px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Recurrente</span>`:'';
     viewContent.innerHTML=`

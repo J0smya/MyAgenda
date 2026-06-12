@@ -40,8 +40,8 @@ export const POST: APIRoute = async ({ request }) => {
 
     const resultTarea = await client.query(
       `INSERT INTO public.tarea
-         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion, id_usuario)
-       VALUES ($1, $2, $3, $4, $5, 'pendiente', NOW(), $6)
+         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion, id_usuario, categoria)
+       VALUES ($1, $2, $3, $4, $5, 'pendiente', NOW(), $6, $7)
        RETURNING *`,
       [
         body.titulo.trim(),
@@ -50,6 +50,7 @@ export const POST: APIRoute = async ({ request }) => {
         body.hora   || null,
         body.prioridad || "media",
         idUsuario,
+        body.categoria || "personal",
       ]
     );
     const nuevaTarea = resultTarea.rows[0];
@@ -96,7 +97,8 @@ export const GET: APIRoute = async ({ request }) => {
          hora_inicio,
          prioridad,
          estado,
-         fecha_creacion
+         fecha_creacion,
+         COALESCE(categoria, 'personal') AS categoria
        FROM public.tarea
        WHERE id_usuario  = $1
          AND deleted_at  IS NULL
@@ -125,7 +127,7 @@ export const PUT: APIRoute = async ({ request }) => {
   const client = await pool.connect();
   try {
     const body = await request.json();
-    const { id_tarea, estado, titulo, descripcion, fecha_inicio, hora_inicio, prioridad } = body;
+    const { id_tarea, estado, titulo, descripcion, fecha_inicio, hora_inicio, prioridad, categoria } = body;
 
     if (!id_tarea) {
       return new Response(
@@ -153,7 +155,8 @@ export const PUT: APIRoute = async ({ request }) => {
          descripcion  = COALESCE($3, descripcion),
          fecha_inicio = COALESCE($4::date, fecha_inicio),
          hora_inicio  = COALESCE($5::time, hora_inicio),
-         prioridad    = COALESCE($6::prioridad_tarea, prioridad)
+         prioridad    = COALESCE($6::prioridad_tarea, prioridad),
+         categoria    = COALESCE($9, categoria)
        WHERE id_tarea = $7 AND id_usuario = $8
        RETURNING *`,
       [
@@ -165,6 +168,7 @@ export const PUT: APIRoute = async ({ request }) => {
         prioridad    || null,
         id_tarea,
         idUsuario,
+        categoria    || null,
       ]
     );
 

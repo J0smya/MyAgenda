@@ -1,7 +1,15 @@
 ---
+export const prerender = false;
 import '../styles/global.css'
 import '../styles/login.css'
 import Layout from "../layouts/Layout.astro";
+import { obtenerSesion } from '../lib/sesion';
+
+const token = Astro.cookies.get('session')?.value;
+if (token) {
+  const sesion = await obtenerSesion(token);
+  if (sesion) return Astro.redirect('/dashboard', 302);
+}
 ---
 
 <Layout title="Iniciar sesión | My Agenda Pro">
@@ -13,6 +21,13 @@ import Layout from "../layouts/Layout.astro";
       </video>
       <div class="cal-overlay"></div>
     </div>
+
+    <nav class="auth-nav">
+      <a href="/" class="auth-nav__brand">
+        <img src="/logo.svg" alt="My Agenda" width="30" height="30" style="border-radius:7px;display:block;flex-shrink:0;" />
+        <span class="auth-nav__brand-text">My Agenda</span>
+      </a>
+    </nav>
 
     <div class="login-card">
 

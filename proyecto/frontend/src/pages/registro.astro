@@ -1,8 +1,15 @@
 ---
+export const prerender = false;
 import '../styles/global.css'
 import '../styles/registro.css'
 import Layout from "../layouts/Layout.astro";
+import { obtenerSesion } from '../lib/sesion';
 
+const token = Astro.cookies.get('session')?.value;
+if (token) {
+  const sesion = await obtenerSesion(token);
+  if (sesion) return Astro.redirect('/dashboard', 302);
+}
 ---
 
 <Layout title="Registro | My Agenda Pro">
@@ -13,6 +20,14 @@ import Layout from "../layouts/Layout.astro";
       </video>
       <div class="reg-video-overlay"></div>
     </div>
+
+    <nav class="auth-nav">
+      <a href="/" class="auth-nav__brand">
+        <img src="/logo.svg" alt="My Agenda" width="30" height="30" style="border-radius:7px;display:block;flex-shrink:0;" />
+        <span class="auth-nav__brand-text">My Agenda</span>
+      </a>
+    </nav>
+
     <div class="card">
 
       <div class="card-header">
@@ -155,6 +170,48 @@ import Layout from "../layouts/Layout.astro";
         </p>
 
       </form>
+
+      <!-- ── PASO 2: Verificar OTP ── -->
+      <div id="panel-otp" style="display:none">
+        <div class="reg-otp-header">
+          <div class="reg-otp-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+          <h2 class="reg-otp-title">Verifica tu identidad</h2>
+          <p class="reg-otp-sub" id="otp-destino-text">Código enviado a tu correo y WhatsApp</p>
+        </div>
+
+        <div class="reg-otp-boxes" id="reg-otp-fila">
+          <input class="reg-otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+          <input class="reg-otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+          <input class="reg-otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+          <input class="reg-otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+          <input class="reg-otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+          <input class="reg-otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+        </div>
+
+        <div class="reg-otp-timer" id="reg-otp-timer-row">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Expira en <strong id="reg-otp-timer">10:00</strong>
+        </div>
+
+        <button class="btn" id="reg-btn-verificar" disabled>
+          <span id="reg-btn-ver-text">Verificar y crear cuenta</span>
+          <span id="reg-btn-ver-spinner" class="btn__spinner" style="display:none"></span>
+        </button>
+
+        <button class="btn reg-btn-reenviar" id="reg-btn-reenviar" disabled>
+          Reenviar código <span id="reg-reenviar-timer"></span>
+        </button>
+
+        <button class="reg-btn-volver" id="reg-btn-volver" type="button">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+          Volver al formulario
+        </button>
+      </div>
+
     </div>
   </div>
 </Layout>
@@ -336,6 +393,147 @@ import Layout from "../layouts/Layout.astro";
       ?.addEventListener('input', () => clearFieldError(`err-${name}`));
   });
 
+  // ── Estado OTP ───────────────────────────────────────────────
+  let regToken     = '';
+  let otpTimerInt: ReturnType<typeof setInterval> | null = null;
+  let reenviarInt: ReturnType<typeof setInterval> | null = null;
+
+  const panelOtp    = document.getElementById('panel-otp')          as HTMLDivElement;
+  const otpFila     = document.getElementById('reg-otp-fila')        as HTMLDivElement;
+  const btnVerif    = document.getElementById('reg-btn-verificar')   as HTMLButtonElement;
+  const btnVerText  = document.getElementById('reg-btn-ver-text')    as HTMLSpanElement;
+  const btnVerSpin  = document.getElementById('reg-btn-ver-spinner') as HTMLSpanElement;
+  const btnReenv    = document.getElementById('reg-btn-reenviar')    as HTMLButtonElement;
+  const otpTimerEl  = document.getElementById('reg-otp-timer')       as HTMLElement;
+  const otpDestinoTxt = document.getElementById('otp-destino-text') as HTMLElement;
+
+  function otpCajas(): HTMLInputElement[] {
+    return Array.from(otpFila.querySelectorAll<HTMLInputElement>('.reg-otp-box'));
+  }
+
+  function otpValor(): string {
+    return otpCajas().map(i => i.value).join('');
+  }
+
+  function iniciarTimerOtp(segundos = 600) {
+    let s = segundos;
+    if (otpTimerInt) clearInterval(otpTimerInt);
+    const tick = () => {
+      const m = Math.floor(s / 60), sec = s % 60;
+      otpTimerEl.textContent = `${m}:${String(sec).padStart(2,'0')}`;
+      if (s <= 0) { clearInterval(otpTimerInt!); otpTimerEl.textContent = 'Expirado'; }
+      s--;
+    };
+    tick();
+    otpTimerInt = setInterval(tick, 1000);
+  }
+
+  function iniciarTimerReenviar(s = 60) {
+    btnReenv.disabled = true;
+    if (reenviarInt) clearInterval(reenviarInt);
+    const reenviarTimer = document.getElementById('reg-reenviar-timer') as HTMLElement;
+    reenviarTimer.textContent = `(${s}s)`;
+    reenviarInt = setInterval(() => {
+      s--;
+      reenviarTimer.textContent = s > 0 ? `(${s}s)` : '';
+      if (s <= 0) { clearInterval(reenviarInt!); btnReenv.disabled = false; }
+    }, 1000);
+  }
+
+  function mostrarPanelOtp(destino: string) {
+    form.style.display = 'none';
+    panelOtp.style.display = 'block';
+    otpDestinoTxt.textContent = destino;
+    otpCajas().forEach(c => { c.value = ''; });
+    btnVerif.disabled = true;
+    iniciarTimerOtp();
+    iniciarTimerReenviar();
+    otpCajas()[0].focus();
+  }
+
+  // Navegación entre cajas OTP
+  otpFila.addEventListener('input', e => {
+    const target = e.target as HTMLInputElement;
+    target.value = target.value.replace(/\D/g, '').slice(-1);
+    if (target.value && target.nextElementSibling) (target.nextElementSibling as HTMLInputElement).focus();
+    btnVerif.disabled = otpValor().length < 6;
+  });
+  otpFila.addEventListener('keydown', e => {
+    const target = e.target as HTMLInputElement;
+    if (e.key === 'Backspace' && !target.value && target.previousElementSibling) {
+      (target.previousElementSibling as HTMLInputElement).focus();
+    }
+    if (e.key === 'Enter' && otpValor().length === 6) verificarOtp();
+  });
+  otpFila.addEventListener('paste', e => {
+    e.preventDefault();
+    const txt = (e.clipboardData?.getData('text') || '').replace(/\D/g,'').slice(0,6);
+    otpCajas().forEach((c,i) => { c.value = txt[i] || ''; });
+    btnVerif.disabled = txt.length < 6;
+    if (txt.length === 6) btnVerif.focus();
+  });
+
+  btnVerif.addEventListener('click', verificarOtp);
+
+  // ── Reenviar código ──
+  let _datosReenviar: any = null;
+  btnReenv.addEventListener('click', async () => {
+    if (!_datosReenviar) return;
+    btnReenv.disabled = true;
+    try {
+      const res = await fetch('/api/registro-verificar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accion: 'enviar_otp', ..._datosReenviar }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        regToken = data.regToken;
+        iniciarTimerOtp();
+        iniciarTimerReenviar();
+        otpCajas().forEach(c => c.value = '');
+        btnVerif.disabled = true;
+        otpCajas()[0].focus();
+      } else {
+        showToastError(data.error || 'Error al reenviar el código.');
+      }
+    } catch { showToastError('Error de conexión.'); }
+  });
+
+  // ── Volver al formulario ──
+  document.getElementById('reg-btn-volver')?.addEventListener('click', () => {
+    if (otpTimerInt) clearInterval(otpTimerInt);
+    if (reenviarInt) clearInterval(reenviarInt);
+    panelOtp.style.display = 'none';
+    form.style.display = 'block';
+  });
+
+  async function verificarOtp() {
+    const codigo = otpValor();
+    if (codigo.length < 6) return;
+    btnVerif.disabled = true;
+    btnVerText.style.display = 'none';
+    btnVerSpin.style.display = 'inline-block';
+    try {
+      const res = await fetch('/api/registro-verificar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accion: 'verificar_y_crear', regToken, codigo }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        toastOk.classList.add('show');
+        if (otpTimerInt) clearInterval(otpTimerInt);
+        setTimeout(() => window.location.href = '/login', 2000);
+      } else {
+        showToastError(data.error || 'Código incorrecto. Intenta de nuevo.');
+        btnVerif.disabled = false;
+      }
+    } catch { showToastError('Error de conexión. Inténtalo de nuevo.'); btnVerif.disabled = false; }
+    finally { btnVerText.style.display = ''; btnVerSpin.style.display = 'none'; }
+  }
+
+  // ── Submit del formulario (paso 1 → enviar OTP) ──────────────
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     ['name','email','password','telefono','terms'].forEach(f => clearFieldError(`err-${f}`));
@@ -361,23 +559,23 @@ import Layout from "../layouts/Layout.astro";
     if (hasError) return;
 
     setLoading(true);
+    _datosReenviar = { nombre: name, email, contrasena: password, telefono };
     try {
-      const fd = new FormData();
-      fd.append('name', name); fd.append('email', email);
-      fd.append('password', password); fd.append('telefono', telefono);
-
-      const res = await fetch('/api/registro', { 
-        method: 'POST', 
-        body: fd 
+      const res = await fetch('/api/registro-verificar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accion: 'enviar_otp', nombre: name, email, contrasena: password, telefono }),
       });
-
-      if (res.ok) {
-        toastOk.classList.add('show');
-        setTimeout(() => window.location.href = '/login', 1800);
+      const data = await res.json();
+      if (data.ok) {
+        regToken = data.regToken;
+        const destino = telefono
+          ? `Código enviado a ${email} y al WhatsApp ${telefono}`
+          : `Código enviado a ${email}`;
+        mostrarPanelOtp(destino);
       } else {
-        const text = await res.text();
-        if (text.includes('registrado')) showFieldError('err-email', 'Este correo ya está registrado');
-        else showToastError(text || 'Error al registrar usuario');
+        if (data.error?.includes('registrado')) showFieldError('err-email', data.error);
+        else showToastError(data.error || 'Error al enviar el código. Intenta de nuevo.');
       }
     } catch {
       showToastError('Error de conexión. Inténtalo de nuevo.');

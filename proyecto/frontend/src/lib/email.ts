@@ -167,24 +167,35 @@ async function enviarWhatsAppGreenApi(telefono: string, mensaje: string): Promis
     return;
   }
 
-  // Green-API requiere solo dígitos + "@c.us"  (ej: "573001234567@c.us")
+  // chatId: solo dígitos + "@c.us" (ej: "573016445715@c.us")
   const chatId = telefono.replace(/\D/g, '') + '@c.us';
 
-  // El subdominio es los primeros 4 dígitos del instanceId (ej: 7107650362 → 7107.api.green-api.com)
-  const subdomain = instanceId.slice(0, 4);
-  const url = `https://${subdomain}.api.green-api.com/waInstance${instanceId}/sendMessage/${token}`;
+  // GREEN_API_HOST puede configurarse explícitamente (ej: https://7103.api.green-api.com)
+  // Si no está definido, se deriva de los primeros 4 dígitos del instanceId
+  const host = process.env.GREEN_API_HOST
+    ?? `https://${instanceId.slice(0, 4)}.api.green-api.com`;
+  const url = `${host}/waInstance${instanceId}/sendMessage/${token}`;
 
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chatId, message: mensaje }),
-  });
+  console.log(`[Green-API] Enviando a ${chatId} via ${host}`);
 
-  if (!resp.ok) {
-    const err = await resp.text();
-    console.error('[Green-API] Error:', err);
-    throw new Error('Error enviando mensaje de WhatsApp');
+  let resp: Response;
+  try {
+    resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chatId, message: mensaje }),
+    });
+  } catch (e: any) {
+    console.error('[Green-API] Error de red:', e.message);
+    throw new Error('No se pudo conectar con Green-API. Verifica que la instancia esté activa.');
   }
+
+  const respText = await resp.text();
+  if (!resp.ok) {
+    console.error(`[Green-API] HTTP ${resp.status}: ${respText}`);
+    throw new Error(`Green-API respondió con error ${resp.status}. Verifica que la instancia esté autorizada (QR escaneado).`);
+  }
+  console.log('[Green-API] Enviado correctamente:', respText);
 }
 
 export async function enviarSmsTelefono(
