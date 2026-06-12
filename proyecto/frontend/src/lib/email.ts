@@ -163,7 +163,12 @@ async function enviarConResend(to: string, subject: string, html: string): Promi
       html,
     }),
   });
-  if (!resp.ok) console.error('[Resend] Error:', await resp.text());
+  const resBody = await resp.text();
+  if (!resp.ok) {
+    console.error(`[Resend] HTTP ${resp.status}:`, resBody);
+    throw new Error(`Resend error ${resp.status}: ${resBody}`);
+  }
+  console.log('[Resend] Enviado OK a', to);
 }
 
 export async function enviarNotificacionCreacion(
