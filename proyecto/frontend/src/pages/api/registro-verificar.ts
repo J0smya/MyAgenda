@@ -78,13 +78,8 @@ export const POST: APIRoute = async ({ request }) => {
       exp: Date.now() + 10 * 60 * 1000,
     });
 
-    const sinSmtp = !process.env.SMTP_USER || !process.env.SMTP_PASS;
-    if (sinSmtp) {
-      console.warn(`\n[DEV] OTP para ${email}: ${otp}\n`);
-    } else {
-      try { await enviarOtpEmail(email.trim(), otp); }
-      catch (e: any) { console.error('[registro] Error email OTP:', e.message); }
-    }
+    try { await enviarOtpEmail(email.trim(), otp); }
+    catch (e: any) { console.error('[registro] Error email OTP:', e.message); }
 
     return json({ ok: true, regToken: token });
   }

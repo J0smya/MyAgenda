@@ -4,7 +4,7 @@ import type { APIRoute } from 'astro';
 import { pool } from '../../lib/db';
 import bcrypt from 'bcryptjs';
 import { createHmac } from 'crypto';
-import { enviarOtpEmail, enviarSmsTelefono, enviarOtpWhatsApp } from '../../lib/email';
+import { enviarOtpEmail } from '../../lib/email';
 
 // ── Clave de firma (misma que sesion.ts) ─────────────────────────────────────
 const SECRET = process.env.SESSION_SECRET ?? 'myagenda-dev-secret-2026';
@@ -141,26 +141,8 @@ export const POST: APIRoute = async ({ request }) => {
     const otp      = Math.floor(100000 + Math.random() * 900000).toString();
     const newToken = crearOtpToken(idUsuario, otp);
 
-    const sinSmtp       = !process.env.SMTP_USER || !process.env.SMTP_PASS;
-    const sinGreenApi   = !process.env.GREEN_API_INSTANCE_ID || !process.env.GREEN_API_TOKEN;
-
-    // Enviar por el canal elegido
-    if (metodo === 'email') {
-      if (sinSmtp) {
-        console.warn(`\n⚠️  [DEV] Sin SMTP configurado. Código para ${emailUsuario}: ${otp}\n`);
-      } else {
-        try { await enviarOtpEmail(emailUsuario, otp); }
-        catch (e: any) { console.error('Error enviando email OTP:', e.message); }
-      }
-    } else {
-      // canal 'sms' y 'whatsapp' ambos van por WhatsApp (Green-API gratuito)
-      if (sinGreenApi) {
-        console.warn(`\n⚠️  [DEV] Sin Green-API configurado. Código para ${telefonoUsuario}: ${otp}\n`);
-      } else {
-        try { await enviarOtpWhatsApp(telefonoUsuario!, otp); }
-        catch (e: any) { console.error('Error enviando WhatsApp OTP:', e.message); }
-      }
-    }
+    try { await enviarOtpEmail(emailUsuario, otp); }
+    catch (e: any) { console.error('Error enviando email OTP:', e.message); }
 
     return json({ ok: true, otpToken: newToken, destino });
   }
