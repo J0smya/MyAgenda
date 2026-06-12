@@ -1,15 +1,16 @@
 import nodemailer from 'nodemailer';
 
+function getSmtpConfig() {
+  const host = process.env.SMTP_HOST ?? (import.meta.env.SMTP_HOST as string | undefined) ?? 'smtp.gmail.com';
+  const port = parseInt(process.env.SMTP_PORT ?? (import.meta.env.SMTP_PORT as string | undefined) ?? '465');
+  const user = process.env.SMTP_USER ?? (import.meta.env.SMTP_USER as string | undefined) ?? '';
+  const pass = process.env.SMTP_PASS ?? (import.meta.env.SMTP_PASS as string | undefined) ?? '';
+  return { host, port, user, pass, secure: port === 465 };
+}
+
 function crearTransporter() {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER || '',
-      pass: process.env.SMTP_PASS || '',
-    },
-  });
+  const { host, port, user, pass, secure } = getSmtpConfig();
+  return nodemailer.createTransport({ host, port, secure, auth: { user, pass } });
 }
 
 export async function enviarOtpTelefono(
@@ -66,20 +67,14 @@ export async function enviarOtpEmail(
   email: string,
   codigo: string
 ): Promise<void> {
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
+  const { user: smtpUser, pass: smtpPass } = getSmtpConfig();
 
   if (!smtpUser || !smtpPass) {
     console.warn(`[DEV] SMTP no configurado. OTP para ${email}: ${codigo}`);
     return;
   }
 
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST ?? 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT ?? '587'),
-    secure: false,
-    auth: { user: smtpUser, pass: smtpPass },
-  });
+  const transporter = crearTransporter();
 
   await transporter.sendMail({
     from: `"My Agenda" <${smtpUser}>`,
@@ -151,20 +146,14 @@ export async function enviarRecordatorioEmail(
     minutos_antes: number;
   }
 ): Promise<void> {
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
+  const { user: smtpUser, pass: smtpPass } = getSmtpConfig();
 
   if (!smtpUser || !smtpPass) {
     console.warn(`[DEV] Recordatorio para ${email}: "${tarea.titulo}" (SMTP no configurado)`);
     return;
   }
 
-  const transporter = nodemailer.createTransport({
-    host:   process.env.SMTP_HOST  ?? 'smtp.gmail.com',
-    port:   parseInt(process.env.SMTP_PORT ?? '587'),
-    secure: false,
-    auth:   { user: smtpUser, pass: smtpPass },
-  });
+  const transporter = crearTransporter();
 
   const fecha     = tarea.fecha_inicio ? tarea.fecha_inicio.toString().slice(0, 10) : 'Sin fecha';
   const hora      = tarea.hora_inicio  ? tarea.hora_inicio.toString().slice(0, 5)   : 'Sin hora';
