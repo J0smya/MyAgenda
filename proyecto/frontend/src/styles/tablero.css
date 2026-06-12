@@ -3988,7 +3988,7 @@ body {
 
   .db-main { width: 100%; min-width: 0; }
 
-  .db-header { padding: 10px 14px; gap: 8px; flex-wrap: nowrap; }
+  .db-header { padding: 10px 14px; gap: 8px; }
 
   .db-sidebar-toggle {
     display: flex;
@@ -4058,12 +4058,14 @@ body.dark-mode .db-crear-opt { color: #e2e8f0; }
   /* ── Main: ancho completo ── */
   .db-main { width: 100%; min-width: 0; }
 
-  /* ── Header ── */
-  .db-header { padding: 10px 14px; gap: 8px; }
-  .db-header-left { gap: 8px; }
-  .db-header-right { gap: 6px; }
-  .db-header-right .db-view-btn span { display: none; }
-  .db-date-title { font-size: 15px !important; }
+  /* ── Header: 2 filas en móvil ── */
+  .db-header { padding: 10px 14px; gap: 6px 8px; flex-wrap: wrap; }
+  .db-header-left { flex: 1; min-width: 0; gap: 6px; overflow: hidden; }
+  .db-date-title-wrap { flex: 1; min-width: 0; overflow: hidden; }
+  .db-date-title { font-size: 14px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .db-header-right { width: 100%; gap: 6px; justify-content: space-between; }
+  .db-view-tabs { flex: 1; }
+  .db-crear-wrap { flex-shrink: 0; }
 
   /* ── Botón Nueva Tarea ── */
   .db-btn-crear-main span { display: none; }

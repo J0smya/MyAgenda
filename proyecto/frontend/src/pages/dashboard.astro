@@ -931,7 +931,7 @@ import '../styles/noteEditor.css';
   }
  
   let allTasks:    Tarea[]               = [];
-  let currentView: 'dia'|'semana'|'mes'  = (localStorage.getItem('conf_vista') as any) || 'dia';
+  let currentView: 'dia'|'semana'|'mes'  = (localStorage.getItem('conf_vista') as any) || 'mes';
   let viewDate      = new Date();
   let selectedTaskId: any                = null;
   let notaHtml      = '';
