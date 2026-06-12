@@ -563,6 +563,25 @@ import '../styles/noteEditor.css';
     </div>
   </div>
 
+  <!-- MODAL CONFLICTO DE HORARIO -->
+  <div id="modal-conflicto-hora" class="db-conflicto-backdrop">
+    <div class="db-conflicto-box">
+      <div class="db-conflicto-icon-wrap">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <circle cx="12" cy="16" r=".5" fill="currentColor" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <h3 class="db-conflicto-titulo">Tu agenda está llena para esta hora</h3>
+      <p class="db-conflicto-sub">Ya tienes una tarea programada a la misma hora y fecha. ¿Seguro que quieres guardar de todas formas?</p>
+      <div class="db-conflicto-actions">
+        <button id="conflicto-btn-no"  class="db-conflicto-btn-cancel">Cancelar</button>
+        <button id="conflicto-btn-si" class="db-conflicto-btn-ok">Sí, guardar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MINI MODAL: ¿Qué quieres crear? (doble click en día) -->
   <div id="modal-quick-create" class="db-modal-backdrop" style="z-index:510;display:none;">
     <div class="db-qc-box">
@@ -842,6 +861,59 @@ import '../styles/noteEditor.css';
   display:inline-flex; align-items:center; gap:4px; letter-spacing:.01em;
 }
 .db-tasks-panel-item-rec svg { flex-shrink:0; }
+
+/* ── Modal conflicto de horario ─────────────────────────── */
+.db-conflicto-backdrop {
+  display:none; position:fixed; inset:0; z-index:620;
+  background:rgba(15,23,42,0.52); backdrop-filter:blur(5px);
+  align-items:center; justify-content:center;
+}
+.db-conflicto-backdrop.open { display:flex; }
+@keyframes conflicto-in {
+  from { opacity:0; transform:scale(.8) translateY(20px); }
+  to   { opacity:1; transform:scale(1)  translateY(0); }
+}
+@keyframes conflicto-pulse {
+  0%,100% { box-shadow:0 0 0 0 rgba(249,115,22,.30); }
+  50%     { box-shadow:0 0 0 12px rgba(249,115,22,0); }
+}
+.db-conflicto-box {
+  background:#fff; border-radius:22px; padding:36px 28px 26px;
+  max-width:360px; width:90%; text-align:center;
+  box-shadow:0 28px 70px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.04);
+  animation:conflicto-in .34s cubic-bezier(.34,1.56,.64,1) both;
+}
+.db-conflicto-icon-wrap {
+  width:64px; height:64px; border-radius:50%;
+  background:#fff7ed; border:2px solid #fed7aa;
+  display:inline-flex; align-items:center; justify-content:center;
+  margin-bottom:18px;
+  animation:conflicto-pulse 1.6s ease-in-out infinite;
+}
+.db-conflicto-icon-wrap svg { stroke:#f97316; }
+.db-conflicto-titulo {
+  font-size:16.5px; font-weight:800; color:#0f172a; margin:0 0 10px;
+  line-height:1.3;
+}
+.db-conflicto-sub {
+  font-size:13px; color:#64748b; line-height:1.6; margin:0 0 26px;
+}
+.db-conflicto-actions { display:flex; gap:10px; }
+.db-conflicto-btn-cancel {
+  flex:1; padding:13px; border-radius:12px;
+  border:1.5px solid #e2e8f0; background:#f8fafc;
+  color:#64748b; font-size:14px; font-weight:600;
+  cursor:pointer; transition:all .15s;
+}
+.db-conflicto-btn-cancel:hover { background:#f1f5f9; border-color:#cbd5e1; color:#475569; }
+.db-conflicto-btn-ok {
+  flex:1; padding:13px; border-radius:12px;
+  border:none; background:#f97316;
+  color:#fff; font-size:14px; font-weight:700;
+  cursor:pointer; transition:all .15s;
+  box-shadow:0 4px 14px rgba(249,115,22,.35);
+}
+.db-conflicto-btn-ok:hover { background:#ea6c0a; box-shadow:0 6px 18px rgba(249,115,22,.45); }
 </style>
 
 </Layout>
@@ -1187,6 +1259,31 @@ import '../styles/noteEditor.css';
       okBtn.addEventListener('click',    onOk,       { once: true });
       cancelBtn.addEventListener('click', onNo,       { once: true });
       modal.addEventListener('click',    onBackdrop, { once: true });
+    });
+  }
+
+  function hayConflictoHorario(fecha: string, hora: string, excludeId?: any): boolean {
+    return allTasks.some(t =>
+      t.fecha === fecha &&
+      t.hora  === hora  &&
+      t.estado !== 'completada' &&
+      (!excludeId || String(t.id) !== String(excludeId))
+    );
+  }
+
+  function mostrarConflictoHorario(): Promise<boolean> {
+    return new Promise(resolve => {
+      const modal = document.getElementById('modal-conflicto-hora') as HTMLElement;
+      const btnSi = document.getElementById('conflicto-btn-si') as HTMLButtonElement;
+      const btnNo = document.getElementById('conflicto-btn-no') as HTMLButtonElement;
+      modal.classList.add('open');
+      function cleanup(val: boolean) {
+        modal.classList.remove('open');
+        resolve(val);
+      }
+      btnSi.addEventListener('click', () => cleanup(true),  { once: true });
+      btnNo.addEventListener('click', () => cleanup(false), { once: true });
+      modal.addEventListener('click', e => { if (e.target === modal) cleanup(false); }, { once: true });
     });
   }
 
@@ -1599,6 +1696,17 @@ import '../styles/noteEditor.css';
  
       // ── MODO CREAR ──
       if (notaHtml){payload.nota_contenido=notaHtml;payload.nota_titulo=notaTitulo;}
+
+      // Verificar conflicto de horario
+      if (horaInput && hayConflictoHorario(fechaInput, horaInput)) {
+        const proceder = await mostrarConflictoHorario();
+        if (!proceder) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Guardar tarea';
+          return;
+        }
+      }
+
       // Con recurrencia
       if (recConfig.activo) {
         const recPayload={
