@@ -2261,17 +2261,39 @@ import '../styles/noteEditor.css';
     cell.classList.add('db-month-day--selected');
   });
 
+  // dblclick en desktop
   container.addEventListener('dblclick', e => {
     if (currentView !== 'mes') return;
     const cell = (e.target as HTMLElement).closest<HTMLElement>('.db-month-day');
     if (!cell || !cell.dataset.date) return;
-    qcFechaSeleccionada = cell.dataset.date;
-    // Formatear fecha legible
+    abrirQCenCelda(cell);
+  });
+
+  // doble toque en móvil
+  let _lastTap = 0;
+  let _lastCell: HTMLElement | null = null;
+  container.addEventListener('touchend', e => {
+    if (currentView !== 'mes') return;
+    const cell = (e.target as HTMLElement).closest<HTMLElement>('.db-month-day');
+    if (!cell || !cell.dataset.date) return;
+    const now = Date.now();
+    if (now - _lastTap < 350 && _lastCell === cell) {
+      e.preventDefault();
+      abrirQCenCelda(cell);
+      _lastTap = 0;
+    } else {
+      _lastTap = now;
+      _lastCell = cell;
+    }
+  }, { passive: false });
+
+  function abrirQCenCelda(cell: HTMLElement) {
+    qcFechaSeleccionada = cell.dataset.date!;
     const [fy, fm, fd] = qcFechaSeleccionada.split('-').map(Number);
     const fechaLabel = new Date(fy, fm-1, fd).toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
     document.getElementById('qc-date-label')!.textContent = fechaLabel.replace(/^\w/, c=>c.toUpperCase());
     modalQC.style.display = 'flex';
-  });
+  }
 
   modalQC.addEventListener('click', e => { if (e.target === modalQC) cerrarModalQC(); });
 
