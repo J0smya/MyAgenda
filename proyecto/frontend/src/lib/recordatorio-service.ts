@@ -1,5 +1,5 @@
 import { pool } from './db';
-import { enviarRecordatorioEmail } from './email';
+import { enviarRecordatorioVencimiento } from './email';
 
 export async function procesarRecordatorios(): Promise<number> {
   const { rows: tareas } = await pool.query(`
@@ -25,13 +25,11 @@ export async function procesarRecordatorios(): Promise<number> {
   let enviados = 0;
   for (const tarea of tareas) {
     try {
-      await enviarRecordatorioEmail(tarea.email, {
-        titulo:        tarea.titulo,
-        descripcion:   tarea.descripcion,
-        fecha_inicio:  tarea.fecha_inicio,
-        hora_inicio:   tarea.hora_inicio,
-        prioridad:     tarea.prioridad,
-        minutos_antes: tarea.recordatorio_minutos ?? 60,
+      await enviarRecordatorioVencimiento(tarea.email, {
+        titulo:       tarea.titulo,
+        fecha_inicio: tarea.fecha_inicio,
+        hora_inicio:  tarea.hora_inicio,
+        prioridad:    tarea.prioridad,
       });
       await pool.query(
         `UPDATE public.tarea SET recordatorio_enviado = TRUE WHERE id_tarea = $1`,

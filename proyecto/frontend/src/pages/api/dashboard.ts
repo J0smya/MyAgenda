@@ -3,6 +3,7 @@ export const prerender = false;
 import type { APIRoute } from "astro";
 import { pool } from "../../lib/db";
 import { obtenerTokenDeCookie, obtenerSesion } from "../../lib/sesion";
+import { enviarNotificacionCreacion } from "../../lib/email";
 
 // ── Helper: obtener id_usuario desde la cookie de sesión ──────────────────────
 async function getUsuarioId(request: Request): Promise<string | null> {
@@ -22,8 +23,11 @@ function noAutorizado() {
 
 // --- POST: CREAR TAREA (vinculada al usuario autenticado) --------------------
 export const POST: APIRoute = async ({ request }) => {
-  const idUsuario = await getUsuarioId(request);
-  if (!idUsuario) return noAutorizado();
+  const token   = obtenerTokenDeCookie(request.headers.get("cookie"));
+  const sesion  = token ? await obtenerSesion(token) : null;
+  if (!sesion?.id_usuario) return noAutorizado();
+  const idUsuario   = sesion.id_usuario;
+  const emailUsuario = sesion.email ?? null;
 
   const client = await pool.connect();
   try {
@@ -67,6 +71,16 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     await client.query("COMMIT");
+
+    if (emailUsuario) {
+      enviarNotificacionCreacion(emailUsuario, {
+        titulo:      nuevaTarea.titulo,
+        fecha_inicio: nuevaTarea.fecha_inicio,
+        hora_inicio:  nuevaTarea.hora_inicio,
+        prioridad:    nuevaTarea.prioridad,
+      }).catch((e: any) => console.error("[email creación]", e.message));
+    }
+
     return new Response(
       JSON.stringify({ success: true, tarea: nuevaTarea }),
       { status: 200, headers: { "Content-Type": "application/json" } }
