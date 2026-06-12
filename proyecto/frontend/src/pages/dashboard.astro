@@ -426,43 +426,49 @@ import '../styles/noteEditor.css';
  
   <!-- MODAL FILTRO -->
   <div id="modal-filtro" class="db-modal-backdrop" style="z-index:230;">
-    <div class="db-filtro-modal-box">
-      <!-- Cabecera -->
-      <div class="db-filtro-modal-head">
-        <div class="db-filtro-modal-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="16" y2="6"/><line x1="4" y1="12" x2="12" y2="12"/><line x1="4" y1="18" x2="8" y2="18"/><circle cx="19" cy="6" r="3"/><circle cx="17" cy="12" r="3"/><circle cx="15" cy="18" r="3"/></svg>
+    <div class="fm-card">
+
+      <div class="fm-header">
+        <div class="fm-header-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+          </svg>
         </div>
         <div>
-          <h3 class="db-filtro-modal-titulo" id="filtro-modal-titulo">Nuevo filtro</h3>
-          <p class="db-filtro-modal-sub">Organiza tus tareas por categoría</p>
+          <h3 class="fm-header-title" id="filtro-modal-titulo">Nuevo filtro</h3>
+          <p class="fm-header-sub">Organiza tus tareas por categoría</p>
         </div>
       </div>
 
-      <div class="db-filtro-modal-body">
-        <!-- Nombre -->
-        <div class="db-filtro-field">
-          <label class="db-filtro-label-text">Nombre</label>
-          <input type="text" id="fi-nombre" class="db-input" placeholder="Ej: Urgente, Casa, Gym…" maxlength="30">
+      <div class="fm-body">
+        <div class="fm-field">
+          <label class="fm-label">Nombre del filtro</label>
+          <input type="text" id="fi-nombre" class="fm-input" placeholder="Ej: Urgente, Casa, Trabajo…" maxlength="30" autocomplete="off">
         </div>
 
-        <!-- Colores preset -->
-        <div class="db-filtro-field">
-          <label class="db-filtro-label-text">Color</label>
-          <div id="fi-colores" class="db-filtro-colores"></div>
+        <div class="fm-field">
+          <label class="fm-label">Color</label>
+          <div id="fi-colores" class="fm-color-grid"></div>
         </div>
 
-        <!-- Color personalizado -->
-        <div class="db-filtro-custom-color">
+        <label class="fm-picker-row">
           <input type="color" id="fi-color-custom" value="#0ea5e9">
-          <span>Color personalizado</span>
-        </div>
-
-        <!-- Acciones -->
-        <div class="db-filtro-actions">
-          <button id="fi-guardar" class="db-btn-submit" style="margin:0;">Guardar filtro</button>
-          <button id="fi-cancelar" class="db-filtro-btn-cancel">Cancelar</button>
-        </div>
+          <div class="fm-picker-info">
+            <span class="fm-picker-title">Color personalizado</span>
+            <span class="fm-picker-hint">Toca para elegir cualquier color</span>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#94a3b8;flex-shrink:0;margin-left:auto;"><polyline points="9 18 15 12 9 6"/></svg>
+        </label>
       </div>
+
+      <div class="fm-footer">
+        <button id="fi-cancelar" class="fm-btn-ghost">Cancelar</button>
+        <button id="fi-guardar" class="fm-btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Guardar filtro
+        </button>
+      </div>
+
     </div>
   </div>
  
