@@ -1,4 +1,4 @@
----
+﻿---
 // src/pages/dashboard.astro
 import Layout from "../layouts/Layout.astro";
 import NoteEditor from "../components/noteEditor.astro";
@@ -33,6 +33,13 @@ import '../styles/noteEditor.css';
         <span>Pendientes</span>
         <span id="pendientes-count-badge" class="db-pendientes-count-badge" style="display:none"></span>
       </button>
+      <button id="btn-completadas" class="db-sidebar-completadas-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span>Completadas</span>
+        <span id="completadas-count-badge" class="db-completadas-count-badge" style="display:none"></span>
+      </button>
       <button id="btn-ver-notas" class="db-sidebar-notes-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -43,9 +50,6 @@ import '../styles/noteEditor.css';
         <span>Notas</span>
         <span id="notas-count-badge" class="db-notes-count-badge" style="display:none"></span>
       </button>
-      <div class="db-sidebar-perfil-wrap">
-        <Perfil />
-      </div>
       <button id="btn-ver-archivos" class="db-sidebar-archivos-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
@@ -53,6 +57,9 @@ import '../styles/noteEditor.css';
         <span>Archivos</span>
         <span id="archivos-count-badge" class="db-archivos-count-badge" style="display:none"></span>
       </button>
+      <div class="db-sidebar-perfil-wrap">
+        <Perfil />
+      </div>
     </div>
   </aside>
 
@@ -365,7 +372,7 @@ import '../styles/noteEditor.css';
   <div id="modal-serie-accion" class="db-modal-backdrop" style="z-index:215;">
     <div class="db-view-modal-box" style="max-width:380px;">
       <div style="text-align:center;margin-bottom:16px;">
-        <div style="font-size:32px;margin-bottom:8px;">🔄</div>
+        <div style="width:44px;height:44px;border-radius:12px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
         <h3 id="serie-accion-titulo" style="font-size:16px;font-weight:700;color:#111827;margin:0 0 6px;"></h3>
         <p id="serie-accion-desc" style="font-size:13px;color:#6b7280;margin:0;"></p>
       </div>
@@ -469,6 +476,75 @@ import '../styles/noteEditor.css';
     </div>
   </div>
  
+  <!-- MODAL PENDIENTES -->
+  <div id="modal-pendientes-lista" class="db-tasks-panel-backdrop">
+    <div class="db-tasks-panel-box">
+      <div class="db-tasks-panel-header">
+        <div class="db-tasks-panel-header-left">
+          <span class="db-tasks-panel-icon db-tasks-panel-icon--pendiente">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </span>
+          <div>
+            <h2 class="db-tasks-panel-title">Pendientes</h2>
+            <p id="pendientes-panel-count" class="db-tasks-panel-sub"></p>
+          </div>
+        </div>
+        <button id="pendientes-panel-close" class="db-tasks-panel-close" title="Cerrar">✕</button>
+      </div>
+      <div id="pendientes-panel-body" class="db-tasks-panel-body">
+        <p class="db-tasks-panel-loading">Cargando…</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL COMPLETADAS -->
+  <div id="modal-completadas-lista" class="db-tasks-panel-backdrop">
+    <div class="db-tasks-panel-box">
+      <div class="db-tasks-panel-header">
+        <div class="db-tasks-panel-header-left">
+          <span class="db-tasks-panel-icon db-tasks-panel-icon--completada">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </span>
+          <div>
+            <h2 class="db-tasks-panel-title">Completadas</h2>
+            <p id="completadas-panel-count" class="db-tasks-panel-sub"></p>
+          </div>
+        </div>
+        <button id="completadas-panel-close" class="db-tasks-panel-close" title="Cerrar">✕</button>
+      </div>
+      <div id="completadas-panel-body" class="db-tasks-panel-body">
+        <p class="db-tasks-panel-loading">Cargando…</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMACIÓN PERSONALIZADO -->
+  <div id="modal-confirmar" class="db-modal-backdrop" style="z-index:270;">
+    <div class="db-confirm-box">
+      <div class="db-confirm-icon" id="confirm-icon"></div>
+      <p class="db-confirm-msg" id="confirm-msg"></p>
+      <div class="db-confirm-actions">
+        <button id="confirm-ok" class="db-btn-submit">Confirmar</button>
+        <button id="confirm-cancel" class="db-btn-cancel" style="width:auto;padding:11px 20px;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ALERTA PERSONALIZADO -->
+  <div id="modal-alerta" class="db-modal-backdrop" style="z-index:275;">
+    <div class="db-confirm-box">
+      <div class="db-confirm-icon" id="alerta-icon"></div>
+      <p class="db-confirm-msg" id="alerta-msg"></p>
+      <div class="db-confirm-actions">
+        <button id="alerta-ok" class="db-btn-submit" style="max-width:160px;">Entendido</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast-container"></div>
   <NoteEditor />
 </div>
@@ -549,16 +625,108 @@ import '../styles/noteEditor.css';
 .db-dia-btn:hover { border-color:#6ee7b7;background:#f0fdf4; }
 .db-dia-btn.activo { background:#059669;border-color:#059669;color:#fff; }
 
-/* ── Preview chips ── */
+/* ── Preview chips (próximas fechas) ── */
 .db-rec-preview-wrap {
-  display:flex;flex-wrap:wrap;gap:5px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
   padding:10px 12px;background:#fff;border-radius:10px;
-  border:1px solid #d1fae5;min-height:38px;align-items:center;
+  border:1px solid #d1fae5;
 }
 .db-rec-preview-chip {
-  padding:3px 9px;background:#ecfdf5;border:1px solid #bbf7d0;
-  border-radius:20px;font-size:11px;font-weight:600;color:#059669;
+  padding:6px 0;background:#ecfdf5;border:1px solid #bbf7d0;
+  border-radius:8px;font-size:11px;font-weight:700;color:#059669;
+  text-align:center;
 }
+.db-rec-preview-extra {
+  grid-column:1/-1;font-size:11px;color:#9ca3af;font-weight:600;
+  text-align:center;padding:2px 0;
+}
+
+/* ── Confirm / Alerta modal ── */
+.db-confirm-box {
+  background:#fff;border-radius:20px;padding:28px 24px 22px;
+  max-width:340px;width:90%;display:flex;flex-direction:column;align-items:center;gap:14px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.18);
+}
+.db-confirm-icon { font-size:34px;line-height:1; }
+.db-confirm-msg {
+  font-size:14px;font-weight:600;color:#1f2937;text-align:center;
+  line-height:1.5;margin:0;
+}
+.db-confirm-actions { display:flex;gap:10px;width:100%;justify-content:center;margin-top:4px; }
+
+/* ── Modales independientes: Pendientes / Completadas ── */
+.db-tasks-panel-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.28);
+  z-index: 260;
+  align-items: flex-end;
+  justify-content: center;
+}
+@media (min-width: 600px) {
+  .db-tasks-panel-backdrop { align-items: center; justify-content: flex-end; }
+}
+.db-tasks-panel-backdrop.open { display: flex; }
+.db-tasks-panel-box {
+  background: #fff;
+  width: 100%;
+  max-width: 420px;
+  height: 100%;
+  max-height: 90dvh;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.14);
+  overflow: hidden;
+  animation: panelSlideUp .22s cubic-bezier(.22,1,.36,1);
+}
+@media (min-width: 600px) {
+  .db-tasks-panel-box {
+    max-height: 100%;
+    border-radius: 0;
+    box-shadow: -8px 0 40px rgba(0,0,0,0.12);
+    animation: panelSlideIn .22s cubic-bezier(.22,1,.36,1);
+  }
+}
+@keyframes panelSlideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes panelSlideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+.db-tasks-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid #f3f4f6;
+  flex-shrink: 0;
+}
+.db-tasks-panel-header-left { display:flex; align-items:center; gap:12px; }
+.db-tasks-panel-icon {
+  width:38px; height:38px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.db-tasks-panel-icon--pendiente { background:#fff7ed; color:#ea580c; }
+.db-tasks-panel-icon--completada { background:#f0fdf4; color:#16a34a; }
+.db-tasks-panel-title { font-size:15px; font-weight:800; color:#111827; margin:0; }
+.db-tasks-panel-sub  { font-size:11px; font-weight:600; color:#9ca3af; margin:2px 0 0; }
+.db-tasks-panel-close {
+  width:32px; height:32px; border-radius:8px;
+  border:1.5px solid #e5e7eb; background:#fff;
+  color:#6b7280; font-size:14px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:all .15s;
+}
+.db-tasks-panel-close:hover { background:#fef2f2; border-color:#fca5a5; color:#ef4444; }
+.db-tasks-panel-body {
+  flex:1; overflow-y:auto; padding:14px 16px;
+  display:flex; flex-direction:column; gap:10px;
+  background:#edf0f5;
+}
+.db-tasks-panel-loading { text-align:center; color:#9ca3af; font-size:13px; padding:24px 0; }
 
 /* ── Task card & series ── */
 .db-task-card-rec {
@@ -574,6 +742,64 @@ import '../styles/noteEditor.css';
 .db-serie-btn.peligro { background:#fff5f5;color:#ef4444;border-color:#fecaca; }
 .db-serie-btn.peligro:hover { background:#fef2f2; }
 </style>
+
+<style is:global>
+@keyframes db-card-in {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.db-tasks-panel-empty {
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+  padding:60px 16px; color:#9ca3af; font-size:13px; font-weight:600; text-align:center;
+}
+.db-tasks-panel-empty-icon {
+  width:56px; height:56px; border-radius:18px; display:flex; align-items:center;
+  justify-content:center; background:#fff; border:1.5px dashed #d1d5db;
+}
+.db-tasks-panel-item {
+  display:flex; align-items:stretch; gap:0;
+  border-radius:14px; border:2px solid #d1d5db; background:#ffffff;
+  cursor:pointer; transition:border-color .18s, box-shadow .18s, transform .18s;
+  text-align:left; width:100%; overflow:hidden;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+  animation:db-card-in .28s ease-out both;
+}
+.db-tasks-panel-item:hover {
+  border-color:#818cf8;
+  box-shadow:0 8px 24px rgba(99,102,241,0.20);
+  transform:translateY(-3px);
+}
+.db-tasks-panel-accent { width:6px; flex-shrink:0; }
+.db-tasks-panel-info { flex:1; min-width:0; padding:13px 15px 12px; }
+.db-tasks-panel-item-title {
+  font-size:15px; font-weight:800; color:#0f172a; letter-spacing:-.02em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.3;
+  margin-bottom:3px;
+}
+.db-tasks-panel-item-cat {
+  font-size:11px; font-weight:600; color:#94a3b8; margin-bottom:9px;
+  display:flex; align-items:center; gap:4px;
+}
+.db-tasks-panel-item-cat-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.db-tasks-panel-item-divider { height:1px; background:#f1f5f9; margin:6px 0; }
+.db-tasks-panel-item-meta { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.db-tasks-panel-item-fecha {
+  font-size:11.5px; color:#64748b; font-weight:600;
+  display:flex; align-items:center; gap:4px;
+}
+.db-tasks-panel-item-fecha svg { flex-shrink:0; opacity:.7; }
+.db-tasks-panel-item-prio {
+  font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:20px;
+  text-transform:capitalize; letter-spacing:.03em; border:1.5px solid transparent;
+}
+.db-tasks-panel-item-rec {
+  font-size:10.5px; font-weight:700; color:#6366f1;
+  background:#eef2ff; border:1.5px solid #c7d2fe; padding:3px 8px; border-radius:20px;
+  display:inline-flex; align-items:center; gap:4px; letter-spacing:.01em;
+}
+.db-tasks-panel-item-rec svg { flex-shrink:0; }
+</style>
+
 </Layout>
  
 <script>
@@ -602,7 +828,6 @@ import '../styles/noteEditor.css';
   const FILTROS_KEY = 'myagenda_filtros';
   let filtros: Filtro[] = [];
   let filtroEditandoId: string | null = null;
-  let mostrarSoloPendientes = false;
   let colorSeleccionado = '#0ea5e9';
   const COLORES_PRESET = ['#0ea5e9','#6366f1','#f59e0b','#ef4444','#10b981','#8b5cf6','#f97316','#ec4899','#14b8a6','#64748b'];
  
@@ -686,9 +911,9 @@ import '../styles/noteEditor.css';
       btn.addEventListener('click', e => { e.stopPropagation(); abrirModalFiltro(btn.dataset.id); })
     );
     lista.querySelectorAll<HTMLButtonElement>('.db-filtro-btn.del').forEach(btn =>
-      btn.addEventListener('click', e => {
+      btn.addEventListener('click', async e => {
         e.stopPropagation();
-        if (confirm('¿Eliminar este filtro?')) {
+        if (await confirmar('¿Eliminar este filtro?', true)) {
           filtros = filtros.filter(x=>x.id!==btn.dataset.id);
           guardarFiltros(); renderFiltros(); render();
         }
@@ -745,7 +970,7 @@ import '../styles/noteEditor.css';
   });
   document.getElementById('fi-guardar')?.addEventListener('click', ()=>{
     const nombre=(document.getElementById('fi-nombre') as HTMLInputElement).value.trim();
-    if (!nombre) { alert('Ingresa un nombre.'); return; }
+    if (!nombre) { mostrarInfo('Ingresa un nombre para el filtro.', 'info'); return; }
     if (filtroEditandoId) {
       const f=filtros.find(x=>x.id===filtroEditandoId);
       if (f) { f.nombre=nombre; f.color=colorSeleccionado; }
@@ -861,15 +1086,15 @@ import '../styles/noteEditor.css';
  
   function generarPreviewRec() {
     const fechaBase = (document.getElementById('t-fecha') as HTMLInputElement)?.value;
-    if (!fechaBase) { recPreview.innerHTML='<span style="font-size:11px;color:#9ca3af;">Selecciona fecha primero</span>'; return; }
+    if (!fechaBase) { recPreview.innerHTML='<span style="font-size:11px;color:#9ca3af;grid-column:1/-1;text-align:center;">Selecciona fecha primero</span>'; return; }
     const fechas = calcularFechasPreview(fechaBase);
-    if (!fechas.length) { recPreview.innerHTML='<span style="font-size:11px;color:#9ca3af;">Sin fechas</span>'; return; }
-    const SHOW=5;
+    if (!fechas.length) { recPreview.innerHTML='<span style="font-size:11px;color:#9ca3af;grid-column:1/-1;text-align:center;">Sin fechas</span>'; return; }
+    const SHOW=6;
     const chips=fechas.slice(0,SHOW).map(f=>{
       const d=new Date(f+'T00:00:00');
       return `<span class="db-rec-preview-chip">${d.toLocaleDateString('es-ES',{day:'2-digit',month:'short'})}</span>`;
     }).join('');
-    const extra=fechas.length>SHOW?`<span style="font-size:11px;color:#9ca3af;padding:3px 8px;">+${fechas.length-SHOW} más</span>`:'';
+    const extra=fechas.length>SHOW?`<span class="db-rec-preview-extra">+${fechas.length-SHOW} más</span>`:'';
     recPreview.innerHTML=chips+extra;
   }
  
@@ -888,6 +1113,65 @@ import '../styles/noteEditor.css';
     recPreview.innerHTML='';
   }
  
+  /* ─────────────────── DIÁLOGOS PERSONALIZADOS ─────────────────── */
+  function confirmar(msg: string, peligro = false): Promise<boolean> {
+    return new Promise(resolve => {
+      const modal     = document.getElementById('modal-confirmar')!;
+      const msgEl     = document.getElementById('confirm-msg')!;
+      const iconEl    = document.getElementById('confirm-icon')!;
+      const okBtn     = document.getElementById('confirm-ok') as HTMLButtonElement;
+      const cancelBtn = document.getElementById('confirm-cancel') as HTMLButtonElement;
+
+      msgEl.textContent  = msg;
+      iconEl.innerHTML = peligro
+        ? `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`
+        : `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+      okBtn.className    = peligro ? 'db-btn-delete' : 'db-btn-submit';
+      okBtn.style.cssText = 'max-width:160px;';
+      modal.classList.add('open');
+
+      const cleanup = () => {
+        modal.classList.remove('open');
+        okBtn.removeEventListener('click', onOk);
+        cancelBtn.removeEventListener('click', onNo);
+        modal.removeEventListener('click', onBackdrop);
+      };
+      const onOk       = () => { cleanup(); resolve(true); };
+      const onNo       = () => { cleanup(); resolve(false); };
+      const onBackdrop = (e: Event) => { if (e.target === modal) { cleanup(); resolve(false); } };
+
+      okBtn.addEventListener('click',    onOk,       { once: true });
+      cancelBtn.addEventListener('click', onNo,       { once: true });
+      modal.addEventListener('click',    onBackdrop, { once: true });
+    });
+  }
+
+  function mostrarInfo(msg: string, tipo: 'error'|'ok'|'info' = 'info') {
+    const modal  = document.getElementById('modal-alerta')!;
+    const msgEl  = document.getElementById('alerta-msg')!;
+    const iconEl = document.getElementById('alerta-icon')!;
+    const okBtn  = document.getElementById('alerta-ok') as HTMLButtonElement;
+
+    msgEl.textContent  = msg;
+    iconEl.innerHTML = tipo === 'error'
+      ? `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`
+      : tipo === 'ok'
+      ? `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+      : `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+    modal.classList.add('open');
+
+    const cleanup = () => {
+      modal.classList.remove('open');
+      okBtn.removeEventListener('click', onOk);
+      modal.removeEventListener('click', onBackdrop);
+    };
+    const onOk       = () => cleanup();
+    const onBackdrop = (e: Event) => { if (e.target === modal) cleanup(); };
+
+    okBtn.addEventListener('click',  onOk,       { once: true });
+    modal.addEventListener('click',  onBackdrop, { once: true });
+  }
+
   /* ─────────────────── TOASTS ─────────────────── */
   function reproducirSonido(tipo:'ahora'|'antes') {
     if (localStorage.getItem('conf_sonido')==='false') return;
@@ -908,7 +1192,10 @@ import '../styles/noteEditor.css';
     const toast = document.createElement('div');
     toast.className=`toast-notif toast-${tipo}`;
     toast.innerHTML=`
-      <div class="toast-icon-wrap">${tipo==='ahora'?'🔴':'🔔'}</div>
+      <div class="toast-icon-wrap">${tipo==='ahora'
+        ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" stroke-width="0"><circle cx="12" cy="12" r="10"/></svg>`
+        : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`
+      }</div>
       <div class="toast-body">
         <div class="toast-label">${label}</div>
         <div class="toast-title">${titulo}</div>
@@ -1181,7 +1468,6 @@ import '../styles/noteEditor.css';
   /* ─────────────────── SUBMIT TAREA ─────────────────── */
   taskForm.addEventListener('submit', async e=>{
     e.preventDefault();
-    const res= await fetch('/api/dashboard');
     const submitBtn=document.getElementById('btn-submit-tarea') as HTMLButtonElement;
     submitBtn.disabled=true; submitBtn.textContent='Guardando...';
  
@@ -1190,8 +1476,8 @@ import '../styles/noteEditor.css';
     const fechaInput=(document.getElementById('t-fecha') as HTMLInputElement).value;
     const horaInput=(document.getElementById('t-hora-inicio') as HTMLInputElement).value||null;
  
-    if (!fechaInput){alert('Selecciona una fecha.');submitBtn.disabled=false;submitBtn.textContent=modoEdicion?'Guardar cambios':'Guardar tarea';return;}
-    if (usaRecordatorio&&!horaInput){alert('Para activar el recordatorio debes asignar una hora.');submitBtn.disabled=false;submitBtn.textContent=modoEdicion?'Guardar cambios':'Guardar tarea';return;}
+    if (!fechaInput){mostrarInfo('Selecciona una fecha.','info');submitBtn.disabled=false;submitBtn.textContent=modoEdicion?'Guardar cambios':'Guardar tarea';return;}
+    if (usaRecordatorio&&!horaInput){mostrarInfo('Para activar el recordatorio debes asignar una hora.','info');submitBtn.disabled=false;submitBtn.textContent=modoEdicion?'Guardar cambios':'Guardar tarea';return;}
  
     const payload: Record<string,any> = {
       titulo:      (document.getElementById('t-titulo')    as HTMLInputElement).value,
@@ -1235,7 +1521,7 @@ import '../styles/noteEditor.css';
         if(data.success){
           closeModalTarea(); resetRecurrencia();
           mostrarToast(`Serie creada (${data.tareas?.length||''} instancias)`,'','antes');
-          await load(); actualizarBadgeNotas();
+          activarPendientes(); await load(); actualizarBadgeNotas();
         } else throw new Error(data.message||data.error);
         return;
       }
@@ -1243,14 +1529,14 @@ import '../styles/noteEditor.css';
       const res=await fetch('/api/dashboard',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
       const data=await res.json();
       if(data.success){
-        closeModalTarea(); resetNota(); await load(); actualizarBadgeNotas();
+        closeModalTarea(); resetNota(); activarPendientes(); await load(); actualizarBadgeNotas();
         if(usaRecordatorio&&horaInput){
           const nt:Tarea={id:data.tarea.id_tarea,titulo:payload.titulo,descripcion:payload.descripcion,fecha:payload.fecha,hora:horaInput,prioridad:payload.prioridad,categoria:payload.categoria};
           programarRecordatorio(nt,minutosAntes);
           mostrarToast('Recordatorio activado',`"${payload.titulo}" · ${minutosAntes>=60?minutosAntes/60+'h':minutosAntes+'min'} antes`,'antes');
         }
       } else throw new Error(data.message||data.error);
-    } catch(err:any){alert(`Error: ${err.message}`);}
+    } catch(err:any){mostrarInfo(`Error: ${(err as any).message}`,'error');}
     finally{submitBtn.disabled=false;submitBtn.textContent=modoEdicion?'Guardar cambios':'Guardar tarea';}
   });
  
@@ -1259,9 +1545,7 @@ import '../styles/noteEditor.css';
   modalView.addEventListener('click',(e)=>{ if(e.target===modalView) modalView.classList.remove('open'); });
   document.getElementById('btn-view-pendientes')?.addEventListener('click',()=>{
     modalView.classList.remove('open');
-    mostrarSoloPendientes = true;
-    document.getElementById('btn-pendientes')?.classList.add('activo');
-    render();
+    abrirPanelTareas('pendiente');
   });
  
   (window as any).verDetalle = (id:string)=>{
@@ -1269,7 +1553,7 @@ import '../styles/noteEditor.css';
     const t=allTasks.find(x=>String(x.id)===String(id)); if(!t) return;
     const filtro=filtros.find(f=>f.id===t.categoria);
     const prioColor=t.prioridad==='alta'?'#ef4444':t.prioridad==='media'?'#f59e0b':'#0ea5e9';
-    const recBadge=t.es_recurrente?`<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#059669;background:#ecfdf5;border:1px solid #bbf7d0;border-radius:20px;padding:2px 10px;">🔄 Recurrente</span>`:'';
+    const recBadge=t.es_recurrente?`<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#059669;background:#ecfdf5;border:1px solid #bbf7d0;border-radius:20px;padding:2px 10px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Recurrente</span>`:'';
     viewContent.innerHTML=`
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
         <span class="db-view-cat" style="background:${filtro?.color+'20'||'#f0f9ff'};color:${filtro?.color||'#0ea5e9'}">${t.categoria}</span>
@@ -1301,7 +1585,7 @@ import '../styles/noteEditor.css';
       const r=await fetch('/api/dashboard',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_tarea:selectedTaskId,estado:nuevoEstado})});
       const data=await r.json();
       if(data.success){ modalView.classList.remove('open'); await load(); }
-      else alert(data.message||data.error||'Error al actualizar');
+      else mostrarInfo(data.message||data.error||'Error al actualizar','error');
     }catch(err){console.error(err);}
   });
  
@@ -1323,7 +1607,7 @@ import '../styles/noteEditor.css';
       abrirSerieAccion('eliminar',t.id_serie,selectedTaskId,null);
       return;
     }
-    if(confirm('¿Eliminar esta tarea?')){
+    if(await confirmar('¿Eliminar esta tarea?', true)){
       try{
         const res=await fetch(`/api/dashboard?id=${selectedTaskId}`,{method:'DELETE'});
         const data=await res.json();
@@ -1331,7 +1615,7 @@ import '../styles/noteEditor.css';
           const key=String(selectedTaskId);
           if(recordatoriosActivos.has(key)){recordatoriosActivos.get(key)!.forEach(clearTimeout);recordatoriosActivos.delete(key);}
           modalView.classList.remove('open'); await load(); actualizarBadgeNotas();
-        } else alert(data.message||data.error||'Error al eliminar');
+        } else mostrarInfo(data.message||data.error||'Error al eliminar','error');
       }catch(err){console.error(err);}
     }
   });
@@ -1365,12 +1649,12 @@ import '../styles/noteEditor.css';
       } else if (payload) {
         const res=await fetch('/api/dashboard',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_tarea:idTarea,modo:'este',...payload})});
         const data=await res.json();
-        if(data.success) await load(); else alert(data.message||'Error al editar');
+        if(data.success) await load(); else mostrarInfo(data.message||'Error al editar','error');
       }
     });
  
     document.getElementById('sb-serie')?.addEventListener('click', async ()=>{
-      const conf = accion==='eliminar' ? confirm('¿Eliminar TODA la serie? Esta acción no se puede deshacer.') : true;
+      const conf = accion==='eliminar' ? await confirmar('¿Eliminar TODA la serie? Esta acción no se puede deshacer.', true) : true;
       if (!conf) return;
       modalSerieAcc.classList.remove('open');
       if (accion==='eliminar') {
@@ -1379,7 +1663,7 @@ import '../styles/noteEditor.css';
       } else if (payload) {
         const res=await fetch('/api/dashboard',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_tarea:idTarea,modo:'serie',...payload})});
         const data=await res.json();
-        if(data.success) await load(); else alert(data.message||'Error al editar');
+        if(data.success) await load(); else mostrarInfo(data.message||'Error al editar','error');
       }
     });
  
@@ -1426,7 +1710,7 @@ import '../styles/noteEditor.css';
       });
       notasListaBody.querySelectorAll<HTMLButtonElement>('.nota-card-btn--del').forEach(btn=>{
         btn.addEventListener('click',async()=>{
-          if(!confirm('¿Eliminar esta nota?'))return;
+          if(!(await confirmar('¿Eliminar esta nota?', true)))return;
           const r=await fetch('/api/noteEditor',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_nota:btn.dataset.id})});
           if((await r.json()).success) await cargarTodasLasNotas();
         });
@@ -1438,24 +1722,24 @@ import '../styles/noteEditor.css';
     neEditor.innerHTML=''; neTitleInput.value=''; neWords.textContent='0 palabras';
     modalNota.classList.add('ne-open'); setTimeout(()=>neEditor.focus(),150);
   });
-  document.getElementById('btn-pendientes')?.addEventListener('click',()=>{
-    mostrarSoloPendientes = !mostrarSoloPendientes;
-    const btn = document.getElementById('btn-pendientes');
-    btn?.classList.toggle('activo', mostrarSoloPendientes);
-    render();
-  });
+  document.getElementById('btn-pendientes')?.addEventListener('click',()=>abrirPanelTareas('pendiente'));
+  document.getElementById('btn-completadas')?.addEventListener('click',()=>abrirPanelTareas('completada'));
+  document.getElementById('pendientes-panel-close')?.addEventListener('click',()=>cerrarPanelTareas('pendiente'));
+  document.getElementById('completadas-panel-close')?.addEventListener('click',()=>cerrarPanelTareas('completada'));
+  document.getElementById('modal-pendientes-lista')?.addEventListener('click',e=>{ if(e.target===e.currentTarget) cerrarPanelTareas('pendiente'); });
+  document.getElementById('modal-completadas-lista')?.addEventListener('click',e=>{ if(e.target===e.currentTarget) cerrarPanelTareas('completada'); });
   document.getElementById('btn-ver-notas')?.addEventListener('click',async()=>{modalNotasLista.classList.add('open');await cargarTodasLasNotas();});
   document.getElementById('notas-lista-close')?.addEventListener('click',()=>modalNotasLista.classList.remove('open'));
   modalNotasLista?.addEventListener('click',e=>{if(e.target===modalNotasLista) modalNotasLista.classList.remove('open');});
  
   /* ─────────────────── MODAL ARCHIVOS ─────────────────── */
   function iconoArchivo(tipo:string):string {
-    if(tipo.startsWith('image/')) return '🖼️';
-    if(tipo.startsWith('video/')) return '🎬';
-    if(tipo.startsWith('audio/')) return '🎵';
-    if(tipo.includes('pdf'))      return '📄';
-    if(tipo.includes('zip')||tipo.includes('rar')) return '🗜️';
-    return '📎';
+    if(tipo.startsWith('image/')) return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+    if(tipo.startsWith('video/')) return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`;
+    if(tipo.startsWith('audio/')) return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`;
+    if(tipo.includes('pdf'))      return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`;
+    if(tipo.includes('zip')||tipo.includes('rar')) return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>`;
+    return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
   }
   function formatSize(b:number):string {
     if(b<1024) return `${b} B`;
@@ -1495,11 +1779,11 @@ import '../styles/noteEditor.css';
       }).join('');
       archivosBody.querySelectorAll<HTMLButtonElement>('.archivo-btn--del').forEach(btn=>{
         btn.addEventListener('click',async()=>{
-          if(!confirm('¿Eliminar este archivo?'))return;
+          if(!(await confirmar('¿Eliminar este archivo?', true)))return;
           try{
             const r=await fetch('/api/archivo',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_archivo:btn.dataset.id})});
             if((await r.json()).success) await cargarTodosLosArchivos();
-          }catch{alert('Error al eliminar archivo');}
+          }catch{mostrarInfo('Error al eliminar archivo','error');}
         });
       });
     } catch{archivosBody.innerHTML='<p class="archivos-empty">Error al cargar archivos.</p>';}
@@ -1513,7 +1797,7 @@ import '../styles/noteEditor.css';
  
   async function subirArchivo(file:File) {
     const idTarea=(document.getElementById('archivo-tarea-select') as HTMLSelectElement).value;
-    if(!idTarea){alert('Selecciona una tarea para asociar el archivo.');return;}
+    if(!idTarea){mostrarInfo('Selecciona una tarea para asociar el archivo.','info');return;}
     progressWrap.classList.remove('hidden'); progressFill.style.width='10%'; progressText.textContent='Subiendo…';
     const fd=new FormData(); fd.append('archivo',file); fd.append('id_tarea',idTarea);
     try{
@@ -1551,35 +1835,112 @@ import '../styles/noteEditor.css';
     try{
       const r=await fetch('/api/dashboard'); const d=await r.json();
       if(d.success){
-        allTasks=d.tareas.map((t:any)=>({
+        const mapped=d.tareas.map((t:any)=>({
           id:t.id_tarea, titulo:t.titulo, descripcion:t.descripcion,
           fecha:t.fecha_inicio?new Date(t.fecha_inicio).toISOString().split('T')[0]:'',
           hora:t.hora_inicio, prioridad:t.prioridad, categoria:t.categoria||'personal',
           estado:t.estado||'pendiente',
           es_recurrente:t.es_recurrente||false, id_serie:t.id_serie||null,
         }));
+        const seen=new Set<string>();
+        allTasks=mapped.filter((t:Tarea)=>{ const k=String(t.id); if(seen.has(k)) return false; seen.add(k); return true; });
         render();
       }
     }catch(e){console.error(e);}
   }
  
+  function activarPendientes() {
+    abrirPanelTareas('pendiente');
+  }
+
+  /* ─────────────────── PANELES PENDIENTES / COMPLETADAS ─────────────────── */
+  function abrirPanelTareas(estado: 'pendiente'|'completada') {
+    const modalId = estado==='pendiente' ? 'modal-pendientes-lista' : 'modal-completadas-lista';
+    document.getElementById(modalId)?.classList.add('open');
+    renderPanelTareas(estado);
+  }
+
+  function cerrarPanelTareas(estado: 'pendiente'|'completada') {
+    const modalId = estado==='pendiente' ? 'modal-pendientes-lista' : 'modal-completadas-lista';
+    document.getElementById(modalId)?.classList.remove('open');
+  }
+
+  function renderPanelTareas(estado: 'pendiente'|'completada') {
+    const bodyId   = estado==='pendiente' ? 'pendientes-panel-body'  : 'completadas-panel-body';
+    const countId  = estado==='pendiente' ? 'pendientes-panel-count' : 'completadas-panel-count';
+    const body  = document.getElementById(bodyId);
+    const count = document.getElementById(countId);
+    if (!body) return;
+
+    const lista = allTasks.filter(t=>t.estado===estado)
+      .sort((a,b)=>{ if(!a.fecha) return 1; if(!b.fecha) return -1; return a.fecha.localeCompare(b.fecha); });
+
+    if (count) count.textContent = `${lista.length} tarea${lista.length!==1?'s':''}`;
+
+    if (!lista.length) {
+      const svgIcon = estado==='pendiente'
+        ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`
+        : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+      const txt = estado==='pendiente' ? 'No hay tareas pendientes' : 'No hay tareas completadas';
+      body.innerHTML=`<div class="db-tasks-panel-empty"><div class="db-tasks-panel-empty-icon">${svgIcon}</div><span>${txt}</span></div>`;
+      return;
+    }
+
+    const prioConfig: Record<string,{bg:string;color:string;border:string}> = {
+      alta:  { bg:'#fef2f2', color:'#dc2626', border:'#fecaca' },
+      media: { bg:'#fffbeb', color:'#d97706', border:'#fde68a' },
+      baja:  { bg:'#f0fdf4', color:'#16a34a', border:'#bbf7d0' },
+    };
+
+    body.innerHTML = lista.map((t,i)=>{
+      const filtro = filtros.find(f=>f.id===t.categoria);
+      const accentColor = filtro ? filtro.color : (t.prioridad==='alta'?'#ef4444':t.prioridad==='media'?'#f59e0b':'#22c55e');
+      const catNombre = filtro ? filtro.nombre : t.categoria;
+      const pc = prioConfig[t.prioridad] ?? prioConfig.media;
+      const fecha = t.fecha ? new Date(t.fecha+'T00:00:00').toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}) : 'Sin fecha';
+      const recBadge = t.es_recurrente
+        ? `<span class="db-tasks-panel-item-rec"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>repetir</span>`
+        : '';
+      return `<div class="db-tasks-panel-item" style="animation-delay:${i*45}ms" onclick="window.verDetalle('${t.id}');window.cerrarPanelExt('${estado}')">
+        <span class="db-tasks-panel-accent" style="background:${accentColor}"></span>
+        <div class="db-tasks-panel-info">
+          <div class="db-tasks-panel-item-title">${t.titulo}</div>
+          <div class="db-tasks-panel-item-cat">
+            <span class="db-tasks-panel-item-cat-dot" style="background:${accentColor}"></span>
+            ${catNombre}
+          </div>
+          <div class="db-tasks-panel-item-divider"></div>
+          <div class="db-tasks-panel-item-meta">
+            <span class="db-tasks-panel-item-fecha">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+              ${fecha}
+            </span>
+            <span class="db-tasks-panel-item-prio" style="background:${pc.bg};color:${pc.color};border-color:${pc.border}">${t.prioridad}</span>
+            ${recBadge}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  (window as any).cerrarPanelExt = (estado: string) => cerrarPanelTareas(estado as 'pendiente'|'completada');
+
   function render() {
     const activos=filtros.filter(f=>f.activo).map(f=>f.id);
-    const filtered=allTasks.filter(t=>
-      activos.includes(t.categoria) &&
-      (!mostrarSoloPendientes || t.estado === 'pendiente')
-    );
-    // Actualizar badge de pendientes
-    const totalPendientes = allTasks.filter(t => t.estado === 'pendiente').length;
+    const filtered=allTasks.filter(t=>activos.includes(t.categoria));
+    // Badges
+    const totalPendientes  = allTasks.filter(t => t.estado === 'pendiente').length;
+    const totalCompletadas = allTasks.filter(t => t.estado === 'completada').length;
     const badge = document.getElementById('pendientes-count-badge');
-    if (badge) {
-      badge.textContent = String(totalPendientes);
-      badge.style.display = totalPendientes > 0 ? '' : 'none';
-    }
+    if (badge) { badge.textContent=String(totalPendientes); badge.style.display=totalPendientes>0?'inline-flex':'none'; }
+    const badgeC = document.getElementById('completadas-count-badge');
+    if (badgeC) { badgeC.textContent=String(totalCompletadas); badgeC.style.display=totalCompletadas>0?'inline-flex':'none'; }
     document.querySelectorAll<HTMLElement>('.db-view-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.v===currentView));
     if(currentView==='dia') renderDia(filtered);
     else if(currentView==='semana') renderSemana(filtered);
     else renderMes(filtered);
+    if(document.getElementById('modal-pendientes-lista')?.classList.contains('open')) renderPanelTareas('pendiente');
+    if(document.getElementById('modal-completadas-lista')?.classList.contains('open')) renderPanelTareas('completada');
   }
  
   function getColorTarea(t:Tarea):string {
@@ -1636,7 +1997,7 @@ import '../styles/noteEditor.css';
   // GT-86: badge recurrente en tarjeta
   function crearCard(t:Tarea):string {
     const color=getColorTarea(t);
-    const recBadge=t.es_recurrente?`<div class="db-task-card-rec">🔄 recurrente</div>`:'';
+    const recBadge=t.es_recurrente?`<div class="db-task-card-rec"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:3px"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>recurrente</div>`:'';
     return `<div onclick="window.verDetalle('${t.id}')" class="db-task-card" style="background:${color}">
       <div class="db-task-card-time">${t.hora||'Todo el día'}</div>
       <div class="db-task-card-title">${t.titulo}</div>
@@ -1696,7 +2057,7 @@ import '../styles/noteEditor.css';
       etiquetasList.querySelectorAll('.btn-eliminar-etiqueta').forEach(btn=>{
         btn.addEventListener('click',async()=>{
           const d=(btn as HTMLElement).dataset;
-          if(!confirm(`¿Eliminar "${d.nombre}"?`))return;
+          if(!(await confirmar(`¿Eliminar ${d.nombre}?`, true)))return;
           const r=await fetch('/api/etiquetas',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_etiqueta:d.id})});
           const rd=await r.json();
           if(rd.success){toastEtiqueta(`"${d.nombre}" eliminada`,true);await cargarEtiquetas();}

@@ -70,8 +70,9 @@ async function tablaRecurrenciaExiste(): Promise<boolean> {
 
 // ─── POST ─────────────────────────────────────────────────────────────────
 export const POST: APIRoute = async ({ request }) => {
-  const client = await pool.connect();
+  let client: any;
   try {
+    client = await pool.connect();
     const body = await request.json();
 
     if (!body.titulo?.trim())
@@ -122,14 +123,15 @@ export const POST: APIRoute = async ({ request }) => {
       for (let i = 0; i < fechas.length; i++) {
         const { rows: [tarea] } = await client.query(
           `INSERT INTO public.tarea
-             (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion)
-           VALUES ($1,$2,$3,$4,$5,'pendiente',NOW()) RETURNING *`,
+             (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, categoria, fecha_creacion)
+           VALUES ($1,$2,$3,$4,$5,'pendiente',$6,NOW()) RETURNING *`,
           [
             body.titulo.trim(),
             body.descripcion?.trim() || "",
             fechas[i],
-            body.hora      || null,
-            body.prioridad || "media",
+            body.hora       || null,
+            body.prioridad  || "media",
+            body.categoria  || "personal",
           ]
         );
 
@@ -139,7 +141,7 @@ export const POST: APIRoute = async ({ request }) => {
           [serie.id_serie, tarea.id_tarea, i + 1]
         );
 
-        if (i === 0 && body.nota_contenido) {
+        if (body.nota_contenido) {
           await client.query(
             `INSERT INTO public.nota (id_tarea, contenido, fecha_creacion)
              VALUES ($1,$2,NOW())`,
@@ -157,14 +159,15 @@ export const POST: APIRoute = async ({ request }) => {
     // ── Tarea simple ──────────────────────────────────────────────────────
     const { rows: [nuevaTarea] } = await client.query(
       `INSERT INTO public.tarea
-         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion)
-       VALUES ($1,$2,$3,$4,$5,'pendiente',NOW()) RETURNING *`,
+         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, categoria, fecha_creacion)
+       VALUES ($1,$2,$3,$4,$5,'pendiente',$6,NOW()) RETURNING *`,
       [
         body.titulo.trim(),
         body.descripcion?.trim() || "",
-        body.fecha     || null,
-        body.hora      || null,
-        body.prioridad || "media",
+        body.fecha      || null,
+        body.hora       || null,
+        body.prioridad  || "media",
+        body.categoria  || "personal",
       ]
     );
 
@@ -180,11 +183,11 @@ export const POST: APIRoute = async ({ request }) => {
     return res({ success: true, tarea: nuevaTarea });
 
   } catch (error: any) {
-    await client.query("ROLLBACK");
+    try { await client?.query("ROLLBACK"); } catch {}
     console.error("Error al crear tarea:", error.message);
     return res({ success: false, error: error.message }, 500);
   } finally {
-    client.release();
+    client?.release();
   }
 };
 
@@ -196,20 +199,23 @@ export const GET: APIRoute = async () => {
     let result;
     if (hayTablas) {
       result = await pool.query(`
-        SELECT
-          t.*,
-          ri.id_serie,
-          ri.ocurrencia_num,
-          rs.frecuencia,
-          rs.intervalo,
-          rs.fecha_fin   AS serie_fecha_fin,
-          rs.dias_semana AS serie_dias_semana,
-          CASE WHEN ri.id_serie IS NOT NULL THEN TRUE ELSE FALSE END AS es_recurrente
-        FROM public.tarea t
-        LEFT JOIN public.recurrencia_instancia ri ON ri.id_tarea = t.id_tarea
-        LEFT JOIN public.recurrencia_serie      rs ON rs.id_serie = ri.id_serie
-        WHERE t.deleted_at IS NULL
-        ORDER BY t.fecha_creacion DESC
+        SELECT * FROM (
+          SELECT DISTINCT ON (t.id_tarea)
+            t.*,
+            ri.id_serie,
+            ri.ocurrencia_num,
+            rs.frecuencia,
+            rs.intervalo,
+            rs.fecha_fin   AS serie_fecha_fin,
+            rs.dias_semana AS serie_dias_semana,
+            CASE WHEN ri.id_serie IS NOT NULL THEN TRUE ELSE FALSE END AS es_recurrente
+          FROM public.tarea t
+          LEFT JOIN public.recurrencia_instancia ri ON ri.id_tarea = t.id_tarea
+          LEFT JOIN public.recurrencia_serie      rs ON rs.id_serie = ri.id_serie
+          WHERE t.deleted_at IS NULL
+          ORDER BY t.id_tarea, t.fecha_creacion DESC
+        ) sub
+        ORDER BY fecha_creacion DESC
       `);
     } else {
       result = await pool.query(`
@@ -229,8 +235,9 @@ export const GET: APIRoute = async () => {
 
 // ─── PUT ──────────────────────────────────────────────────────────────────
 export const PUT: APIRoute = async ({ request }) => {
-  const client = await pool.connect();
+  let client: any;
   try {
+    client = await pool.connect();
     const body = await request.json();
     const { id_tarea, modo, ...campos } = body;
 
@@ -279,7 +286,8 @@ export const PUT: APIRoute = async ({ request }) => {
            hora_inicio  = COALESCE(NULLIF($3,'')::time without time zone, hora_inicio),
            prioridad    = COALESCE(NULLIF($4,'')::public.prioridad_tarea, prioridad),
            fecha_inicio = COALESCE($5::date, fecha_inicio),
-           estado       = COALESCE(NULLIF($7,'')::public.estado_tarea, estado)
+           estado       = COALESCE(NULLIF($7,'')::public.estado_tarea, estado),
+           categoria    = COALESCE(NULLIF($8,''), categoria)
          WHERE id_tarea = $6`,
         [
           campos.titulo      || null,
@@ -289,6 +297,7 @@ export const PUT: APIRoute = async ({ request }) => {
           campos.fecha       || null,
           id_tarea,
           campos.estado      || null,
+          campos.categoria   || null,
         ]
       );
     }
@@ -297,18 +306,19 @@ export const PUT: APIRoute = async ({ request }) => {
     return res({ success: true, modo: modo ?? "simple" });
 
   } catch (error: any) {
-    await client.query("ROLLBACK");
+    try { await client?.query("ROLLBACK"); } catch {}
     console.error("Error al editar tarea:", error.message);
     return res({ success: false, error: error.message }, 500);
   } finally {
-    client.release();
+    client?.release();
   }
 };
 
 // ─── DELETE ───────────────────────────────────────────────────────────────
 export const DELETE: APIRoute = async ({ url }) => {
-  const client = await pool.connect();
+  let client: any;
   try {
+    client = await pool.connect();
     const id   = url.searchParams.get("id");
     const modo = url.searchParams.get("modo") ?? "simple";
 
@@ -370,10 +380,10 @@ export const DELETE: APIRoute = async ({ url }) => {
     return res({ success: true, message: "Eliminada correctamente." });
 
   } catch (error: any) {
-    await client.query("ROLLBACK");
+    try { await client?.query("ROLLBACK"); } catch {}
     console.error("Error al eliminar tarea:", error.message);
     return res({ success: false, error: error.message }, 500);
   } finally {
-    client.release();
+    client?.release();
   }
 };

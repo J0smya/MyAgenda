@@ -126,12 +126,11 @@ body.dark-mode .config-divider {
    🛠️ CORRECCIÓN DE ICONOS LATERALES (Notas, Archivos, Filtros)
 ========================================= */
 
-/* Aplica texto blanco y fondo oscuro SOLO cuando NO tienes el cursor encima */
-body.dark-mode .db-sidebar button:not(:hover),
-body.dark-mode .btn-estilo-notas:not(:hover) {
-    color: #f8fafc !important; /* Vuelve blancos el texto y los logos */
-    background-color: transparent !important; /* Quita el fondo blanco para que se fusione elegante con la barra */
-    border-color: #334155 !important; /* Borde sutil oscuro */
+/* Aplica texto blanco y fondo oscuro a botones genéricos del sidebar (excluyendo los botones de acción) */
+body.dark-mode .db-sidebar button:not(:hover):not(.db-sidebar-pendientes-btn):not(.db-sidebar-completadas-btn):not(.db-sidebar-notes-btn):not(.db-sidebar-archivos-btn):not(.btn-estilo-notas) {
+    color: #f8fafc !important;
+    background-color: transparent !important;
+    border-color: #334155 !important;
 }
 
 /* Asegura que los íconos SVG sigan la regla del color blanco */
@@ -150,39 +149,87 @@ body.dark-mode .btn-estilo-notas svg {
     stroke: currentColor !important;
 }
 
-/* 2. ESTADO DE REPOSO EN MODO OSCURO (Fondo transparente, texto blanco) */
-body.dark-mode .db-sidebar-notes-btn,
-body.dark-mode .btn-estilo-notas,
+/* 2. ESTADO DE REPOSO EN MODO OSCURO — botones de acción del sidebar con colores propios */
+
+/* Pendientes — ámbar */
+body.dark-mode .db-sidebar-pendientes-btn {
+    background: linear-gradient(135deg, rgba(251,146,60,0.16) 0%, rgba(234,88,12,0.11) 100%) !important;
+    border: 1.5px solid rgba(251,146,60,0.38) !important;
+    color: #fb923c !important;
+    transition: all 0.22s !important;
+}
+body.dark-mode .db-sidebar-pendientes-btn span { color: #fb923c !important; }
+body.dark-mode .db-sidebar-pendientes-btn svg { stroke: #fb923c !important; }
+body.dark-mode .db-sidebar-pendientes-btn:hover {
+    background: linear-gradient(135deg, rgba(251,146,60,0.28) 0%, rgba(234,88,12,0.2) 100%) !important;
+    border-color: rgba(251,146,60,0.6) !important;
+    box-shadow: 0 6px 18px rgba(251,146,60,0.22) !important;
+}
+
+/* Completadas — teal */
+body.dark-mode .db-sidebar-completadas-btn {
+    background: linear-gradient(135deg, rgba(20,184,166,0.16) 0%, rgba(13,148,136,0.11) 100%) !important;
+    border: 1.5px solid rgba(20,184,166,0.38) !important;
+    color: #2dd4bf !important;
+    transition: all 0.22s !important;
+}
+body.dark-mode .db-sidebar-completadas-btn span { color: #2dd4bf !important; }
+body.dark-mode .db-sidebar-completadas-btn svg { stroke: #2dd4bf !important; }
+body.dark-mode .db-sidebar-completadas-btn:hover {
+    background: linear-gradient(135deg, rgba(20,184,166,0.28) 0%, rgba(13,148,136,0.2) 100%) !important;
+    border-color: rgba(20,184,166,0.6) !important;
+    box-shadow: 0 6px 18px rgba(20,184,166,0.22) !important;
+}
+
+/* Notas — verde */
+body.dark-mode .db-sidebar-notes-btn {
+    background: linear-gradient(135deg, rgba(34,197,94,0.16) 0%, rgba(22,163,74,0.11) 100%) !important;
+    border: 1.5px solid rgba(34,197,94,0.38) !important;
+    color: #4ade80 !important;
+    transition: all 0.22s !important;
+}
+body.dark-mode .db-sidebar-notes-btn span { color: #4ade80 !important; }
+body.dark-mode .db-sidebar-notes-btn svg { stroke: #4ade80 !important; }
+body.dark-mode .db-sidebar-notes-btn:hover {
+    background: linear-gradient(135deg, rgba(34,197,94,0.28) 0%, rgba(22,163,74,0.2) 100%) !important;
+    border-color: rgba(34,197,94,0.6) !important;
+    box-shadow: 0 6px 18px rgba(34,197,94,0.2) !important;
+}
+
+/* Archivos — violeta */
+body.dark-mode .db-sidebar-archivos-btn,
 body.dark-mode [class*="archivo"],
 body.dark-mode [id*="archivo"] {
-    background-color: transparent !important;
-    color: #f1f5f9 !important; /* Texto y logo se vuelven blancos limpios */
-    border: 1px solid #334155 !important;
-    transition: all 0.3s ease !important; /* Añade la animación suave a todos */
+    background: linear-gradient(135deg, rgba(168,85,247,0.16) 0%, rgba(147,51,234,0.11) 100%) !important;
+    border: 1.5px solid rgba(168,85,247,0.38) !important;
+    color: #c084fc !important;
+    transition: all 0.22s !important;
 }
-
-/* 3. EFECTOS HOVER EN MODO OSCURO (Iluminación) */
-
-/* Notas -> Iluminación Verde */
-body.dark-mode .db-sidebar-notes-btn:hover {
-    background-color: rgba(34, 197, 94, 0.15) !important;
-    color: #4ade80 !important; /* El texto y el logo cambian a verde juntos */
-    border-color: rgba(34, 197, 94, 0.4) !important;
-}
-
-/* Archivos -> Iluminación Morada */
+body.dark-mode .db-sidebar-archivos-btn span,
+body.dark-mode [class*="archivo"] span { color: #c084fc !important; }
+body.dark-mode .db-sidebar-archivos-btn svg,
+body.dark-mode [class*="archivo"] svg { stroke: #c084fc !important; }
+body.dark-mode .db-sidebar-archivos-btn:hover,
 body.dark-mode [class*="archivo"]:hover,
 body.dark-mode [id*="archivo"]:hover {
-    background-color: rgba(168, 85, 247, 0.15) !important;
-    color: #c084fc !important; /* El texto y el logo cambian a morado juntos */
-    border-color: rgba(168, 85, 247, 0.4) !important;
+    background: linear-gradient(135deg, rgba(168,85,247,0.28) 0%, rgba(147,51,234,0.2) 100%) !important;
+    border-color: rgba(168,85,247,0.6) !important;
+    box-shadow: 0 6px 18px rgba(168,85,247,0.22) !important;
 }
 
-/* Perfil -> Iluminación Azul (Para que tenga el mismo efecto que los otros) */
+/* Perfil — índigo */
+body.dark-mode .btn-estilo-notas {
+    background: rgba(99,102,241,0.13) !important;
+    border: 1.5px solid rgba(99,102,241,0.35) !important;
+    color: #a5b4fc !important;
+    transition: all 0.22s !important;
+}
+body.dark-mode .btn-estilo-notas svg { stroke: #a5b4fc !important; color: #a5b4fc !important; }
 body.dark-mode .btn-estilo-notas:hover {
-    background-color: rgba(14, 165, 233, 0.15) !important;
-    color: #38bdf8 !important; /* El texto y el logo cambian a azul juntos */
-    border-color: rgba(14, 165, 233, 0.4) !important;
+    background: rgba(99,102,241,0.24) !important;
+    border-color: rgba(99,102,241,0.55) !important;
+    color: #c7d2fe !important;
+    box-shadow: 0 6px 18px rgba(99,102,241,0.22) !important;
 }
 
 /* =========================================
@@ -430,3 +477,9 @@ body.dark-mode .g-confirm-title { color: #f1f5f9 !important; }
 body.dark-mode .g-confirm-desc  { color: #94a3b8 !important; }
 body.dark-mode .g-confirm-cancel { background: #334155 !important; color: #94a3b8 !important; }
 body.dark-mode .g-confirm-cancel:hover { background: #475569 !important; }
+
+/* ── Badges de conteo en modo oscuro ── */
+body.dark-mode .db-pendientes-count-badge  { background: rgba(251,146,60,0.18) !important; color: #fb923c !important; border-color: rgba(251,146,60,0.4) !important; }
+body.dark-mode .db-completadas-count-badge { background: rgba(20,184,166,0.18) !important; color: #2dd4bf !important; border-color: rgba(20,184,166,0.4) !important; }
+body.dark-mode .db-notes-count-badge       { background: rgba(34,197,94,0.18) !important;  color: #4ade80 !important; border-color: rgba(34,197,94,0.4) !important; }
+body.dark-mode .db-archivos-count-badge    { background: rgba(168,85,247,0.18) !important; color: #c084fc !important; border-color: rgba(168,85,247,0.4) !important; }
