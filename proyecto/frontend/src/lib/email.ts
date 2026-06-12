@@ -316,10 +316,12 @@ export async function enviarRecordatorioVencimiento(
           <h3 style="color:#0f172a;margin:0 0 14px;font-size:18px;">${tarea.titulo}</h3>
           <p style="margin:6px 0;color:#64748b;font-size:14px;">🕐 Hora: <strong style="color:#0f172a;">${hora}</strong></p>
           <p style="margin:6px 0;color:#64748b;font-size:14px;">⚡ Prioridad: <strong style="color:#0f172a;">${prioridad}</strong></p>
+        </div>
+        <p style="font-size:12px;color:#94a3b8;text-align:center;margin:0;">My Agenda — Tu agenda personal inteligente</p>
       </div>
-      <p style="font-size:12px;color:#94a3b8;text-align:center;margin:0;">My Agenda — Tu agenda personal inteligente</p>
-    </div>
-  `);
+    `,
+  });
+  console.log('[SMTP] Recordatorio enviado a', email);
 }
 
 // ── WhatsApp via Green-API (plan gratuito — green-api.com) ───────────────────
