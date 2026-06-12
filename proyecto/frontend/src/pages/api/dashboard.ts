@@ -40,8 +40,9 @@ export const POST: APIRoute = async ({ request }) => {
 
     const resultTarea = await client.query(
       `INSERT INTO public.tarea
-         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion, id_usuario, categoria)
-       VALUES ($1, $2, $3, $4, $5, 'pendiente', NOW(), $6, $7)
+         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion, id_usuario, categoria,
+          recordatorio_activo, recordatorio_minutos)
+       VALUES ($1, $2, $3, $4, $5, 'pendiente', NOW(), $6, $7, $8, $9)
        RETURNING *`,
       [
         body.titulo.trim(),
@@ -51,6 +52,8 @@ export const POST: APIRoute = async ({ request }) => {
         body.prioridad || "media",
         idUsuario,
         body.categoria || "personal",
+        body.recordatorio_activo ?? false,
+        body.recordatorio_minutos ?? 60,
       ]
     );
     const nuevaTarea = resultTarea.rows[0];
@@ -98,7 +101,9 @@ export const GET: APIRoute = async ({ request }) => {
          prioridad,
          estado,
          fecha_creacion,
-         COALESCE(categoria, 'personal') AS categoria
+         COALESCE(categoria, 'personal') AS categoria,
+         COALESCE(recordatorio_activo, FALSE) AS recordatorio_activo,
+         COALESCE(recordatorio_minutos, 60)   AS recordatorio_minutos
        FROM public.tarea
        WHERE id_usuario  = $1
          AND deleted_at  IS NULL
@@ -127,7 +132,8 @@ export const PUT: APIRoute = async ({ request }) => {
   const client = await pool.connect();
   try {
     const body = await request.json();
-    const { id_tarea, estado, titulo, descripcion, fecha_inicio, hora_inicio, prioridad, categoria } = body;
+    const { id_tarea, estado, titulo, descripcion, fecha_inicio, hora_inicio, prioridad, categoria,
+            recordatorio_activo, recordatorio_minutos } = body;
 
     if (!id_tarea) {
       return new Response(
@@ -150,13 +156,16 @@ export const PUT: APIRoute = async ({ request }) => {
 
     const result = await client.query(
       `UPDATE public.tarea SET
-         estado       = COALESCE($1::estado_tarea, estado),
-         titulo       = COALESCE($2, titulo),
-         descripcion  = COALESCE($3, descripcion),
-         fecha_inicio = COALESCE($4::date, fecha_inicio),
-         hora_inicio  = COALESCE($5::time, hora_inicio),
-         prioridad    = COALESCE($6::prioridad_tarea, prioridad),
-         categoria    = COALESCE($9, categoria)
+         estado               = COALESCE($1::estado_tarea, estado),
+         titulo               = COALESCE($2, titulo),
+         descripcion          = COALESCE($3, descripcion),
+         fecha_inicio         = COALESCE($4::date, fecha_inicio),
+         hora_inicio          = COALESCE($5::time, hora_inicio),
+         prioridad            = COALESCE($6::prioridad_tarea, prioridad),
+         categoria            = COALESCE($9, categoria),
+         recordatorio_activo  = COALESCE($10::boolean, recordatorio_activo),
+         recordatorio_minutos = COALESCE($11::integer, recordatorio_minutos),
+         recordatorio_enviado = CASE WHEN $10::boolean IS NOT NULL THEN FALSE ELSE recordatorio_enviado END
        WHERE id_tarea = $7 AND id_usuario = $8
        RETURNING *`,
       [
@@ -168,7 +177,9 @@ export const PUT: APIRoute = async ({ request }) => {
         prioridad    || null,
         id_tarea,
         idUsuario,
-        categoria    || null,
+        categoria             || null,
+        recordatorio_activo   ?? null,
+        recordatorio_minutos  ?? null,
       ]
     );
 

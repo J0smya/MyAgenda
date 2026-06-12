@@ -1,28 +1,51 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  // CARGAR avatar y nombre guardados
   const avatarVisual = document.getElementById('avatar-visual') as HTMLElement;
   const nombreVisual = document.getElementById('nombre-visual') as HTMLElement;
+  const wrapper      = document.querySelector('.perfil-wrapper') as HTMLElement;
 
-  const fotoGuardada = localStorage.getItem('perfil_foto');
-  const nombreGuardado = localStorage.getItem('perfil_nombre');
+  // Cargar desde el servidor (data attributes) — fuente de verdad por usuario
+  const nombreServidor = wrapper?.dataset.nombre ?? '';
+  const fotoServidor   = wrapper?.dataset.foto   ?? '';
+
+  // Sincronizar localStorage con datos reales del usuario autenticado
+  if (nombreServidor) localStorage.setItem('perfil_nombre', nombreServidor);
+  if (fotoServidor)   localStorage.setItem('perfil_foto',   fotoServidor);
+  else                localStorage.removeItem('perfil_foto');
 
   if (avatarVisual) {
-    if (fotoGuardada) {
-      avatarVisual.style.backgroundImage = `url(${fotoGuardada})`;
-      avatarVisual.style.backgroundSize = 'cover';
+    if (fotoServidor) {
+      avatarVisual.style.backgroundImage    = `url(${fotoServidor})`;
+      avatarVisual.style.backgroundSize     = 'cover';
       avatarVisual.style.backgroundPosition = 'center';
       avatarVisual.textContent = '';
     } else {
-      avatarVisual.textContent = nombreGuardado ? nombreGuardado.charAt(0).toUpperCase() : 'A';
+      avatarVisual.textContent = nombreServidor ? nombreServidor.charAt(0).toUpperCase() : 'A';
     }
   }
 
-  if (nombreVisual && nombreGuardado) {
-    nombreVisual.textContent = nombreGuardado;
+  if (nombreVisual && nombreServidor) {
+    nombreVisual.textContent = nombreServidor;
   }
 
-  // CLICKS
+  function limpiarSesionLocal() {
+    localStorage.removeItem('perfil_foto');
+    localStorage.removeItem('perfil_nombre');
+  }
+
+  // Botón confirmar cambio de cuenta
+  document.getElementById('btn-confirmar-cambio')?.addEventListener('click', () => {
+    limpiarSesionLocal();
+    window.location.href = '/login';
+  });
+
+  // Botón confirmar cerrar sesión
+  document.getElementById('btn-confirmar-cerrar')?.addEventListener('click', () => {
+    limpiarSesionLocal();
+    window.location.href = '/';
+  });
+
+  // CLICKS generales
   document.addEventListener('click', (evento) => {
     const target = evento.target as HTMLElement;
 

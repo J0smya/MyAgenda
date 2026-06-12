@@ -138,6 +138,122 @@ export async function enviarOtpEmail(
   console.log('[SMTP] Enviado OK a', email);
 }
 
+// ── Recordatorio de tarea vía Gmail SMTP ─────────────────────────────────────
+
+export async function enviarRecordatorioEmail(
+  email: string,
+  tarea: {
+    titulo: string;
+    descripcion?: string | null;
+    fecha_inicio?: string | null;
+    hora_inicio?: string | null;
+    prioridad?: string | null;
+    minutos_antes: number;
+  }
+): Promise<void> {
+  const smtpUser = import.meta.env.SMTP_USER ?? process.env.SMTP_USER;
+  const smtpPass = import.meta.env.SMTP_PASS ?? process.env.SMTP_PASS;
+
+  if (!smtpUser || !smtpPass) {
+    console.warn(`[DEV] Recordatorio para ${email}: "${tarea.titulo}" (SMTP no configurado)`);
+    return;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host:   import.meta.env.SMTP_HOST  ?? process.env.SMTP_HOST  ?? 'smtp.gmail.com',
+    port:   parseInt(import.meta.env.SMTP_PORT ?? process.env.SMTP_PORT ?? '587'),
+    secure: false,
+    auth:   { user: smtpUser, pass: smtpPass },
+  });
+
+  const fecha     = tarea.fecha_inicio ? tarea.fecha_inicio.toString().slice(0, 10) : 'Sin fecha';
+  const hora      = tarea.hora_inicio  ? tarea.hora_inicio.toString().slice(0, 5)   : 'Sin hora';
+  const prioridad = tarea.prioridad ?? 'media';
+  const m         = tarea.minutos_antes;
+  const tiempoLabel =
+    m >= 1440 ? `${m / 1440} día${m / 1440 > 1 ? 's' : ''}` :
+    m >= 60   ? `${m / 60} hora${m / 60 > 1 ? 's' : ''}` :
+                `${m} minuto${m > 1 ? 's' : ''}`;
+
+  const prioColor = prioridad === 'alta' ? '#ef4444' : prioridad === 'media' ? '#f59e0b' : '#0ea5e9';
+  const prioLabel = prioridad === 'alta' ? 'Alta' : prioridad === 'media' ? 'Media' : 'Baja';
+
+  const descripcionHtml = tarea.descripcion?.trim()
+    ? `<tr><td style="padding:0 36px 20px;">
+         <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;">Descripción</p>
+         <p style="margin:0;font-size:14px;color:#374151;line-height:1.6;">${tarea.descripcion}</p>
+       </td></tr>`
+    : '';
+
+  await transporter.sendMail({
+    from:    `"My Agenda" <${smtpUser}>`,
+    to:      email,
+    subject: `Recordatorio: ${tarea.titulo}`,
+    html: `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 16px;">
+    <tr><td align="center">
+      <table width="520" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden;max-width:520px;width:100%;">
+        <tr>
+          <td style="background:linear-gradient(135deg,#f59e0b,#ef4444);padding:28px 32px;text-align:center;">
+            <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:rgba(255,255,255,0.85);text-transform:uppercase;letter-spacing:1.5px;">My Agenda</p>
+            <h1 style="margin:0;font-size:20px;font-weight:800;color:#ffffff;">Recordatorio de tarea</h1>
+            <p style="margin:8px 0 0;font-size:13px;color:rgba(255,255,255,0.85);">Tienes una tarea en <strong>${tiempoLabel}</strong></p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:28px 36px 8px;">
+            <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;">Tarea</p>
+            <h2 style="margin:0 0 20px;font-size:22px;font-weight:800;color:#0f172a;line-height:1.3;">${tarea.titulo}</h2>
+          </td>
+        </tr>
+        ${descripcionHtml}
+        <tr>
+          <td style="padding:0 36px 28px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+              <tr>
+                <td style="padding:16px 20px;border-bottom:1px solid #e2e8f0;">
+                  <span style="font-size:12px;color:#64748b;">📅 Fecha</span>
+                  <strong style="display:block;font-size:14px;color:#0f172a;margin-top:2px;">${fecha}</strong>
+                </td>
+                <td style="padding:16px 20px;border-bottom:1px solid #e2e8f0;border-left:1px solid #e2e8f0;">
+                  <span style="font-size:12px;color:#64748b;">🕐 Hora</span>
+                  <strong style="display:block;font-size:14px;color:#0f172a;margin-top:2px;">${hora}</strong>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding:16px 20px;">
+                  <span style="font-size:12px;color:#64748b;">⚡ Prioridad</span>
+                  <span style="display:inline-flex;align-items:center;margin-top:4px;padding:3px 10px;border-radius:20px;font-size:13px;font-weight:700;color:#fff;background:${prioColor};">${prioLabel}</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#fefce8;border-top:1px solid #fde68a;padding:14px 36px;text-align:center;">
+            <p style="margin:0;font-size:13px;color:#854d0e;">
+              ⏱️ Este recordatorio se envió <strong>${tiempoLabel} antes</strong> del evento.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:16px 36px;text-align:center;">
+            <p style="margin:0;font-size:12px;color:#94a3b8;">My Agenda &mdash; Tu agenda personal inteligente</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  });
+
+  console.log('[SMTP] Recordatorio enviado a', email, '—', tarea.titulo);
+}
+
 // ── Notificaciones de tareas (Resend) ────────────────────────────────────────
 
 async function enviarConResend(to: string, subject: string, html: string): Promise<void> {

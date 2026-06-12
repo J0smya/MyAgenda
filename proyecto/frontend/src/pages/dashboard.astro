@@ -924,6 +924,7 @@ import '../styles/noteEditor.css';
     fecha: string; hora: string | null; prioridad: string; categoria: string;
     estado?: string;
     es_recurrente?: boolean; id_serie?: number | null;
+    recordatorio_activo?: boolean; recordatorio_minutos?: number;
   }
   interface Filtro {
     id: string; nombre: string; color: string; activo: boolean;
@@ -1463,6 +1464,13 @@ import '../styles/noteEditor.css';
       // categoria guardada en DB es el nombre del filtro
       (document.getElementById('t-cat') as HTMLSelectElement).value = tarea.categoria || '';
       actualizarDots();
+      const cbRec = document.getElementById('t-usa-recordatorio') as HTMLInputElement;
+      const wRec  = document.getElementById('wrapper-recordatorio')!;
+      const selMin = document.getElementById('t-minutos-antes') as HTMLSelectElement;
+      cbRec.checked = tarea.recordatorio_activo || false;
+      wRec.classList.toggle('hidden', !cbRec.checked);
+      wRec.style.display = cbRec.checked ? 'flex' : 'none';
+      if (tarea.recordatorio_minutos) selMin.value = String(tarea.recordatorio_minutos);
       document.getElementById('recurrencia-wrap')!.style.display = 'none';
     } else {
       modoEdicion    = false;
@@ -1675,6 +1683,8 @@ import '../styles/noteEditor.css';
       fecha:fechaInput, hora:horaInput,
       prioridad:   (document.getElementById('t-prioridad') as HTMLSelectElement).value,
       categoria:   (document.getElementById('t-cat')       as HTMLSelectElement).value,
+      recordatorio_activo:  usaRecordatorio,
+      recordatorio_minutos: usaRecordatorio ? minutosAntes : null,
     };
  
     try {
@@ -1822,7 +1832,7 @@ import '../styles/noteEditor.css';
   });
  
   /* ─────────────────── MODAL SERIE ACCIÓN (GT-87/GT-88) ─────────────────── */
-  function abrirSerieAccion(accion:'editar'|'eliminar', idSerie:number, idTarea:any, payload:Record<string,any>|null) {
+  function abrirSerieAccion(accion:'editar'|'eliminar', _idSerie:number, idTarea:any, payload:Record<string,any>|null) {
     const titulo  = document.getElementById('serie-accion-titulo')!;
     const desc    = document.getElementById('serie-accion-desc')!;
     const btnsDiv = document.getElementById('serie-accion-btns')!;
@@ -2042,6 +2052,8 @@ import '../styles/noteEditor.css';
           hora:t.hora_inicio?t.hora_inicio.slice(0,5):null, prioridad:t.prioridad, categoria:t.categoria||'personal',
           estado:t.estado||'pendiente',
           es_recurrente:t.es_recurrente||false, id_serie:t.id_serie||null,
+          recordatorio_activo:t.recordatorio_activo||false,
+          recordatorio_minutos:t.recordatorio_minutos||60,
         }));
         const seen=new Set<string>();
         allTasks=mapped.filter((t:Tarea)=>{ const k=String(t.id); if(seen.has(k)) return false; seen.add(k); return true; });
