@@ -172,38 +172,79 @@ export async function enviarRecordatorioVencimiento(
   });
 }
 
-export async function enviarSmsTelefono(
-  telefono: string,
-  codigo: string
-): Promise<void> {
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken  = process.env.TWILIO_AUTH_TOKEN;
-  const from       = process.env.TWILIO_PHONE_NUMBER;
+// ── WhatsApp via Green-API (plan gratuito — green-api.com) ───────────────────
+// Registro gratuito en https://green-api.com → crear instancia → escanear QR
+// Variables: GREEN_API_INSTANCE_ID y GREEN_API_TOKEN
 
-  if (!accountSid || !authToken || !from) {
-    console.warn(`[DEV] SMS OTP para ${telefono}: ${codigo} (Twilio no configurado)`);
+async function enviarWhatsAppGreenApi(telefono: string, mensaje: string): Promise<void> {
+  const instanceId = process.env.GREEN_API_INSTANCE_ID;
+  const token      = process.env.GREEN_API_TOKEN;
+
+  if (!instanceId || !token) {
+    console.warn(`[DEV] WhatsApp OTP para ${telefono}: ${mensaje} (GREEN_API no configurado)`);
     return;
   }
 
-  // Twilio REST API — no importamos el SDK para no añadir dependencia
-  const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-  const body = new URLSearchParams({
-    To:   telefono,
-    From: from,
-    Body: `Tu código de verificación de My Agenda es: ${codigo}. Válido por 10 minutos.`,
-  });
+  // Green-API requiere solo dígitos + "@c.us"  (ej: "573001234567@c.us")
+  const chatId = telefono.replace(/\D/g, '') + '@c.us';
+
+  const url = `https://api.green-api.com/waInstance${instanceId}/sendMessage/${token}`;
 
   const resp = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: 'Basic ' + btoa(`${accountSid}:${authToken}`),
-    },
-    body: body.toString(),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chatId, message: mensaje }),
   });
 
   if (!resp.ok) {
     const err = await resp.text();
-    console.error('Twilio SMS error:', err);
+    console.error('[Green-API] Error:', err);
+    throw new Error('Error enviando mensaje de WhatsApp');
   }
+}
+
+export async function enviarSmsTelefono(
+  telefono: string,
+  codigo: string
+): Promise<void> {
+  // SMS (Twilio) eliminado — redirige el canal "sms" a WhatsApp gratuito
+  await enviarOtpWhatsApp(telefono, codigo);
+}
+
+export async function enviarOtpWhatsApp(
+  telefono: string,
+  codigo: string
+): Promise<void> {
+  await enviarWhatsAppGreenApi(
+    telefono,
+    `*My Agenda* — Código de verificación\n\nTu código es: *${codigo}*\n\nVálido por 10 minutos. No lo compartas con nadie.`
+  );
+}
+
+export async function enviarRecordatorioWhatsApp(
+  telefono: string,
+  tarea: { titulo: string; hora_inicio?: string | null; prioridad?: string | null }
+): Promise<void> {
+  const hora      = tarea.hora_inicio ? tarea.hora_inicio.toString().slice(0, 5) : 'sin hora';
+  const prioridad = tarea.prioridad ?? 'media';
+  const nivel     = prioridad === 'alta' ? 'ALTA' : prioridad === 'media' ? 'Media' : 'Baja';
+
+  await enviarWhatsAppGreenApi(
+    telefono,
+    `*My Agenda* — Recordatorio\n\n*${tarea.titulo}*\nHora: ${hora}\nPrioridad: ${nivel}\n\nTienes esta tarea programada para hoy.`
+  );
+}
+
+export async function enviarNotificacionCreacionWhatsApp(
+  telefono: string,
+  tarea: { titulo: string; fecha_inicio?: string | null; hora_inicio?: string | null; prioridad?: string | null }
+): Promise<void> {
+  const fecha     = tarea.fecha_inicio ? tarea.fecha_inicio.toString().slice(0, 10) : 'sin fecha';
+  const hora      = tarea.hora_inicio  ? tarea.hora_inicio.toString().slice(0, 5)   : 'sin hora';
+  const prioridad = tarea.prioridad ?? 'media';
+
+  await enviarWhatsAppGreenApi(
+    telefono,
+    `*My Agenda* — Tarea creada\n\n*${tarea.titulo}*\nFecha: ${fecha}   Hora: ${hora}\nPrioridad: ${prioridad}`
+  );
 }

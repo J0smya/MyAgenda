@@ -4,7 +4,7 @@ import type { APIRoute } from 'astro';
 import { pool } from '../../lib/db';
 import bcrypt from 'bcryptjs';
 import { createHmac } from 'crypto';
-import { enviarOtpEmail, enviarSmsTelefono } from '../../lib/email';
+import { enviarOtpEmail, enviarSmsTelefono, enviarOtpWhatsApp } from '../../lib/email';
 
 // ── Clave de firma (misma que sesion.ts) ─────────────────────────────────────
 const SECRET = process.env.SESSION_SECRET ?? 'myagenda-dev-secret-2026';
@@ -114,7 +114,7 @@ export const POST: APIRoute = async ({ request }) => {
         emailUsuario = res.rows[0].email;
         destino      = enmascararEmail(emailUsuario);
 
-      } else if (metodo === 'sms') {
+      } else if (metodo === 'sms' || metodo === 'whatsapp') {
         if (!telefono?.trim()) return json({ error: 'Ingresa tu número de teléfono' }, 400);
 
         const res = await pool.query(
@@ -130,7 +130,7 @@ export const POST: APIRoute = async ({ request }) => {
         destino         = enmascararTelefono(telefonoUsuario!);
 
       } else {
-        return json({ error: 'Método inválido. Elige "email" o "sms".' }, 400);
+        return json({ error: 'Método inválido. Elige "email", "sms" o "whatsapp".' }, 400);
       }
     } catch (e: any) {
       console.error('[recuperar] Error buscando usuario:', e.message);
@@ -141,10 +141,8 @@ export const POST: APIRoute = async ({ request }) => {
     const otp      = Math.floor(100000 + Math.random() * 900000).toString();
     const newToken = crearOtpToken(idUsuario, otp);
 
-    // ¿Estamos en modo desarrollo? (sin email ni SMS configurados)
-    const sinSmtp   = !process.env.SMTP_USER || !process.env.SMTP_PASS;
-    const sinTwilio = !process.env.TWILIO_ACCOUNT_SID;
-    const esDevMode = sinSmtp && sinTwilio;
+    const sinSmtp       = !process.env.SMTP_USER || !process.env.SMTP_PASS;
+    const sinGreenApi   = !process.env.GREEN_API_INSTANCE_ID || !process.env.GREEN_API_TOKEN;
 
     // Enviar por el canal elegido
     if (metodo === 'email') {
@@ -155,11 +153,12 @@ export const POST: APIRoute = async ({ request }) => {
         catch (e: any) { console.error('Error enviando email OTP:', e.message); }
       }
     } else {
-      if (sinTwilio) {
-        console.warn(`\n⚠️  [DEV] Sin Twilio configurado. Código SMS para ${telefonoUsuario}: ${otp}\n`);
+      // canal 'sms' y 'whatsapp' ambos van por WhatsApp (Green-API gratuito)
+      if (sinGreenApi) {
+        console.warn(`\n⚠️  [DEV] Sin Green-API configurado. Código para ${telefonoUsuario}: ${otp}\n`);
       } else {
-        try { await enviarSmsTelefono(telefonoUsuario!, otp); }
-        catch (e: any) { console.error('Error enviando SMS OTP:', e.message); }
+        try { await enviarOtpWhatsApp(telefonoUsuario!, otp); }
+        catch (e: any) { console.error('Error enviando WhatsApp OTP:', e.message); }
       }
     }
 

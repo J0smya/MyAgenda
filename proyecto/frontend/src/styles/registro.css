@@ -16,19 +16,47 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(145deg, #f0f9ff, #e0f2fe);
+  background: #0a0e28;
   padding: 20px 12px;
   font-family: 'Inter', system-ui, sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.reg-video-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.reg-video-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.reg-video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 14, 40, 0.68) 0%,
+    rgba(15, 8, 50, 0.60) 50%,
+    rgba(10, 14, 40, 0.68) 100%
+  );
 }
 
 .card {
-  background: white;
+  position: relative;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.93);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   width: 100%;
   max-width: 380px;
   border-radius: 24px;
   padding: 28px 24px 24px;
-  box-shadow: 0 20px 50px -10px rgb(0 0 0 / 0.15);
-  border: 1px solid #f1f5f9;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255,255,255,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   max-height: 95vh;
   overflow-y: auto;
 }

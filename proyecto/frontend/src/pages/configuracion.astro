@@ -199,6 +199,25 @@ const fotoPerfil = sesion.foto_perfil ?? '';
             </div>
           </div>
 
+          <!-- VISTA RÁPIDA -->
+          <div class="vista-rapida-section">
+            <p class="vista-rapida-label">Vista rápida del tablero</p>
+            <div class="vista-rapida-chips">
+              <a href="/dashboard" class="vista-chip vista-chip--pendientes">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Pendientes
+              </a>
+              <a href="/dashboard" class="vista-chip vista-chip--completadas">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Completadas
+              </a>
+            </div>
+          </div>
+
         </div>
       </section>
 

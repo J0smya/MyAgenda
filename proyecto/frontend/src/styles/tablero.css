@@ -2755,6 +2755,7 @@ body {
 
 /* ── Estilos base compartidos para todos los botones del sidebar ── */
 .db-sidebar-pendientes-btn,
+.db-sidebar-completadas-btn,
 .db-sidebar-notes-btn,
 .db-sidebar-archivos-btn {
   width: 100%;
@@ -2771,12 +2772,14 @@ body {
 }
 
 .db-sidebar-pendientes-btn:active,
+.db-sidebar-completadas-btn:active,
 .db-sidebar-notes-btn:active,
 .db-sidebar-archivos-btn:active {
   transform: scale(0.97);
 }
 
 .db-sidebar-pendientes-btn svg,
+.db-sidebar-completadas-btn svg,
 .db-sidebar-notes-btn svg,
 .db-sidebar-archivos-btn svg {
   width: 18px;
@@ -2786,6 +2789,7 @@ body {
 }
 
 .db-sidebar-pendientes-btn span,
+.db-sidebar-completadas-btn span,
 .db-sidebar-notes-btn span,
 .db-sidebar-archivos-btn span {
   font-size: 13.5px;
@@ -2812,6 +2816,28 @@ body {
   background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
   border-color: #f97316;
   box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
+}
+
+/* ── Botón Completadas (teal) ── */
+.db-sidebar-completadas-btn {
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  border-color: #99f6e4;
+}
+
+.db-sidebar-completadas-btn span { color: #0f766e; }
+
+.db-sidebar-completadas-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.18);
+  border-color: #5eead4;
+}
+
+.db-sidebar-completadas-btn:hover svg { color: #0d9488; transform: scale(1.1); }
+
+.db-sidebar-completadas-btn.activo {
+  background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
+  border-color: #14b8a6;
+  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.25);
 }
 
 /* ── Botón Notas (verde) ── */
@@ -2848,6 +2874,7 @@ body {
 
 /* ── Badges de conteo ── */
 .db-pendientes-count-badge,
+.db-completadas-count-badge,
 .db-notes-count-badge,
 .db-archivos-count-badge {
   margin-left: auto;
@@ -2862,13 +2889,15 @@ body {
   border: 1.5px solid;
 }
 
-.db-pendientes-count-badge { color: #9a3412; border-color: #fed7aa; }
-.db-notes-count-badge      { color: #166534; border-color: #bbf7d0; }
-.db-archivos-count-badge   { color: #6b21a8; border-color: #e9d5ff; }
+.db-pendientes-count-badge  { color: #9a3412; border-color: #fed7aa; }
+.db-completadas-count-badge { color: #0f766e; border-color: #99f6e4; }
+.db-notes-count-badge       { color: #166534; border-color: #bbf7d0; }
+.db-archivos-count-badge    { color: #6b21a8; border-color: #e9d5ff; }
 
-.db-sidebar-pendientes-btn:hover .db-pendientes-count-badge { background: #f97316; color: white; border-color: #f97316; }
-.db-sidebar-notes-btn:hover     .db-notes-count-badge       { background: #16a34a; color: white; border-color: #16a34a; }
-.db-sidebar-archivos-btn:hover  .db-archivos-count-badge    { background: #9333ea; color: white; border-color: #9333ea; }
+.db-sidebar-pendientes-btn:hover  .db-pendientes-count-badge  { background: #f97316; color: white; border-color: #f97316; }
+.db-sidebar-completadas-btn:hover .db-completadas-count-badge { background: #14b8a6; color: white; border-color: #14b8a6; }
+.db-sidebar-notes-btn:hover       .db-notes-count-badge       { background: #16a34a; color: white; border-color: #16a34a; }
+.db-sidebar-archivos-btn:hover    .db-archivos-count-badge    { background: #9333ea; color: white; border-color: #9333ea; }
 
 /* =============================================
    MODAL ARCHIVOS

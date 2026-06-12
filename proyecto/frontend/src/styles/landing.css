@@ -285,6 +285,110 @@
   border-color: var(--blue);
 }
 
+/* ── VIDEO DE FONDO ── */
+.video-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+}
+.video-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.video-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 14, 40, 0.72) 0%,
+    rgba(20, 10, 60, 0.65) 50%,
+    rgba(10, 14, 40, 0.72) 100%
+  );
+}
+
+/* ── AJUSTES SOBRE VIDEO ── */
+body {
+  background: transparent;
+}
+
+.nav {
+  background: rgba(8, 10, 30, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.nav__brand-text {
+  background: linear-gradient(135deg, #60c8ff 0%, #b78cff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.btn-outline {
+  border-color: rgba(255,255,255,0.55);
+  color: #fff;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(6px);
+}
+.btn-outline:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: #fff;
+  color: #fff;
+}
+
+.hero__title {
+  color: #ffffff;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.35);
+}
+.hero__subtitle {
+  color: rgba(255,255,255,0.72);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%);
+  box-shadow: 0 8px 28px rgba(99,102,241,0.45);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #6d28d9 100%);
+  box-shadow: 0 12px 36px rgba(99,102,241,0.55);
+  transform: translateY(-3px);
+}
+
+.feature-item {
+  color: rgba(255,255,255,0.82);
+}
+.feature-item__icon {
+  border-color: rgba(255,255,255,0.25);
+  color: #fff;
+  background: rgba(255,255,255,0.07);
+}
+.feature-item__icon:hover {
+  border-color: #60c8ff;
+  background: rgba(96,200,255,0.12);
+}
+
+.platforms {
+  position: relative;
+}
+.platforms__label {
+  color: rgba(255,255,255,0.55);
+}
+.badge {
+  border-color: rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(6px);
+}
+.badge:hover {
+  border-color: #60c8ff;
+  color: #fff;
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .nav {

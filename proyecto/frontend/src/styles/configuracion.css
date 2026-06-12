@@ -634,6 +634,69 @@
 
 .dm-chip svg { margin-left: auto; flex-shrink: 0; }
 
+/* ── Vista rápida del tablero ── */
+.vista-rapida-section {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1.5px solid #f1f5f9;
+}
+
+.vista-rapida-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 10px;
+}
+
+.vista-rapida-chips {
+  display: flex;
+  gap: 10px;
+}
+
+.vista-chip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px 10px;
+  border-radius: 14px;
+  border: 1.5px solid transparent;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.vista-chip--pendientes {
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+  border-color: #fed7aa;
+  color: #9a3412;
+}
+
+.vista-chip--pendientes:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(249, 115, 22, 0.18);
+  border-color: #f97316;
+  color: #9a3412;
+}
+
+.vista-chip--completadas {
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  border-color: #99f6e4;
+  color: #0f766e;
+}
+
+.vista-chip--completadas:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.18);
+  border-color: #14b8a6;
+  color: #0f766e;
+}
+
 /* ══════════════════════════════════════════════════
    TELÉFONO — fila con botón cambiar
 ══════════════════════════════════════════════════ */

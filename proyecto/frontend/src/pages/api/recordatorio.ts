@@ -2,7 +2,7 @@ export const prerender = false;
 
 import type { APIRoute } from "astro";
 import { pool } from "../../lib/db";
-import { enviarRecordatorioVencimiento } from "../../lib/email";
+import { enviarRecordatorioVencimiento, enviarRecordatorioWhatsApp } from "../../lib/email";
 
 function json(body: object, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -13,7 +13,8 @@ function json(body: object, status = 200) {
 
 async function procesarRecordatorios() {
   const { rows: tareas } = await pool.query(`
-    SELECT t.id_tarea, t.titulo, t.fecha_inicio, t.hora_inicio, t.prioridad, u.email
+    SELECT t.id_tarea, t.titulo, t.fecha_inicio, t.hora_inicio, t.prioridad,
+           u.email, u.telefono
     FROM public.tarea t
     JOIN public.usuario u ON u.id_usuario = t.id_usuario
     WHERE t.fecha_inicio = CURRENT_DATE
@@ -25,12 +26,22 @@ async function procesarRecordatorios() {
   let enviados = 0;
   for (const tarea of tareas) {
     try {
-      await enviarRecordatorioVencimiento(tarea.email, {
-        titulo: tarea.titulo,
+      const payload = {
+        titulo:      tarea.titulo,
         fecha_inicio: tarea.fecha_inicio,
-        hora_inicio: tarea.hora_inicio,
-        prioridad: tarea.prioridad,
-      });
+        hora_inicio:  tarea.hora_inicio,
+        prioridad:    tarea.prioridad,
+      };
+
+      // Email siempre
+      await enviarRecordatorioVencimiento(tarea.email, payload);
+
+      // WhatsApp si el usuario tiene teléfono y Twilio está configurado
+      if (tarea.telefono && process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID) {
+        try { await enviarRecordatorioWhatsApp(tarea.telefono, payload); }
+        catch (eWa: any) { console.error(`Error WhatsApp recordatorio ${tarea.id_tarea}:`, eWa.message); }
+      }
+
       await pool.query(
         `UPDATE public.tarea SET recordatorio_enviado = TRUE WHERE id_tarea = $1`,
         [tarea.id_tarea]
