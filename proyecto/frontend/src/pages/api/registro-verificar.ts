@@ -4,7 +4,7 @@ import type { APIRoute } from 'astro';
 import { pool } from '../../lib/db';
 import bcrypt from 'bcryptjs';
 import { createHmac } from 'crypto';
-import { enviarOtpEmail, enviarOtpWhatsApp } from '../../lib/email';
+import { enviarOtpEmail } from '../../lib/email';
 
 const SECRET = process.env.SESSION_SECRET ?? 'myagenda-dev-secret-2026';
 
@@ -78,24 +78,12 @@ export const POST: APIRoute = async ({ request }) => {
       exp: Date.now() + 10 * 60 * 1000,
     });
 
-    // Enviar a email (siempre que esté configurado SMTP)
     const sinSmtp = !process.env.SMTP_USER || !process.env.SMTP_PASS;
     if (sinSmtp) {
       console.warn(`\n[DEV] OTP para ${email}: ${otp}\n`);
     } else {
       try { await enviarOtpEmail(email.trim(), otp); }
       catch (e: any) { console.error('[registro] Error email OTP:', e.message); }
-    }
-
-    // Enviar a WhatsApp si hay teléfono y Green-API configurado
-    if (telefono?.trim()) {
-      const sinGreenApi = !process.env.GREEN_API_INSTANCE_ID || !process.env.GREEN_API_TOKEN;
-      if (sinGreenApi) {
-        console.warn(`\n[DEV] WhatsApp OTP para ${telefono}: ${otp}\n`);
-      } else {
-        try { await enviarOtpWhatsApp(telefono.trim(), otp); }
-        catch (e: any) { console.error('[registro] Error WhatsApp OTP:', e.message); }
-      }
     }
 
     return json({ ok: true, regToken: token });

@@ -561,9 +561,7 @@ import Layout from "../layouts/Layout.astro";
       const data = await res.json();
       if (data.ok) {
         regToken = data.regToken;
-        const destino = telefono
-          ? `Código enviado a ${email} y al WhatsApp ${telefono}`
-          : `Código enviado a ${email}`;
+        const destino = `Código enviado a ${email}`;
         mostrarPanelOtp(destino);
       } else {
         if (data.error?.includes('registrado')) showFieldError('err-email', data.error);
