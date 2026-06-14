@@ -491,8 +491,8 @@ import '../styles/recuperarcontrasena.css';
       btn.setAttribute('aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
     }
 
-    document.getElementById('ojo-nueva').addEventListener('click',     () => toggleOjo('input-nueva',     'ojo-nueva'));
-    document.getElementById('ojo-confirmar').addEventListener('click', () => toggleOjo('input-confirmar', 'ojo-confirmar'));
+    document.getElementById('ojo-nueva').addEventListener('mousedown',     e => { e.preventDefault(); toggleOjo('input-nueva',     'ojo-nueva'); });
+    document.getElementById('ojo-confirmar').addEventListener('mousedown', e => { e.preventDefault(); toggleOjo('input-confirmar', 'ojo-confirmar'); });
   </script>
 
 </body>

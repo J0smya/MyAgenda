@@ -250,6 +250,11 @@ label {
 .wrap-input input::placeholder { color: #cbd5e1; }
 .wrap-input--pass input { padding-right: 44px; }
 
+/* Ocultar el botón nativo del navegador (Edge/Chrome) para evitar duplicados */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-credentials-auto-fill-button { display: none !important; }
+
 /* ── Botón ojo (mostrar/ocultar contraseña) ──────────────────── */
 .btn-ojo {
   position: absolute;
@@ -264,6 +269,7 @@ label {
   border-radius: 6px;
   flex-shrink: 0;
   transition: color .2s, background .2s;
+  user-select: none;
 }
 .btn-ojo:hover { color: var(--texto-suave); background: #f1f5f9; }
 
