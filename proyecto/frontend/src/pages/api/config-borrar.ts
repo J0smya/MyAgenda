@@ -27,7 +27,20 @@ export const POST: APIRoute = async ({ request }) => {
       RETURNING id_tarea
     `, [sesion.id_usuario]);
 
-    return json({ ok: true, eliminadas: result.rowCount ?? 0 });
+    // Soft-delete de notas completadas del usuario (vinculadas a sus tareas, o sin tarea)
+    const notasResult = await pool.query(`
+      UPDATE public.nota
+      SET    deleted_at = NOW()
+      WHERE  completada = TRUE
+        AND  deleted_at IS NULL
+        AND  (
+          id_tarea IN (SELECT id_tarea FROM public.tarea WHERE id_usuario = $1)
+          OR id_tarea IS NULL
+        )
+      RETURNING id_nota
+    `, [sesion.id_usuario]);
+
+    return json({ ok: true, eliminadas: (result.rowCount ?? 0) + (notasResult.rowCount ?? 0) });
 
   } catch (err: any) {
     console.error('config-borrar error:', err.message);

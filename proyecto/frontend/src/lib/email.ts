@@ -1,10 +1,27 @@
 import nodemailer from 'nodemailer';
 
+// Formatea fecha en español independientemente de si llega como Date o string ISO
+function fmtFecha(val: any): string {
+  if (!val) return 'Sin fecha';
+  try {
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return String(val).slice(0, 10);
+    return d.toLocaleDateString('es-ES', {
+      timeZone: 'UTC',
+      weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
+    });
+  } catch { return String(val).slice(0, 10); }
+}
+
 function getSmtpConfig() {
-  const host = process.env.SMTP_HOST ?? (import.meta.env.SMTP_HOST as string | undefined) ?? 'smtp.gmail.com';
-  const port = parseInt(process.env.SMTP_PORT ?? (import.meta.env.SMTP_PORT as string | undefined) ?? '465');
-  const user = process.env.SMTP_USER ?? (import.meta.env.SMTP_USER as string | undefined) ?? '';
-  const pass = process.env.SMTP_PASS ?? (import.meta.env.SMTP_PASS as string | undefined) ?? '';
+  // import.meta.env primero: Vite lo inyecta en build/dev desde .env
+  // process.env como fallback: para Render.com donde las vars son del sistema
+  const host = (import.meta.env.SMTP_HOST as string | undefined) || process.env.SMTP_HOST || 'smtp.gmail.com';
+  const port = parseInt((import.meta.env.SMTP_PORT as string | undefined) || process.env.SMTP_PORT || '465');
+  const user = (import.meta.env.SMTP_USER as string | undefined) || process.env.SMTP_USER || '';
+  const pass = (import.meta.env.SMTP_PASS as string | undefined) || process.env.SMTP_PASS || '';
+  if (user) console.log('[SMTP] Config cargada — user:', user, 'port:', port);
+  else      console.warn('[SMTP] Sin credenciales — SMTP_USER no encontrado en env');
   return { host, port, user, pass, secure: port === 465 };
 }
 
@@ -18,7 +35,8 @@ export async function enviarOtpTelefono(
   telefonoPendiente: string,
   codigo: string
 ): Promise<void> {
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+  const { user: smtpUser, pass: smtpPass } = getSmtpConfig();
+  if (!smtpUser || !smtpPass) {
     console.warn(`[DEV] OTP para cambio de teléfono a ${telefonoPendiente}: ${codigo}`);
     return;
   }
@@ -51,7 +69,7 @@ export async function enviarOtpTelefono(
 
         <div style="background:#fef9ec;border:1px solid #fde68a;border-radius:10px;padding:14px 16px;margin-bottom:24px;">
           <p style="margin:0;font-size:13px;color:#92400e;">
-            ⏱️ Este código expira en <strong>10 minutos</strong>. Si no solicitaste este cambio, ignora este correo.
+            ⏱️ Este código expira en <strong>3 minutos</strong>. Si no solicitaste este cambio, ignora este correo.
           </p>
         </div>
 
@@ -79,7 +97,7 @@ export async function enviarOtpEmail(
   await transporter.sendMail({
     from: `"My Agenda" <${smtpUser}>`,
     to: email,
-    subject: 'Código de verificación — My Agenda',
+    subject: 'Recuperación de contraseña — My Agenda',
     html: `<!DOCTYPE html>
 <html lang="es">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
@@ -111,7 +129,7 @@ export async function enviarOtpEmail(
               <tr>
                 <td style="background:#fefce8;border:1px solid #fde68a;border-radius:12px;padding:14px 16px;">
                   <p style="margin:0;font-size:13px;color:#854d0e;line-height:1.5;">
-                    <strong>Expira en 10 minutos.</strong> Nunca compartas este código con nadie.
+                    <strong>Expira en 3 minutos.</strong> Nunca compartas este código con nadie.
                   </p>
                 </td>
               </tr>
@@ -155,7 +173,7 @@ export async function enviarRecordatorioEmail(
 
   const transporter = crearTransporter();
 
-  const fecha     = tarea.fecha_inicio ? tarea.fecha_inicio.toString().slice(0, 10) : 'Sin fecha';
+  const fecha     = fmtFecha(tarea.fecha_inicio);
   const hora      = tarea.hora_inicio  ? tarea.hora_inicio.toString().slice(0, 5)   : 'Sin hora';
   const prioridad = tarea.prioridad ?? 'media';
   const m         = tarea.minutos_antes;
@@ -177,7 +195,7 @@ export async function enviarRecordatorioEmail(
   await transporter.sendMail({
     from:    `"My Agenda" <${smtpUser}>`,
     to:      email,
-    subject: `Recordatorio: ${tarea.titulo}`,
+    subject: `Recordatorio de tarea: ${tarea.titulo}`,
     html: `<!DOCTYPE html>
 <html lang="es">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
@@ -249,20 +267,19 @@ export async function enviarNotificacionCreacion(
   email: string,
   tarea: { titulo: string; fecha_inicio?: string | null; hora_inicio?: string | null; prioridad?: string | null }
 ): Promise<void> {
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
+  const { user: smtpUser, pass: smtpPass } = getSmtpConfig();
   if (!smtpUser || !smtpPass) {
     console.warn('[DEV] SMTP no configurado. Notificación no enviada para:', tarea.titulo);
     return;
   }
-  const fecha     = tarea.fecha_inicio ? tarea.fecha_inicio.toString().slice(0, 10) : 'Sin fecha';
+  const fecha     = fmtFecha(tarea.fecha_inicio);
   const hora      = tarea.hora_inicio  ? tarea.hora_inicio.toString().slice(0, 5)   : 'Sin hora';
   const prioridad = tarea.prioridad ?? 'media';
   const transporter = crearTransporter();
   await transporter.sendMail({
     from: `"My Agenda" <${smtpUser}>`,
     to: email,
-    subject: `Nueva tarea: ${tarea.titulo}`,
+    subject: `Recordatorio de tarea: ${tarea.titulo}`,
     html: `
       <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;">
         <h2 style="color:#0f172a;margin:0 0 6px;">Tarea creada en My Agenda</h2>
@@ -284,8 +301,7 @@ export async function enviarRecordatorioVencimiento(
   email: string,
   tarea: { titulo: string; fecha_inicio?: string | null; hora_inicio?: string | null; prioridad?: string | null }
 ): Promise<void> {
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
+  const { user: smtpUser, pass: smtpPass } = getSmtpConfig();
   if (!smtpUser || !smtpPass) {
     console.warn('[DEV] SMTP no configurado. Recordatorio no enviado para:', tarea.titulo);
     return;
@@ -296,7 +312,7 @@ export async function enviarRecordatorioVencimiento(
   await transporter.sendMail({
     from: `"My Agenda" <${smtpUser}>`,
     to: email,
-    subject: `Recordatorio: ${tarea.titulo}`,
+    subject: `Recordatorio de tarea: ${tarea.titulo}`,
     html: `
       <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;">
         <h2 style="color:#0f172a;margin:0 0 6px;">Recordatorio de tarea</h2>
@@ -371,7 +387,7 @@ export async function enviarOtpWhatsApp(
 ): Promise<void> {
   await enviarWhatsAppGreenApi(
     telefono,
-    `*My Agenda* — Código de verificación\n\nTu código es: *${codigo}*\n\nVálido por 10 minutos. No lo compartas con nadie.`
+    `*My Agenda* — Código de verificación\n\nTu código es: *${codigo}*\n\nVálido por 3 minutos. No lo compartas con nadie.`
   );
 }
 
@@ -393,7 +409,7 @@ export async function enviarNotificacionCreacionWhatsApp(
   telefono: string,
   tarea: { titulo: string; fecha_inicio?: string | null; hora_inicio?: string | null; prioridad?: string | null }
 ): Promise<void> {
-  const fecha     = tarea.fecha_inicio ? tarea.fecha_inicio.toString().slice(0, 10) : 'sin fecha';
+  const fecha     = fmtFecha(tarea.fecha_inicio);
   const hora      = tarea.hora_inicio  ? tarea.hora_inicio.toString().slice(0, 5)   : 'sin hora';
   const prioridad = tarea.prioridad ?? 'media';
 

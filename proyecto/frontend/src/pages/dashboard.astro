@@ -546,6 +546,11 @@ import '../styles/noteEditor.css';
         </div>
         <button id="pendientes-panel-close" class="db-tasks-panel-close" title="Cerrar">✕</button>
       </div>
+      <div class="db-panel-filter-bar">
+        <button class="db-panel-filter-btn active" data-panel="pendiente" data-filter="todo">Todo</button>
+        <button class="db-panel-filter-btn" data-panel="pendiente" data-filter="tareas">Tareas</button>
+        <button class="db-panel-filter-btn" data-panel="pendiente" data-filter="notas">Notas</button>
+      </div>
       <div id="pendientes-panel-body" class="db-tasks-panel-body">
         <p class="db-tasks-panel-loading">Cargando…</p>
       </div>
@@ -569,14 +574,51 @@ import '../styles/noteEditor.css';
         </div>
         <button id="completadas-panel-close" class="db-tasks-panel-close" title="Cerrar">✕</button>
       </div>
+      <div class="db-panel-filter-bar">
+        <button class="db-panel-filter-btn active" data-panel="completada" data-filter="todo">Todo</button>
+        <button class="db-panel-filter-btn" data-panel="completada" data-filter="tareas">Tareas</button>
+        <button class="db-panel-filter-btn" data-panel="completada" data-filter="notas">Notas</button>
+      </div>
       <div id="completadas-panel-body" class="db-tasks-panel-body">
         <p class="db-tasks-panel-loading">Cargando…</p>
       </div>
     </div>
   </div>
 
+  <!-- MODAL VER NOTA (desde calendario) -->
+  <div id="modal-ver-nota" class="nvn-backdrop">
+    <div class="nvn-box">
+      <div class="nvn-header">
+        <button class="nvn-btn-back" id="nvn-btn-back" title="Volver">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Atrás
+        </button>
+        <div class="nvn-header-actions">
+          <button class="nvn-btn-action nvn-btn-completar" id="nvn-btn-completar" title="Marcar completada">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="nvn-completar-label">Completar</span>
+          </button>
+          <button class="nvn-btn-action nvn-btn-editar" id="nvn-btn-editar" title="Editar nota">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Editar
+          </button>
+          <button class="nvn-btn-action nvn-btn-eliminar" id="nvn-btn-eliminar" title="Eliminar nota">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            Eliminar
+          </button>
+        </div>
+      </div>
+      <div class="nvn-body">
+        <div class="nvn-status-bar" id="nvn-status-bar"></div>
+        <h2 class="nvn-titulo" id="nvn-titulo"></h2>
+        <div class="nvn-meta" id="nvn-meta"></div>
+        <div class="nvn-contenido" id="nvn-contenido"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL CONFIRMACIÓN PERSONALIZADO -->
-  <div id="modal-confirmar" class="db-modal-backdrop" style="z-index:500;">
+  <div id="modal-confirmar" class="db-modal-backdrop" style="z-index:600;">
     <div class="db-confirm-box">
       <div class="db-confirm-icon" id="confirm-icon"></div>
       <p class="db-confirm-msg" id="confirm-msg"></p>
@@ -588,7 +630,7 @@ import '../styles/noteEditor.css';
   </div>
 
   <!-- MODAL ALERTA PERSONALIZADO -->
-  <div id="modal-alerta" class="db-modal-backdrop" style="z-index:505;">
+  <div id="modal-alerta" class="db-modal-backdrop" style="z-index:610;">
     <div class="db-confirm-box">
       <div class="db-confirm-icon" id="alerta-icon"></div>
       <p class="db-confirm-msg" id="alerta-msg"></p>
@@ -920,6 +962,113 @@ import '../styles/noteEditor.css';
 }
 .db-tasks-panel-item-rec svg { flex-shrink:0; }
 
+/* ── Filtros de panel ── */
+.db-panel-filter-bar {
+  display:flex; gap:6px; padding:0 16px 12px; border-bottom:1px solid #f1f5f9;
+}
+.db-panel-filter-btn {
+  padding:5px 14px; border-radius:20px; border:1.5px solid #e2e8f0;
+  font-size:12px; font-weight:600; color:#64748b; background:#fff; cursor:pointer;
+  transition:all .15s;
+}
+.db-panel-filter-btn:hover { border-color:#0ea5e9; color:#0ea5e9; }
+.db-panel-filter-btn.active { background:#0ea5e9; border-color:#0ea5e9; color:#fff; }
+
+/* ── Nota en panel ── */
+.db-panel-nota-accent {
+  background: url('/textura-nota.jpg') center/cover no-repeat !important;
+  width:4px !important; flex-shrink:0;
+}
+.db-panel-nota-item { cursor:default; }
+.db-panel-nota-item .db-tasks-panel-info { cursor:pointer; }
+.db-panel-nota-toggle {
+  margin-left:auto; flex-shrink:0; background:none; border:none;
+  cursor:pointer; padding:6px; border-radius:8px; display:flex; align-items:center;
+  transition:background .15s;
+}
+.db-panel-nota-toggle:hover { background:#f1f5f9; }
+.db-panel-nota-item--completada .db-panel-nota-accent {
+  background: repeating-linear-gradient(90deg,rgba(255,255,255,.3) 0,rgba(255,255,255,.3) 1px,transparent 1px,transparent 5px),
+              #94a3b8 !important;
+}
+.db-panel-nota-item--completada .db-tasks-panel-item-title {
+  text-decoration: line-through; color: #9ca3af !important; opacity: 0.75;
+}
+
+/* ══════════════════════════════════════════════════════════
+   MODAL VER NOTA (nvn = nota-ver)
+══════════════════════════════════════════════════════════ */
+.nvn-backdrop {
+  display: none; position: fixed; inset: 0; z-index: 540;
+  background: rgba(15,23,42,0.45); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center; padding: 20px;
+}
+.nvn-backdrop.nvn-open { display: flex; animation: nvn-fade-in .18s ease; }
+@keyframes nvn-fade-in { from { opacity:0; } to { opacity:1; } }
+
+.nvn-box {
+  background: #fff; border-radius: 20px; width: 100%; max-width: 520px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.18); display: flex; flex-direction: column;
+  max-height: 82vh; overflow: hidden;
+  animation: nvn-slide-up .22s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes nvn-slide-up { from { transform: translateY(20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+
+.nvn-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 14px 14px; border-bottom: 1px solid #f1f5f9; flex-shrink: 0;
+}
+.nvn-btn-back {
+  display: flex; align-items: center; gap: 4px; background: none; border: none;
+  font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; padding: 6px 10px;
+  border-radius: 10px; transition: background .15s, color .15s;
+}
+.nvn-btn-back:hover { background: #f1f5f9; color: #0f172a; }
+
+.nvn-header-actions { display: flex; gap: 6px; }
+.nvn-btn-action {
+  display: flex; align-items: center; gap: 5px; padding: 7px 13px;
+  border-radius: 10px; border: 1.5px solid transparent; font-size: 12.5px;
+  font-weight: 700; cursor: pointer; transition: all .15s;
+}
+.nvn-btn-completar {
+  background: #f0fdf4; color: #16a34a; border-color: #bbf7d0;
+}
+.nvn-btn-completar:hover { background: #dcfce7; }
+.nvn-btn-pendiente {
+  background: #fff7ed; color: #ea580c; border-color: #fed7aa;
+}
+.nvn-btn-pendiente:hover { background: #ffedd5; }
+.nvn-btn-editar {
+  background: #eff6ff; color: #2563eb; border-color: #bfdbfe;
+}
+.nvn-btn-editar:hover { background: #dbeafe; }
+.nvn-btn-eliminar {
+  background: #fef2f2; color: #dc2626; border-color: #fecaca;
+}
+.nvn-btn-eliminar:hover { background: #fee2e2; }
+
+.nvn-body { padding: 22px 24px 28px; overflow-y: auto; flex: 1; }
+
+.nvn-status-bar {
+  display: inline-flex; align-items: center; padding: 3px 12px;
+  border-radius: 20px; font-size: 11px; font-weight: 800;
+  letter-spacing: .04em; text-transform: uppercase; margin-bottom: 12px;
+}
+.nvn-status--pendiente { background: #fff7ed; color: #ea580c; border: 1.5px solid #fed7aa; }
+.nvn-status--completada { background: #f0fdf4; color: #16a34a; border: 1.5px solid #bbf7d0; }
+
+.nvn-titulo {
+  font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 8px; line-height: 1.3;
+}
+.nvn-meta {
+  font-size: 12px; color: #9ca3af; font-weight: 500; margin-bottom: 18px;
+}
+.nvn-contenido {
+  font-size: 14.5px; color: #374151; line-height: 1.7;
+  border-top: 1px solid #f1f5f9; padding-top: 16px; min-height: 60px;
+}
+
 /* ── Modal conflicto de horario ─────────────────────────── */
 .db-conflicto-backdrop {
   display:none; position:fixed; inset:0; z-index:620;
@@ -989,7 +1138,12 @@ import '../styles/noteEditor.css';
   }
  
   let allTasks:    Tarea[]               = [];
+  let allNotes:    any[]                 = [];
   let currentView: 'dia'|'semana'|'mes'  = (localStorage.getItem('conf_vista') as any) || 'mes';
+  const panelFilter: Record<string,'todo'|'tareas'|'notas'> = { pendiente:'todo', completada:'todo' };
+
+  const SVG_TAREA = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;flex-shrink:0"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>`;
+  const SVG_NOTA  = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`;
   let viewDate      = new Date();
   let selectedTaskId: any                = null;
   let notaHtml      = '';
@@ -1405,7 +1559,17 @@ import '../styles/noteEditor.css';
     toast.querySelector('.toast-close')?.addEventListener('click',e=>{e.stopPropagation();cerrarToast(toast);});
     toast.addEventListener('click',()=>cerrarToast(toast));
     toastContainer.appendChild(toast);
-    setTimeout(()=>cerrarToast(toast),6000);
+    setTimeout(()=>cerrarToast(toast),8000);
+    // Notificación del sistema operativo (cuando la pestaña está en 2do plano)
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(`My Agenda — ${label}`, {
+          body: subtitulo ? `${titulo}\n${subtitulo}` : titulo,
+          icon: '/favicon.svg',
+          tag: `reminder-${titulo}`,
+        });
+      } catch {}
+    }
   }
   function cerrarToast(t:HTMLElement) {
     t.classList.add('toast-out');
@@ -1414,7 +1578,7 @@ import '../styles/noteEditor.css';
  
   /* ─────────────────── RECORDATORIOS ─────────────────── */
   function programarRecordatorio(tarea:Tarea, minutosAntes:number) {
-    if (!tarea.hora) return;
+    if (!tarea.hora || !tarea.fecha) return;
     const key=String(tarea.id);
     if (recordatoriosActivos.has(key)) recordatoriosActivos.get(key)!.forEach(clearTimeout);
     const timers:ReturnType<typeof setTimeout>[]=[];
@@ -1422,13 +1586,19 @@ import '../styles/noteEditor.css';
     const [hh,mm]=tarea.hora.split(':').map(Number);
     const venc=new Date(ay,am-1,ad,hh,mm,0,0);
     const ahora=Date.now();
-    const msAntes=venc.getTime()-minutosAntes*60*1000-ahora;
+    const msAntes=venc.getTime()-minutosAntes*60_000-ahora;
     if (msAntes>0) {
       const label=minutosAntes>=60?`En ${minutosAntes/60}h`:`En ${minutosAntes}min`;
-      timers.push(setTimeout(()=>mostrarToast(tarea.titulo,`${label} · ${tarea.hora}`,'antes'),msAntes));
+      timers.push(setTimeout(()=>{
+        sessionStorage.setItem(`rec-${key}-${tarea.fecha}-antes`,'1');
+        mostrarToast(tarea.titulo,`${label} · ${tarea.hora}`,'antes');
+      },msAntes));
     }
     const msExacto=venc.getTime()-ahora;
-    if (msExacto>0) timers.push(setTimeout(()=>mostrarToast(tarea.titulo,`Hora exacta · ${tarea.hora}`,'ahora'),msExacto));
+    if (msExacto>0) timers.push(setTimeout(()=>{
+      sessionStorage.setItem(`rec-${key}-${tarea.fecha}-ahora`,'1');
+      mostrarToast(tarea.titulo,`Hora de inicio · ${tarea.hora}`,'ahora');
+    },msExacto));
     if (timers.length) recordatoriosActivos.set(key,timers);
   }
  
@@ -2105,7 +2275,9 @@ import '../styles/noteEditor.css';
   /* ─────────────────── LOAD & RENDER ─────────────────── */
   async function load() {
     try{
-      const r=await fetch('/api/dashboard'); const d=await r.json();
+      const [rTareas, rNotas] = await Promise.all([fetch('/api/dashboard'), fetch('/api/noteEditor')]);
+      const d = await rTareas.json();
+      const dn = await rNotas.json();
       if(d.success){
         const mapped=d.tareas.map((t:any)=>({
           id:t.id_tarea, titulo:t.titulo, descripcion:t.descripcion,
@@ -2118,6 +2290,12 @@ import '../styles/noteEditor.css';
         }));
         const seen=new Set<string>();
         allTasks=mapped.filter((t:Tarea)=>{ const k=String(t.id); if(seen.has(k)) return false; seen.add(k); return true; });
+        allNotes=(dn.notas||[]).map((n:any)=>({
+          id: n.id_nota,
+          titulo: n.nota_titulo||'Nota',
+          fecha: n.fecha_creacion ? new Date(n.fecha_creacion).toISOString().split('T')[0] : '',
+          completada: Boolean(n.completada),
+        }));
         render();
       }
     }catch(e){console.error(e);}
@@ -2140,22 +2318,27 @@ import '../styles/noteEditor.css';
   }
 
   function renderPanelTareas(estado: 'pendiente'|'completada') {
-    const bodyId   = estado==='pendiente' ? 'pendientes-panel-body'  : 'completadas-panel-body';
-    const countId  = estado==='pendiente' ? 'pendientes-panel-count' : 'completadas-panel-count';
+    const bodyId  = estado==='pendiente' ? 'pendientes-panel-body'  : 'completadas-panel-body';
+    const countId = estado==='pendiente' ? 'pendientes-panel-count' : 'completadas-panel-count';
     const body  = document.getElementById(bodyId);
     const count = document.getElementById(countId);
     if (!body) return;
 
-    const lista = allTasks.filter(t=>t.estado===estado)
+    const filtro = panelFilter[estado] ?? 'todo';
+
+    const tareas = allTasks.filter(t=>t.estado===estado)
       .sort((a,b)=>{ if(!a.fecha) return 1; if(!b.fecha) return -1; return a.fecha.localeCompare(b.fecha); });
+    const notas = allNotes.filter(n=> estado==='pendiente' ? !n.completada : n.completada)
+      .sort((a:any,b:any)=>b.fecha.localeCompare(a.fecha));
 
-    if (count) count.textContent = `${lista.length} tarea${lista.length!==1?'s':''}`;
+    const totalItems = (filtro==='tareas' ? 0 : notas.length) + (filtro==='notas' ? 0 : tareas.length);
+    if (count) count.textContent = `${totalItems} elemento${totalItems!==1?'s':''}`;
 
-    if (!lista.length) {
+    if (!totalItems) {
       const svgIcon = estado==='pendiente'
         ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`
         : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-      const txt = estado==='pendiente' ? 'No hay tareas pendientes' : 'No hay tareas completadas';
+      const txt = estado==='pendiente' ? 'Nada pendiente' : 'Nada completado';
       body.innerHTML=`<div class="db-tasks-panel-empty"><div class="db-tasks-panel-empty-icon">${svgIcon}</div><span>${txt}</span></div>`;
       return;
     }
@@ -2166,10 +2349,10 @@ import '../styles/noteEditor.css';
       baja:  { bg:'#f0fdf4', color:'#16a34a', border:'#bbf7d0' },
     };
 
-    body.innerHTML = lista.map((t,i)=>{
-      const filtro = filtros.find(f=>f.nombre===t.categoria);
-      const accentColor = filtro ? filtro.color : (t.prioridad==='alta'?'#ef4444':t.prioridad==='media'?'#f59e0b':'#22c55e');
-      const catNombre = filtro ? filtro.nombre : t.categoria;
+    const htmlTareas = filtro!=='notas' ? tareas.map((t,i)=>{
+      const f = filtros.find(x=>x.nombre===t.categoria);
+      const accentColor = f ? f.color : (t.prioridad==='alta'?'#ef4444':t.prioridad==='media'?'#f59e0b':'#22c55e');
+      const catNombre = f ? f.nombre : t.categoria;
       const pc = prioConfig[t.prioridad] ?? prioConfig.media;
       const fecha = t.fecha ? new Date(t.fecha+'T00:00:00').toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}) : 'Sin fecha';
       const recBadge = t.es_recurrente
@@ -2178,33 +2361,151 @@ import '../styles/noteEditor.css';
       return `<div class="db-tasks-panel-item" style="animation-delay:${i*45}ms" onclick="window.verDetalle('${t.id}');window.cerrarPanelExt('${estado}')">
         <span class="db-tasks-panel-accent" style="background:${accentColor}"></span>
         <div class="db-tasks-panel-info">
-          <div class="db-tasks-panel-item-title">${t.titulo}</div>
-          <div class="db-tasks-panel-item-cat">
-            <span class="db-tasks-panel-item-cat-dot" style="background:${accentColor}"></span>
-            ${catNombre}
-          </div>
+          <div class="db-tasks-panel-item-title">${SVG_TAREA}${t.titulo}</div>
+          <div class="db-tasks-panel-item-cat"><span class="db-tasks-panel-item-cat-dot" style="background:${accentColor}"></span>${catNombre}</div>
           <div class="db-tasks-panel-item-divider"></div>
           <div class="db-tasks-panel-item-meta">
-            <span class="db-tasks-panel-item-fecha">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
-              ${fecha}
-            </span>
+            <span class="db-tasks-panel-item-fecha"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>${fecha}</span>
             <span class="db-tasks-panel-item-prio" style="background:${pc.bg};color:${pc.color};border-color:${pc.border}">${t.prioridad}</span>
             ${recBadge}
           </div>
         </div>
       </div>`;
-    }).join('');
+    }).join('') : '';
+
+    const htmlNotas = filtro!=='tareas' ? notas.map((n:any,i:number)=>{
+      const fecha = n.fecha ? new Date(n.fecha+'T00:00:00').toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}) : 'Sin fecha';
+      const checkIcon = n.completada
+        ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+        : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>`;
+      return `<div class="db-tasks-panel-item db-panel-nota-item${n.completada?' db-panel-nota-item--completada':''}" style="animation-delay:${(tareas.length+i)*45}ms">
+        <span class="db-tasks-panel-accent db-panel-nota-accent"></span>
+        <div class="db-tasks-panel-info" onclick="window.abrirNota('${n.id}');window.cerrarPanelExt('${estado}')">
+          <div class="db-tasks-panel-item-title">${SVG_NOTA}${n.titulo}</div>
+          <div class="db-tasks-panel-item-divider"></div>
+          <div class="db-tasks-panel-item-meta">
+            <span class="db-tasks-panel-item-fecha"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>${fecha}</span>
+            <span class="db-tasks-panel-item-prio" style="background:#fef3e2;color:#92400e;border-color:#fde68a">nota</span>
+          </div>
+        </div>
+        <button class="db-panel-nota-toggle" title="${n.completada?'Marcar pendiente':'Marcar completada'}" onclick="window.toggleNotaCompletada('${n.id}',${n.completada},'${estado}')">${checkIcon}</button>
+      </div>`;
+    }).join('') : '';
+
+    body.innerHTML = htmlTareas + htmlNotas;
   }
 
   (window as any).cerrarPanelExt = (estado: string) => cerrarPanelTareas(estado as 'pendiente'|'completada');
+
+  (window as any).toggleNotaCompletada = async (id: string, actual: boolean, estado: string) => {
+    await fetch('/api/noteEditor', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_nota: id, completada: !actual }),
+    });
+    await load();
+    renderPanelTareas('pendiente');
+    renderPanelTareas('completada');
+  };
+
+  // Listeners filtros de panel
+  document.querySelectorAll<HTMLButtonElement>('.db-panel-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const panel = btn.dataset.panel as 'pendiente'|'completada';
+      const filter = btn.dataset.filter as 'todo'|'tareas'|'notas';
+      panelFilter[panel] = filter;
+      btn.closest('.db-panel-filter-bar')?.querySelectorAll('.db-panel-filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderPanelTareas(panel);
+    });
+  });
+
+  // ── Modal ver nota (desde calendario) ──
+  const modalVerNota   = document.getElementById('modal-ver-nota')      as HTMLDivElement;
+  const nvnTitulo      = document.getElementById('nvn-titulo')          as HTMLElement;
+  const nvnContenido   = document.getElementById('nvn-contenido')       as HTMLElement;
+  const nvnMeta        = document.getElementById('nvn-meta')            as HTMLElement;
+  const nvnStatusBar   = document.getElementById('nvn-status-bar')      as HTMLElement;
+  const nvnCompletarBtn= document.getElementById('nvn-btn-completar')   as HTMLButtonElement;
+  const nvnCompletarLbl= document.getElementById('nvn-completar-label') as HTMLElement;
+  let   nvnNotaActual: any = null;
+
+  function cerrarModalVerNota() { modalVerNota.classList.remove('nvn-open'); nvnNotaActual = null; }
+
+  document.getElementById('nvn-btn-back')?.addEventListener('click', cerrarModalVerNota);
+  modalVerNota?.addEventListener('click', (e) => { if (e.target === modalVerNota) cerrarModalVerNota(); });
+
+  function nvnActualizarEstado(completada: boolean) {
+    nvnStatusBar.textContent = completada ? 'Completada' : 'Pendiente';
+    nvnStatusBar.className   = 'nvn-status-bar ' + (completada ? 'nvn-status--completada' : 'nvn-status--pendiente');
+    nvnCompletarBtn.className= 'nvn-btn-action ' + (completada ? 'nvn-btn-pendiente' : 'nvn-btn-completar');
+    nvnCompletarLbl.textContent = completada ? 'Desmarcar' : 'Completar';
+    const iconPath = completada
+      ? `<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>`
+      : `<polyline points="20 6 9 17 4 12"/>`;
+    nvnCompletarBtn.querySelector('svg')!.innerHTML = iconPath;
+  }
+
+  nvnCompletarBtn?.addEventListener('click', async () => {
+    if (!nvnNotaActual) return;
+    const nuevaCompletada = !nvnNotaActual.completada;
+    await fetch('/api/noteEditor', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_nota: String(nvnNotaActual.id_nota), completada: nuevaCompletada }),
+    });
+    nvnNotaActual.completada = nuevaCompletada;
+    nvnActualizarEstado(nuevaCompletada);
+    await load();
+  });
+
+  document.getElementById('nvn-btn-editar')?.addEventListener('click', () => {
+    if (!nvnNotaActual) return;
+    const notaEdit = nvnNotaActual;
+    cerrarModalVerNota();
+    editorMode = 'sidebar-edit';
+    notaSidebarEditandoId = String(notaEdit.id_nota);
+    neEditor.innerHTML  = notaEdit.contenido || '';
+    neTitleInput.value  = notaEdit.nota_titulo || '';
+    neWords.textContent = '0 palabras';
+    modalNota.classList.add('ne-open');
+    setTimeout(() => neEditor.focus(), 150);
+  });
+
+  document.getElementById('nvn-btn-eliminar')?.addEventListener('click', async () => {
+    if (!nvnNotaActual) return;
+    if (!(await confirmar('¿Eliminar esta nota?', true))) return;
+    await fetch('/api/noteEditor', {
+      method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_nota: String(nvnNotaActual.id_nota) }),
+    });
+    cerrarModalVerNota();
+    await load();
+  });
+
+  (window as any).abrirNota = async (idNota: string) => {
+    try {
+      const r = await fetch(`/api/noteEditor?id_nota=${idNota}`);
+      const data = await r.json();
+      const nota = data.notas?.[0];
+      if (!nota) return;
+      nvnNotaActual = nota;
+      nvnTitulo.textContent = nota.nota_titulo || 'Sin título';
+      nvnContenido.innerHTML = nota.contenido || '<em style="color:#9ca3af">Sin contenido</em>';
+      const fecha = nota.fecha_creacion
+        ? new Date(nota.fecha_creacion).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
+        : '';
+      nvnMeta.textContent = fecha + (nota.tarea_titulo ? ` · Tarea: ${nota.tarea_titulo}` : '');
+      nvnActualizarEstado(Boolean(nota.completada));
+      modalVerNota.classList.add('nvn-open');
+    } catch(e) { console.error('Error abriendo nota:', e); }
+  };
 
   function render() {
     const activos=filtros.filter(f=>f.activo).map(f=>f.nombre);
     const filtered=allTasks.filter(t=>activos.includes(t.categoria));
     // Badges
-    const totalPendientes  = allTasks.filter(t => t.estado === 'pendiente').length;
-    const totalCompletadas = allTasks.filter(t => t.estado === 'completada').length;
+    const totalPendientes  = allTasks.filter(t => t.estado === 'pendiente').length  + allNotes.filter(n => !n.completada).length;
+    const totalCompletadas = allTasks.filter(t => t.estado === 'completada').length + allNotes.filter(n => n.completada).length;
     const badge = document.getElementById('pendientes-count-badge');
     if (badge) { badge.textContent=String(totalPendientes); badge.style.display=totalPendientes>0?'inline-flex':'none'; }
     const badgeC = document.getElementById('completadas-count-badge');
@@ -2229,10 +2530,13 @@ import '../styles/noteEditor.css';
     return `${i.toString().padStart(2,'0')}:00`;
   }
  
+
   function renderDia(filtered:Tarea[]) {
     const dStr=[viewDate.getFullYear(),String(viewDate.getMonth()+1).padStart(2,'0'),String(viewDate.getDate()).padStart(2,'0')].join('-');
     hTitle.textContent=viewDate.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
-    let html='<div class="db-day-grid">';
+    const notasHtml=allNotes.filter(n=>n.fecha===dStr).map(n=>`<div onclick="window.abrirNota('${n.id}')" class="db-task-card db-nota-card${n.completada?' db-nota-card--completada':''}" title="${n.titulo}"><div class="db-task-card-title">${SVG_NOTA}${n.titulo}</div></div>`).join('');
+    let html=`<div class="db-day-grid">`;
+    if(notasHtml) html+=`<div class="db-day-row"><div class="db-hour-label">Notas</div><div class="db-hour-tasks">${notasHtml}</div></div>`;
     for(let i=0;i<24;i++){
       const h=i.toString().padStart(2,'0');
       const tasks=filtered.filter(t=>t.fecha===dStr&&t.hora?.startsWith(h+':'));
@@ -2248,7 +2552,8 @@ import '../styles/noteEditor.css';
     for(let i=0;i<7;i++){
       const d=new Date(start); d.setDate(start.getDate()+i);
       const ds=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
-      html+=`<div class="db-week-col" data-date="${ds}"><div class="db-week-col-header"><div class="db-week-col-day">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div><div class="db-week-col-num">${d.getDate()}</div></div>${filtered.filter(t=>t.fecha===ds).map(crearCard).join('')}</div>`;
+      const notasCol=allNotes.filter(n=>n.fecha===ds).map(n=>`<div onclick="window.abrirNota('${n.id}')" class="db-task-card db-nota-card${n.completada?' db-nota-card--completada':''}" title="${n.titulo}"><div class="db-task-card-title">${SVG_NOTA}${n.titulo}</div></div>`).join('');
+      html+=`<div class="db-week-col" data-date="${ds}"><div class="db-week-col-header"><div class="db-week-col-day">${d.toLocaleDateString('es-ES',{weekday:'short'})}</div><div class="db-week-col-num">${d.getDate()}</div></div>${notasCol}${filtered.filter(t=>t.fecha===ds).map(crearCard).join('')}</div>`;
     }
     container.innerHTML=html+'</div>';
   }
@@ -2268,7 +2573,8 @@ import '../styles/noteEditor.css';
       const esHoy = ds===todayStr;
       const extraClass = esHoy ? ' db-month-day--hoy' : '';
       const numClass   = esHoy ? ' db-month-day-num--hoy' : '';
-      html+=`<div class="db-month-day${extraClass}" data-date="${ds}"><div class="db-month-day-num${numClass}">${d}</div>${dt.map(t=>`<div onclick="window.verDetalle('${t.id}')" class="db-month-dot" style="background:${getColorTarea(t)}" title="${t.titulo}"></div>`).join('')}</div>`;
+      const notasDot=allNotes.filter(n=>n.fecha===ds).map(n=>`<div onclick="window.abrirNota('${n.id}')" class="db-month-nota${n.completada?' db-month-nota--completada':''}" title="${n.titulo}"></div>`).join('');
+      html+=`<div class="db-month-day${extraClass}" data-date="${ds}"><div class="db-month-day-num${numClass}">${d}</div>${dt.map(t=>`<div onclick="window.verDetalle('${t.id}')" class="db-month-dot" style="background:${getColorTarea(t)}" title="${t.titulo}"></div>`).join('')}${notasDot}</div>`;
     }
     container.innerHTML=html+'</div>';
   }
@@ -2505,4 +2811,54 @@ import '../styles/noteEditor.css';
   });
  
   load();
+
+  // Pedir permiso de notificaciones del sistema operativo
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+
+  // ── Verificación activa de recordatorios cada 30 segundos ───────────────────
+  // sessionStorage evita disparar el mismo recordatorio dos veces en la misma sesión.
+  function verificarRecordatoriosAhora() {
+    const ahora = Date.now();
+    allTasks
+      .filter(t => t.recordatorio_activo && t.estado === 'pendiente' && t.hora && t.fecha)
+      .forEach(t => {
+        const [ay, am, ad] = t.fecha.split('-').map(Number);
+        const [hh, mm]     = t.hora!.split(':').map(Number);
+        const venc         = new Date(ay, am - 1, ad, hh, mm, 0, 0).getTime();
+        const minAntes     = t.recordatorio_minutos || 60;
+        const tRec         = venc - minAntes * 60_000;
+        const ventana      = 31_000; // 31 s — cubre el intervalo + 1 s de margen
+
+        // Recordatorio "N minutos antes"
+        if (Math.abs(ahora - tRec) < ventana) {
+          const keyAntes = `rec-${t.id}-${t.fecha}-antes`;
+          if (!sessionStorage.getItem(keyAntes)) {
+            sessionStorage.setItem(keyAntes, '1');
+            const lbl = minAntes >= 60 ? `En ${minAntes / 60}h` : `En ${minAntes}min`;
+            mostrarToast(t.titulo, `${lbl} · ${t.hora}`, 'antes');
+          }
+        }
+
+        // Recordatorio exacto (hora de inicio)
+        if (Math.abs(ahora - venc) < ventana) {
+          const keyAhora = `rec-${t.id}-${t.fecha}-ahora`;
+          if (!sessionStorage.getItem(keyAhora)) {
+            sessionStorage.setItem(keyAhora, '1');
+            mostrarToast(t.titulo, `Hora de inicio · ${t.hora}`, 'ahora');
+          }
+        }
+      });
+  }
+
+  // Verificar inmediatamente al cargar (cubre recordatorios que se activan justo al abrir)
+  setTimeout(verificarRecordatoriosAhora, 2_000);
+  // Luego verificar cada 30 s
+  setInterval(verificarRecordatoriosAhora, 30_000);
+
+  // Polling cada 60 s para enviar correo electrónico de recordatorio
+  setInterval(async () => {
+    try { await fetch('/api/recordatorio'); } catch {}
+  }, 60_000);
 </script>

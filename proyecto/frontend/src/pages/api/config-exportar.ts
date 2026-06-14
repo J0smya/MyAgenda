@@ -25,13 +25,13 @@ export const GET: APIRoute = async ({ request }) => {
     `, [sesion.id_usuario]);
 
     const notasRes = await pool.query(`
-      SELECT n.nota_titulo, n.contenido,
+      SELECT n.nota_titulo, n.contenido, n.completada,
              TO_CHAR(n.fecha_creacion, 'YYYY-MM-DD') AS fecha_creacion,
              t.titulo AS tarea
       FROM   public.nota n
-      JOIN   public.tarea t ON t.id_tarea = n.id_tarea
-      WHERE  t.id_usuario = $1
-        AND  n.deleted_at IS NULL
+      LEFT JOIN public.tarea t ON t.id_tarea = n.id_tarea
+      WHERE  n.deleted_at IS NULL
+        AND  (t.id_usuario = $1 OR n.id_tarea IS NULL)
       ORDER  BY n.fecha_creacion DESC
     `, [sesion.id_usuario]);
 
@@ -87,17 +87,24 @@ export const GET: APIRoute = async ({ request }) => {
         <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:13px;">${t.hora_inicio ? String(t.hora_inicio).slice(0,5) : '—'}</td>
       </tr>`).join('');
 
+    function notaBadge(completada: boolean): string {
+      return completada
+        ? `<span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;color:#10b981;background:#ecfdf5;border:1px solid #10b98133;">Completada</span>`
+        : `<span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;color:#f59e0b;background:#fffbeb;border:1px solid #f59e0b33;">Pendiente</span>`;
+    }
+
     // ── Filas de notas ──
     const filasNotas = notasRes.rows.map(n => `
       <tr>
-        <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#0f172a;font-weight:600;">${n.nota_titulo ?? 'Sin título'}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#0f172a;font-weight:600;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>${n.nota_titulo ?? 'Sin título'}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;">${notaBadge(Boolean(n.completada))}</td>
         <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:13px;">${n.tarea ?? '—'}</td>
-        <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#64748b;font-size:13px;max-width:260px;">${n.contenido ? n.contenido.slice(0, 100) + (n.contenido.length > 100 ? '…' : '') : '—'}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#64748b;font-size:13px;max-width:260px;">${n.contenido ? n.contenido.replace(/<[^>]*>/g,'').slice(0, 120) + (n.contenido.length > 120 ? '…' : '') : '—'}</td>
         <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:13px;white-space:nowrap;">${fmt(n.fecha_creacion)}</td>
       </tr>`).join('');
 
     const sinTareas = `<tr><td colspan="7" style="padding:28px;text-align:center;color:#94a3b8;font-style:italic;">Sin tareas registradas</td></tr>`;
-    const sinNotas  = `<tr><td colspan="4" style="padding:28px;text-align:center;color:#94a3b8;font-style:italic;">Sin notas registradas</td></tr>`;
+    const sinNotas  = `<tr><td colspan="5" style="padding:28px;text-align:center;color:#94a3b8;font-style:italic;">Sin notas registradas</td></tr>`;
 
     const html = `<!DOCTYPE html>
 <html lang="es">
@@ -225,6 +232,7 @@ export const GET: APIRoute = async ({ request }) => {
           <thead>
             <tr>
               <th>Título</th>
+              <th>Estado</th>
               <th>Tarea vinculada</th>
               <th>Contenido</th>
               <th>Fecha</th>

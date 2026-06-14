@@ -265,6 +265,86 @@ document.addEventListener('DOMContentLoaded', () => {
   let telefonoPendiente = '';
   let timerInterval: ReturnType<typeof setInterval> | null = null;
 
+  // ── Selector de código de país ──
+  const TEL_PAISES = [
+    { flag:'🇨🇴', name:'Colombia',        code:'+57'  },
+    { flag:'🇺🇸', name:'Estados Unidos',  code:'+1'   },
+    { flag:'🇨🇦', name:'Canadá',          code:'+1'   },
+    { flag:'🇲🇽', name:'México',          code:'+52'  },
+    { flag:'🇦🇷', name:'Argentina',       code:'+54'  },
+    { flag:'🇨🇱', name:'Chile',           code:'+56'  },
+    { flag:'🇵🇪', name:'Perú',            code:'+51'  },
+    { flag:'🇻🇪', name:'Venezuela',       code:'+58'  },
+    { flag:'🇪🇨', name:'Ecuador',         code:'+593' },
+    { flag:'🇧🇴', name:'Bolivia',         code:'+591' },
+    { flag:'🇵🇾', name:'Paraguay',        code:'+595' },
+    { flag:'🇺🇾', name:'Uruguay',         code:'+598' },
+    { flag:'🇵🇦', name:'Panamá',          code:'+507' },
+    { flag:'🇨🇷', name:'Costa Rica',      code:'+506' },
+    { flag:'🇸🇻', name:'El Salvador',     code:'+503' },
+    { flag:'🇬🇹', name:'Guatemala',       code:'+502' },
+    { flag:'🇭🇳', name:'Honduras',        code:'+504' },
+    { flag:'🇳🇮', name:'Nicaragua',       code:'+505' },
+    { flag:'🇩🇴', name:'Rep. Dominicana', code:'+1'   },
+    { flag:'🇨🇺', name:'Cuba',            code:'+53'  },
+    { flag:'🇪🇸', name:'España',          code:'+34'  },
+    { flag:'🇬🇧', name:'Reino Unido',     code:'+44'  },
+    { flag:'🇫🇷', name:'Francia',         code:'+33'  },
+    { flag:'🇩🇪', name:'Alemania',        code:'+49'  },
+    { flag:'🇮🇹', name:'Italia',          code:'+39'  },
+    { flag:'🇵🇹', name:'Portugal',        code:'+351' },
+    { flag:'🇧🇷', name:'Brasil',          code:'+55'  },
+    { flag:'🇯🇵', name:'Japón',           code:'+81'  },
+    { flag:'🇨🇳', name:'China',           code:'+86'  },
+    { flag:'🇮🇳', name:'India',           code:'+91'  },
+    { flag:'🇦🇺', name:'Australia',       code:'+61'  },
+  ];
+  let selectedTelPais = TEL_PAISES[0];
+
+  const telPrefijoBox      = document.getElementById('tel-prefijo-box')      as HTMLElement;
+  const telPrefijoFlag     = document.getElementById('tel-prefijo-flag')     as HTMLElement;
+  const telPrefijoCode     = document.getElementById('tel-prefijo-code')     as HTMLElement;
+  const telPrefijoDropdown = document.getElementById('tel-prefijo-dropdown') as HTMLElement;
+  const telPrefijoSearch   = document.getElementById('tel-prefijo-search')   as HTMLInputElement;
+  const telPrefijoList     = document.getElementById('tel-prefijo-list')     as HTMLElement;
+
+  function renderTelPaises(filtro = '') {
+    const filtrados = TEL_PAISES.filter(p =>
+      p.name.toLowerCase().includes(filtro.toLowerCase()) || p.code.includes(filtro)
+    );
+    telPrefijoList.innerHTML = filtrados.map(p => `
+      <div class="tel-prefijo-option ${p === selectedTelPais ? 'selected' : ''}" data-i="${TEL_PAISES.indexOf(p)}">
+        <span class="tel-prefijo-option-flag">${p.flag}</span>
+        <span class="tel-prefijo-option-name">${p.name}</span>
+        <span class="tel-prefijo-option-code">${p.code}</span>
+      </div>
+    `).join('');
+    telPrefijoList.querySelectorAll<HTMLElement>('.tel-prefijo-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        selectedTelPais = TEL_PAISES[Number(opt.dataset.i)];
+        telPrefijoFlag.textContent = selectedTelPais.flag;
+        telPrefijoCode.textContent = selectedTelPais.code;
+        telPrefijoDropdown.classList.add('hidden');
+        inputNuevoTel.focus();
+      });
+    });
+  }
+
+  telPrefijoBox?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (telPrefijoDropdown.classList.contains('hidden')) {
+      telPrefijoDropdown.classList.remove('hidden');
+      telPrefijoSearch.value = '';
+      renderTelPaises();
+      setTimeout(() => telPrefijoSearch.focus(), 50);
+    } else {
+      telPrefijoDropdown.classList.add('hidden');
+    }
+  });
+  telPrefijoSearch?.addEventListener('input', () => renderTelPaises(telPrefijoSearch.value));
+  telPrefijoSearch?.addEventListener('click', e => e.stopPropagation());
+  document.addEventListener('click', () => telPrefijoDropdown?.classList.add('hidden'));
+
   function abrirModalTelefono() {
     telPaso1.style.display = '';
     telPaso2.style.display = 'none';
@@ -323,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return [...otpBoxes.children].map(el => (el as HTMLInputElement).value).join('');
   }
 
-  function iniciarTimer(segundos = 60) {
+  function iniciarTimer(segundos = 50) {
     let restante = segundos;
     if (otpSeconds) otpSeconds.textContent = String(restante);
     otpTimerEl?.style && (otpTimerEl.style.display = '');
@@ -353,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       const data = await res.json();
       if (!data.ok) {
-        errorNuevoTel.querySelector('span') && (errorNuevoTel.querySelector('span')!.textContent = data.error);
+        errorNuevoTel.textContent = data.error ?? 'Error al enviar el código.';
         errorNuevoTel.classList.add('visible');
         return;
       }
@@ -362,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
       telPaso1.style.display = 'none';
       telPaso2.style.display = '';
       buildOtpBoxes();
-      iniciarTimer(60);
+      iniciarTimer(50);
       setTimeout(() => (otpBoxes.children[0] as HTMLInputElement)?.focus(), 80);
     } catch {
       mostrarToast('Sin conexión', 'No se pudo conectar al servidor.', 'error');
@@ -381,7 +461,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     errorNuevoTel.classList.remove('visible');
-    enviarOtp(tel);
+    enviarOtp(`${selectedTelPais.code}${numericOnly}`);
+  });
+
+  inputNuevoTel?.addEventListener('input', () => {
+    errorNuevoTel.classList.remove('visible');
   });
 
   inputNuevoTel?.addEventListener('keydown', (e) => {

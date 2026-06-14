@@ -115,7 +115,7 @@ const fotoPerfil = sesion.foto_perfil ?? '';
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/>
                 <line x1="12" y1="8" x2="12.01" y2="8"/>
               </svg>
-              Se enviará un código de verificación a tu email y SMS
+              Se enviará un código de verificación a tu correo electrónico
             </span>
           </div>
 
@@ -290,11 +290,26 @@ const fotoPerfil = sesion.foto_perfil ?? '';
       </div>
       <div class="config-confirm-title">Cambiar número de teléfono</div>
       <div class="config-confirm-desc">
-        Ingresa tu nuevo número. Te enviaremos un código de verificación por email y SMS.
+        Ingresa tu nuevo número. Te enviaremos un código de verificación a tu correo electrónico.
       </div>
       <div class="tel-input-group">
-        <input type="tel" id="input-nuevo-tel" class="config-input"
-               placeholder="+51 999 999 999" autocomplete="tel">
+        <div class="tel-prefijo-wrap" id="tel-prefijo-wrap">
+          <div class="tel-prefijo-box" id="tel-prefijo-box">
+            <span id="tel-prefijo-flag">🇨🇴</span>
+            <span id="tel-prefijo-code">+57</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+          <div class="tel-prefijo-sep"></div>
+          <input type="tel" id="input-nuevo-tel" class="tel-prefijo-input"
+                 placeholder="999 999 999" autocomplete="tel">
+        </div>
+        <div id="tel-prefijo-dropdown" class="tel-prefijo-dropdown hidden">
+          <input type="text" id="tel-prefijo-search" class="tel-prefijo-search" placeholder="Buscar país..."/>
+          <div id="tel-prefijo-list" class="tel-prefijo-list"></div>
+        </div>
         <span id="error-nuevo-tel" class="config-error-msg">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                stroke-linecap="round" stroke-linejoin="round">
@@ -323,7 +338,7 @@ const fotoPerfil = sesion.foto_perfil ?? '';
       </div>
       <div class="config-confirm-title">Ingresa el código</div>
       <div class="config-confirm-desc" id="tel-paso2-desc">
-        Código enviado a tu email y número <strong id="tel-paso2-num"></strong>.
+        Código enviado a tu correo electrónico. Ingresa el código de 6 dígitos.
       </div>
       <div class="otp-input-row" id="otp-boxes"></div>
       <div id="error-otp" class="config-error-msg" style="margin-top:8px">
@@ -335,7 +350,7 @@ const fotoPerfil = sesion.foto_perfil ?? '';
         <span id="error-otp-msg">Código incorrecto.</span>
       </div>
       <div class="otp-resend-row">
-        <span class="otp-timer" id="otp-timer">Reenviar en <strong id="otp-seconds">60</strong>s</span>
+        <span class="otp-timer" id="otp-timer">Reenviar en <strong id="otp-seconds">50</strong>s</span>
         <button class="otp-resend-btn" id="btn-reenviar-otp" disabled>Reenviar código</button>
       </div>
       <div class="config-confirm-actions">

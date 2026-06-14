@@ -2,6 +2,15 @@
 import type { APIRoute } from "astro";
 import { pool } from "../../lib/db";
 
+const SELECT_FIELDS = `
+  n.id_nota,
+  n.nota_titulo,
+  n.contenido,
+  n.fecha_creacion,
+  n.completada,
+  n.id_tarea,
+  t.titulo AS tarea_titulo
+`;
 
 export const GET: APIRoute = async ({ url }) => {
   try {
@@ -12,12 +21,7 @@ export const GET: APIRoute = async ({ url }) => {
 
     if (idNota) {
       const r = await pool.query(
-        `SELECT n.id_nota,
-                n.nota_titulo,
-                n.contenido,
-                n.fecha_creacion,
-                n.id_tarea,
-                t.titulo AS tarea_titulo
+        `SELECT ${SELECT_FIELDS}
          FROM nota n
          LEFT JOIN tarea t ON t.id_tarea = n.id_tarea
          WHERE n.id_nota = $1
@@ -28,12 +32,7 @@ export const GET: APIRoute = async ({ url }) => {
 
     } else if (idTarea) {
       const r = await pool.query(
-        `SELECT n.id_nota,
-                n.nota_titulo,
-                n.contenido,
-                n.fecha_creacion,
-                n.id_tarea,
-                t.titulo AS tarea_titulo
+        `SELECT ${SELECT_FIELDS}
          FROM nota n
          LEFT JOIN tarea t ON t.id_tarea = n.id_tarea
          WHERE n.id_tarea = $1
@@ -45,12 +44,7 @@ export const GET: APIRoute = async ({ url }) => {
 
     } else {
       const r = await pool.query(
-        `SELECT n.id_nota,
-                n.nota_titulo,
-                n.contenido,
-                n.fecha_creacion,
-                n.id_tarea,
-                t.titulo AS tarea_titulo
+        `SELECT ${SELECT_FIELDS}
          FROM nota n
          LEFT JOIN tarea t ON t.id_tarea = n.id_tarea
          WHERE n.deleted_at IS NULL
@@ -76,7 +70,6 @@ export const POST: APIRoute = async ({ request }) => {
 
     if (!contenido) return fail("El contenido no puede estar vacío", 400);
 
-    // Si se pasa id_tarea, verificar que exista
     if (idTarea) {
       const check = await pool.query(
         `SELECT id_tarea FROM tarea WHERE id_tarea = $1 LIMIT 1`,
@@ -86,9 +79,9 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const { rows } = await pool.query(
-      `INSERT INTO nota (nota_titulo, contenido, id_tarea, fecha_creacion)
-       VALUES ($1, $2, $3, NOW())
-       RETURNING id_nota, nota_titulo, contenido, fecha_creacion, id_tarea`,
+      `INSERT INTO nota (nota_titulo, contenido, id_tarea, fecha_creacion, completada)
+       VALUES ($1, $2, $3, NOW(), FALSE)
+       RETURNING id_nota, nota_titulo, contenido, fecha_creacion, completada, id_tarea`,
       [notaTitulo, contenido, idTarea || null]
     );
 
@@ -104,11 +97,9 @@ export const PUT: APIRoute = async ({ request }) => {
   try {
     const body       = await parseBody(request);
     const idNota     = String(body.id_nota     ?? "").trim();
-    const contenido  = String(body.contenido   ?? "").trim();
     const notaTitulo = String(body.nota_titulo ?? "").trim();
 
-    if (!idNota)    return fail("id_nota es obligatorio", 400);
-    if (!contenido) return fail("contenido es obligatorio", 400);
+    if (!idNota) return fail("id_nota es obligatorio", 400);
 
     const check = await pool.query(
       `SELECT id_nota FROM nota WHERE id_nota = $1 AND deleted_at IS NULL`,
@@ -116,14 +107,33 @@ export const PUT: APIRoute = async ({ request }) => {
     );
     if (check.rowCount === 0) return fail("Nota no encontrada", 404);
 
+    // Permite actualizar solo completada sin tocar contenido
+    if (body.completada !== undefined && body.contenido === undefined) {
+      const completada = Boolean(body.completada);
+      const { rows } = await pool.query(
+        `UPDATE nota SET completada = $1 WHERE id_nota = $2 AND deleted_at IS NULL
+         RETURNING id_nota, nota_titulo, contenido, fecha_creacion, completada, id_tarea`,
+        [completada, idNota]
+      );
+      return ok({ nota: rows[0] });
+    }
+
+    const contenido = String(body.contenido ?? "").trim();
+    if (!contenido) return fail("contenido es obligatorio", 400);
+
+    const completada = body.completada !== undefined ? Boolean(body.completada) : undefined;
+
     const { rows } = await pool.query(
       `UPDATE nota
-       SET contenido   = $1,
-           nota_titulo = CASE WHEN $2 <> '' THEN $2 ELSE nota_titulo END
+       SET contenido    = $1,
+           nota_titulo  = CASE WHEN $2 <> '' THEN $2 ELSE nota_titulo END
+           ${completada !== undefined ? ', completada = $4' : ''}
        WHERE id_nota = $3
          AND deleted_at IS NULL
-       RETURNING id_nota, nota_titulo, contenido, fecha_creacion, id_tarea`,
-      [contenido, notaTitulo, idNota]
+       RETURNING id_nota, nota_titulo, contenido, fecha_creacion, completada, id_tarea`,
+      completada !== undefined
+        ? [contenido, notaTitulo, idNota, completada]
+        : [contenido, notaTitulo, idNota]
     );
 
     return ok({ nota: rows[0] });

@@ -669,6 +669,48 @@ body {
 .db-month-dot--media { background: #f59e0b; }
 .db-month-dot--baja  { background: #0ea5e9; }
 
+/* ── Barra de notas en calendario (textura malla marrón) ── */
+.db-month-nota {
+  height: 6px;
+  border-radius: 999px;
+  margin-top: 4px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  background: url('/textura-nota.jpg') center/cover no-repeat;
+}
+.db-month-nota:hover { opacity: 0.78; }
+.db-month-nota--completada {
+  background-color: #94a3b8;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255,255,255,0.3) 0px,
+    rgba(255,255,255,0.3) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+  opacity: 0.7;
+}
+
+/* Tarjeta de nota en vista día/semana */
+.db-nota-card {
+  background: url('/textura-nota.jpg') center/cover no-repeat !important;
+  color: #fff !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.55);
+}
+.db-nota-card .db-task-card-title { color: #fff !important; text-shadow: 0 1px 3px rgba(0,0,0,0.55); }
+.db-nota-card--completada {
+  background-color: #94a3b8 !important;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255,255,255,0.25) 0px,
+    rgba(255,255,255,0.25) 1px,
+    transparent 1px,
+    transparent 6px
+  ) !important;
+  opacity: 0.75;
+}
+.db-nota-card--completada .db-task-card-title { color: #e2e8f0 !important; text-decoration: line-through; }
+
 /* ════════════════════════════════════════════
    BOTONES FLOTANTES
 ════════════════════════════════════════════ */

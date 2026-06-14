@@ -1,21 +1,25 @@
 import { pool } from './db';
-import { enviarRecordatorioVencimiento } from './email';
+import { enviarRecordatorioEmail } from './email';
 
 export async function procesarRecordatorios(): Promise<number> {
   const { rows: tareas } = await pool.query(`
     SELECT t.id_tarea, t.titulo, t.descripcion,
            TO_CHAR(t.fecha_inicio, 'YYYY-MM-DD') AS fecha_inicio,
-           t.hora_inicio, t.prioridad, t.recordatorio_minutos, u.email
+           t.hora_inicio, t.prioridad,
+           COALESCE(t.recordatorio_minutos, 60) AS recordatorio_minutos,
+           u.email
     FROM public.tarea t
     JOIN public.usuario u ON u.id_usuario = t.id_usuario
     WHERE t.recordatorio_activo = TRUE
       AND t.recordatorio_enviado = FALSE
+      AND t.deleted_at IS NULL
       AND t.estado = 'pendiente'
       AND t.hora_inicio IS NOT NULL
+      AND t.fecha_inicio IS NOT NULL
       AND (t.fecha_inicio::date + t.hora_inicio::time)::timestamp
-            - t.recordatorio_minutos * INTERVAL '1 minute'
-          BETWEEN (NOW() AT TIME ZONE 'America/Bogota') - INTERVAL '15 minutes'
-              AND (NOW() AT TIME ZONE 'America/Bogota') + INTERVAL '30 seconds'
+            - COALESCE(t.recordatorio_minutos, 60) * INTERVAL '1 minute'
+          BETWEEN (NOW() AT TIME ZONE 'America/Bogota') - INTERVAL '2 minutes'
+              AND (NOW() AT TIME ZONE 'America/Bogota') + INTERVAL '1 minute'
   `);
 
   if (tareas.length > 0) {
@@ -25,11 +29,13 @@ export async function procesarRecordatorios(): Promise<number> {
   let enviados = 0;
   for (const tarea of tareas) {
     try {
-      await enviarRecordatorioVencimiento(tarea.email, {
-        titulo:       tarea.titulo,
-        fecha_inicio: tarea.fecha_inicio,
-        hora_inicio:  tarea.hora_inicio,
-        prioridad:    tarea.prioridad,
+      await enviarRecordatorioEmail(tarea.email, {
+        titulo:        tarea.titulo,
+        descripcion:   tarea.descripcion,
+        fecha_inicio:  tarea.fecha_inicio,
+        hora_inicio:   tarea.hora_inicio,
+        prioridad:     tarea.prioridad,
+        minutos_antes: Number(tarea.recordatorio_minutos),
       });
       await pool.query(
         `UPDATE public.tarea SET recordatorio_enviado = TRUE WHERE id_tarea = $1`,

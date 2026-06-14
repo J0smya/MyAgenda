@@ -6,18 +6,22 @@ import { obtenerTokenDeCookie, obtenerSesion } from '../../lib/sesion';
 import { enviarOtpTelefono, enviarSmsTelefono } from '../../lib/email';
 
 async function asegurarTablaOtp() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS public.verificaciones_otp (
-      id          SERIAL PRIMARY KEY,
-      id_usuario  UUID        NOT NULL,
-      tipo        VARCHAR(50) NOT NULL,
-      dato_nuevo  VARCHAR(200),
-      codigo      VARCHAR(6)  NOT NULL,
-      expires_at  TIMESTAMP   NOT NULL,
-      usado       BOOLEAN     DEFAULT FALSE,
-      created_at  TIMESTAMP   DEFAULT NOW()
-    )
-  `);
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS public.verificaciones_otp (
+        id          SERIAL PRIMARY KEY,
+        id_usuario  UUID        NOT NULL,
+        tipo        VARCHAR(50) NOT NULL,
+        dato_nuevo  VARCHAR(200),
+        codigo      VARCHAR(6)  NOT NULL,
+        expires_at  TIMESTAMP   NOT NULL,
+        usado       BOOLEAN     DEFAULT FALSE,
+        created_at  TIMESTAMP   DEFAULT NOW()
+      )
+    `);
+  } catch {
+    // La tabla ya existe o el rol no tiene permiso de creación — continuar
+  }
 }
 
 // POST /api/config-telefono
@@ -53,7 +57,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Generar OTP de 6 dígitos
     const codigo    = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutos
+    const expiresAt = new Date(Date.now() + 3 * 60 * 1000); // 3 minutos
 
     // Invalidar OTPs anteriores del mismo usuario y tipo
     await pool.query(
