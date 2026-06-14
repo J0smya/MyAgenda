@@ -975,7 +975,7 @@ import '../styles/noteEditor.css';
   interface Tarea {
     id: any; titulo: string; descripcion: string;
     fecha: string; hora: string | null; prioridad: string; categoria: string;
-    estado?: string;
+    estado?: string; fecha_vencimiento?: string | null;
     es_recurrente?: boolean; id_serie?: number | null;
     recordatorio_activo?: boolean; recordatorio_minutos?: number;
   }
