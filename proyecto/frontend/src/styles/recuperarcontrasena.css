@@ -265,6 +265,8 @@ input[type="password"]::-webkit-credentials-auto-fill-button { display: none !im
 .btn-ojo {
   position: absolute;
   right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
