@@ -88,9 +88,10 @@ body {
   background: rgba(255,255,255,0.08);
 }
 .db-sidebar .db-logo-text {
-  background: linear-gradient(135deg, #60d8ff 0%, #c084fc 100%);
+  background: linear-gradient(135deg, #93d4ff 0%, #3b82f6 100%);
   -webkit-background-clip: text;
   background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(147, 212, 255, 0.75));
 }
 .db-sidebar .db-filtro-item {
   background: rgba(255,255,255,0.10);
@@ -129,10 +130,11 @@ body {
   font-size: 1.1rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  background: linear-gradient(135deg, #0ea5e9 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #60b8ff 0%, #2563eb 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.65));
 }
 
 /* Sección filtros */
