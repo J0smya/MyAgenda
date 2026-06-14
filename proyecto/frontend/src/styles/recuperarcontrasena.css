@@ -227,59 +227,59 @@ label {
 .btn-metodo svg { stroke: currentColor; }
 
 /* ── Input con icono ─────────────────────────────────────────── */
+/* El borde va en el contenedor para que el botón ojo quede DENTRO */
 .wrap-input {
   position: relative;
   display: flex;
   align-items: center;
+  border: 1.5px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--fondo);
+  transition: border-color .2s, box-shadow .2s;
 }
-.wrap-input svg {
+.wrap-input:focus-within {
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(14,165,233,.12);
+}
+.wrap-input > svg:first-child {
   position: absolute;
   left: 14px;
   pointer-events: none;
   flex-shrink: 0;
 }
 .wrap-input input {
-  width: 100%;
-  padding: 11px 14px 11px 40px;
-  border: 1.5px solid var(--borde);
+  flex: 1;
+  min-width: 0;
+  padding: 11px 8px 11px 40px;
+  border: none;
   border-radius: var(--radio);
   font-size: 14px;
   color: var(--texto);
-  background: var(--fondo);
+  background: transparent;
   outline: none;
-  transition: border-color .2s, box-shadow .2s;
-}
-.wrap-input input:focus {
-  border-color: var(--azul);
-  box-shadow: 0 0 0 3px rgba(14,165,233,.12);
 }
 .wrap-input input::placeholder { color: #cbd5e1; }
-.wrap-input--pass input { padding-right: 44px; }
 
 /* Ocultar el botón nativo del navegador (Edge/Chrome) para evitar duplicados */
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear,
 input[type="password"]::-webkit-credentials-auto-fill-button { display: none !important; }
 
-/* ── Botón ojo (mostrar/ocultar contraseña) ──────────────────── */
+/* ── Botón ojo — flex item dentro del contenedor, siempre visible ── */
 .btn-ojo {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  flex-shrink: 0;
   background: none;
   border: none;
   cursor: pointer;
   color: #9ca3af;
-  padding: 4px;
+  padding: 4px 10px 4px 4px;
   display: flex;
   align-items: center;
   border-radius: 6px;
-  flex-shrink: 0;
   transition: color .2s, background .2s;
   user-select: none;
 }
-.btn-ojo:hover { color: var(--texto-suave); background: #f1f5f9; }
+.btn-ojo:hover { color: var(--texto-suave); background: rgba(0,0,0,0.04); }
 
 /* ── Botón principal ─────────────────────────────────────────── */
 .btn-ok {
