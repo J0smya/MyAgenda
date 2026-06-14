@@ -13,28 +13,31 @@ export const GET: APIRoute = async ({ request }) => {
 
   try {
     const tareasRes = await pool.query(`
-      SELECT t.titulo, t.descripcion, t.estado, t.prioridad,
-             t.fecha_inicio, t.fecha_vencimiento,
-             t.hora_inicio, t.hora_fin, t.fecha_creacion
-      FROM   public.tarea t
-      LEFT JOIN public.proyecto p ON p.id_proyecto = t.id_proyecto
-      WHERE  (p.id_usuario = $1 OR t.id_proyecto IS NULL)
-        AND  t.deleted_at IS NULL
-      ORDER  BY t.fecha_creacion DESC
+      SELECT titulo, descripcion, estado, prioridad,
+             TO_CHAR(fecha_inicio, 'YYYY-MM-DD')      AS fecha_inicio,
+             TO_CHAR(fecha_vencimiento, 'YYYY-MM-DD') AS fecha_vencimiento,
+             hora_inicio, hora_fin,
+             TO_CHAR(fecha_creacion, 'YYYY-MM-DD')    AS fecha_creacion
+      FROM   public.tarea
+      WHERE  id_usuario = $1
+        AND  deleted_at IS NULL
+      ORDER  BY fecha_creacion DESC
     `, [sesion.id_usuario]);
 
     const notasRes = await pool.query(`
-      SELECT n.nota_titulo, n.contenido, n.fecha_creacion, t.titulo AS tarea
+      SELECT n.nota_titulo, n.contenido,
+             TO_CHAR(n.fecha_creacion, 'YYYY-MM-DD') AS fecha_creacion,
+             t.titulo AS tarea
       FROM   public.nota n
       JOIN   public.tarea t ON t.id_tarea = n.id_tarea
-      LEFT JOIN public.proyecto p ON p.id_proyecto = t.id_proyecto
-      WHERE  (p.id_usuario = $1 OR t.id_proyecto IS NULL)
+      WHERE  t.id_usuario = $1
         AND  n.deleted_at IS NULL
       ORDER  BY n.fecha_creacion DESC
     `, [sesion.id_usuario]);
 
     const proyectosRes = await pool.query(`
-      SELECT nombre, descripcion, estado, color, fecha_creacion
+      SELECT nombre, descripcion, estado, color,
+             TO_CHAR(fecha_creacion, 'YYYY-MM-DD') AS fecha_creacion
       FROM   public.proyecto
       WHERE  id_usuario = $1 AND deleted_at IS NULL
       ORDER  BY fecha_creacion DESC
