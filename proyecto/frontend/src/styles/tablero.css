@@ -50,11 +50,11 @@ body {
   will-change: transform;
 }
 
-/* Capa translúcida sobre el video para mantener legibilidad */
+/* Capa oscura sobre el video para mantener legibilidad */
 .db-sidebar-bg-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(8, 14, 32, 0.62);
   z-index: 1;
   pointer-events: none;
 }
@@ -65,6 +65,47 @@ body {
 .db-sidebar-bottom-btns {
   position: relative;
   z-index: 2;
+}
+
+/* ── Textos del sidebar adaptados al fondo oscuro ── */
+.db-sidebar .db-filters-header h3,
+.db-sidebar .db-sidebar-section h3 {
+  color: rgba(255,255,255,0.5);
+}
+.db-sidebar .db-filter-label span {
+  color: rgba(255,255,255,0.92);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+.db-sidebar .db-filter-label:hover {
+  background: rgba(255,255,255,0.1);
+}
+.db-sidebar .db-btn-add-filtro {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.22);
+  color: rgba(255,255,255,0.8);
+}
+.db-sidebar .db-filtro-item:hover {
+  background: rgba(255,255,255,0.08);
+}
+.db-sidebar .db-logo-text {
+  background: linear-gradient(135deg, #60d8ff 0%, #c084fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.db-sidebar .db-filtro-item {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.14);
+}
+.db-sidebar .db-filtro-item:hover {
+  background: rgba(255,255,255,0.18);
+}
+.db-sidebar .db-filtro-nombre {
+  color: rgba(255,255,255,0.92);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+.db-sidebar .db-filtro-count {
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.65);
 }
 
 /* Logo */
