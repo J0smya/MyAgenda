@@ -8,6 +8,8 @@ import '../styles/recuperarcontrasena.css';
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" href="/favicon.ico" />
   <title>Recuperar contraseña — My Agenda</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -160,7 +162,6 @@ import '../styles/recuperarcontrasena.css';
 
   <script is:inline>
     // ── Estado ────────────────────────────────────────────────────
-    let metodoActual     = 'email';
     let contactoActual   = '';
     let otpToken         = '';   // token firmado que contiene el OTP (viene del servidor)
     let resetToken       = '';   // token para cambiar la clave (viene tras verificar OTP)

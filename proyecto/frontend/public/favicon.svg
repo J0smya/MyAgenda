@@ -1,41 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#06b6d4"/>
-      <stop offset="55%" stop-color="#0ea5e9"/>
-      <stop offset="100%" stop-color="#7c3aed"/>
+    <linearGradient id="bg" x1="25%" y1="0%" x2="75%" y2="100%">
+      <stop offset="0%"   stop-color="#5cb8ff"/>
+      <stop offset="50%"  stop-color="#2979f5"/>
+      <stop offset="100%" stop-color="#1238b8"/>
     </linearGradient>
-    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="white" stop-opacity="0.18"/>
+    <linearGradient id="panel" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#7dcfff" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#1545bf" stop-opacity="0.7"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#e8f5ff"/>
+      <stop offset="100%" stop-color="#90caff"/>
+    </linearGradient>
+    <radialGradient id="gloss" cx="35%" cy="28%" r="55%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0.3"/>
       <stop offset="100%" stop-color="white" stop-opacity="0"/>
-    </linearGradient>
+    </radialGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0d2a8a" flood-opacity="0.4"/>
+    </filter>
   </defs>
 
-  <!-- Background rounded square -->
-  <rect width="128" height="128" rx="32" fill="url(#bg)"/>
+  <!-- Cuerpo del notepad -->
+  <rect x="8" y="22" width="112" height="100" rx="22" fill="url(#bg)" filter="url(#shadow)"/>
+  <rect x="8" y="22" width="112" height="100" rx="22" fill="url(#gloss)"/>
 
-  <!-- Top shine overlay -->
-  <rect x="0" y="0" width="128" height="70" rx="32" fill="url(#shine)"/>
+  <!-- Panel interior -->
+  <rect x="20" y="46" width="88" height="70" rx="13" fill="url(#panel)"/>
 
-  <!-- Ring pins -->
-  <rect x="40" y="16" width="9" height="29" rx="4.5" fill="rgba(255,255,255,0.92)"/>
-  <rect x="79" y="16" width="9" height="29" rx="4.5" fill="rgba(255,255,255,0.92)"/>
+  <!-- Líneas de texto (más gruesas para legibilidad en tamaño pequeño) -->
+  <rect x="30" y="59"  width="42" height="5" rx="2.5" fill="white" opacity="0.85"/>
+  <rect x="30" y="73"  width="66" height="5" rx="2.5" fill="white" opacity="0.85"/>
+  <rect x="30" y="87"  width="66" height="5" rx="2.5" fill="white" opacity="0.85"/>
+  <rect x="30" y="101" width="48" height="5" rx="2.5" fill="white" opacity="0.85"/>
 
-  <!-- Calendar body frame -->
-  <rect x="16" y="32" width="96" height="80" rx="14"
-        fill="rgba(255,255,255,0.13)"
-        stroke="rgba(255,255,255,0.88)"
-        stroke-width="5.8"/>
-
-  <!-- Header divider -->
-  <line x1="16" y1="56" x2="112" y2="56"
-        stroke="rgba(255,255,255,0.5)" stroke-width="4.5"/>
-
-  <!-- Checkmark — main visual element -->
-  <path d="M 35 83 L 56 102 L 93 64"
-        stroke="white"
-        stroke-width="10.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        fill="none"/>
+  <!-- Anillos espiral (U-arcos en la parte superior, trazos más gruesos) -->
+  <path d="M 27 29 Q 27 8  39 8  Q 51 8  51 29"
+        fill="none" stroke="url(#ring)" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M 50 29 Q 50 8  64 8  Q 78 8  78 29"
+        fill="none" stroke="url(#ring)" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M 77 29 Q 77 8  89 8  Q 101 8 101 29"
+        fill="none" stroke="url(#ring)" stroke-width="7.5" stroke-linecap="round"/>
 </svg>
