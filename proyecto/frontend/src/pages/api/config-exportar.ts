@@ -35,14 +35,6 @@ export const GET: APIRoute = async ({ request }) => {
       ORDER  BY n.fecha_creacion DESC
     `, [sesion.id_usuario]);
 
-    const proyectosRes = await pool.query(`
-      SELECT nombre, descripcion, estado, color,
-             TO_CHAR(fecha_creacion, 'YYYY-MM-DD') AS fecha_creacion
-      FROM   public.proyecto
-      WHERE  id_usuario = $1 AND deleted_at IS NULL
-      ORDER  BY fecha_creacion DESC
-    `, [sesion.id_usuario]);
-
     const ahora = new Date();
     const fechaExport = ahora.toLocaleDateString('es-ES', {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
@@ -83,11 +75,6 @@ export const GET: APIRoute = async ({ request }) => {
       return `<span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;color:${color};background:${bg};border:1px solid ${color}33;">${label}</span>`;
     }
 
-    function colorDot(color: string): string {
-      if (!color) return '—';
-      return `<span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${color};"></span>${color}</span>`;
-    }
-
     // ── Filas de tareas ──
     const filasTareas = tareasRes.rows.map(t => `
       <tr>
@@ -100,16 +87,6 @@ export const GET: APIRoute = async ({ request }) => {
         <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:13px;">${t.hora_inicio ? String(t.hora_inicio).slice(0,5) : '—'}</td>
       </tr>`).join('');
 
-    // ── Filas de proyectos ──
-    const filasProyectos = proyectosRes.rows.map(p => `
-      <tr>
-        <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#0f172a;font-weight:600;">${p.nombre ?? '—'}</td>
-        <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#64748b;font-size:13px;">${p.descripcion ? p.descripcion.slice(0, 80) + (p.descripcion.length > 80 ? '…' : '') : '—'}</td>
-        <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;">${estadoBadge(p.estado)}</td>
-        <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;">${colorDot(p.color)}</td>
-        <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:13px;white-space:nowrap;">${fmt(p.fecha_creacion)}</td>
-      </tr>`).join('');
-
     // ── Filas de notas ──
     const filasNotas = notasRes.rows.map(n => `
       <tr>
@@ -119,9 +96,8 @@ export const GET: APIRoute = async ({ request }) => {
         <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:13px;white-space:nowrap;">${fmt(n.fecha_creacion)}</td>
       </tr>`).join('');
 
-    const sinTareas    = `<tr><td colspan="7" style="padding:28px;text-align:center;color:#94a3b8;font-style:italic;">Sin tareas registradas</td></tr>`;
-    const sinProyectos = `<tr><td colspan="5" style="padding:28px;text-align:center;color:#94a3b8;font-style:italic;">Sin proyectos registrados</td></tr>`;
-    const sinNotas     = `<tr><td colspan="4" style="padding:28px;text-align:center;color:#94a3b8;font-style:italic;">Sin notas registradas</td></tr>`;
+    const sinTareas = `<tr><td colspan="7" style="padding:28px;text-align:center;color:#94a3b8;font-style:italic;">Sin tareas registradas</td></tr>`;
+    const sinNotas  = `<tr><td colspan="4" style="padding:28px;text-align:center;color:#94a3b8;font-style:italic;">Sin notas registradas</td></tr>`;
 
     const html = `<!DOCTYPE html>
 <html lang="es">
@@ -144,7 +120,7 @@ export const GET: APIRoute = async ({ request }) => {
     .header-meta-label { font-size: 11px; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: 0.08em; }
     .header-meta-value { font-size: 15px; font-weight: 700; color: #fff; }
     /* Resumen */
-    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+    .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 28px; }
     .summary-card { background: #fff; border-radius: 16px; padding: 22px 24px; border: 1px solid #e2e8f0; text-align: center; }
     .summary-num { font-size: 38px; font-weight: 900; color: #4f46e5; line-height: 1; }
     .summary-label { font-size: 13px; color: #64748b; margin-top: 6px; font-weight: 600; }
@@ -207,10 +183,6 @@ export const GET: APIRoute = async ({ request }) => {
         <div class="summary-label">Tareas</div>
       </div>
       <div class="summary-card">
-        <div class="summary-num">${proyectosRes.rows.length}</div>
-        <div class="summary-label">Proyectos</div>
-      </div>
-      <div class="summary-card">
         <div class="summary-num">${notasRes.rows.length}</div>
         <div class="summary-label">Notas</div>
       </div>
@@ -237,29 +209,6 @@ export const GET: APIRoute = async ({ request }) => {
             </tr>
           </thead>
           <tbody>${tareasRes.rows.length ? filasTareas : sinTareas}</tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- PROYECTOS -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon" style="background:#faf5ff;">📁</div>
-        <span class="section-title">Proyectos</span>
-        <span class="section-count">${proyectosRes.rows.length} registros</span>
-      </div>
-      <div style="overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th>Estado</th>
-              <th>Color</th>
-              <th>Creado</th>
-            </tr>
-          </thead>
-          <tbody>${proyectosRes.rows.length ? filasProyectos : sinProyectos}</tbody>
         </table>
       </div>
     </div>

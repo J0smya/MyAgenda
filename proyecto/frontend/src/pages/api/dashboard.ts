@@ -44,19 +44,20 @@ export const POST: APIRoute = async ({ request }) => {
 
     const resultTarea = await client.query(
       `INSERT INTO public.tarea
-         (titulo, descripcion, fecha_inicio, hora_inicio, prioridad, estado, fecha_creacion, id_usuario, categoria,
+         (titulo, descripcion, fecha_inicio, fecha_vencimiento, hora_inicio, prioridad, estado, fecha_creacion, id_usuario, categoria,
           recordatorio_activo, recordatorio_minutos)
-       VALUES ($1, $2, $3, $4, $5, 'pendiente', NOW(), $6, $7, $8, $9)
+       VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', NOW(), $7, $8, $9, $10)
        RETURNING *`,
       [
         body.titulo.trim(),
         body.descripcion?.trim() || "",
-        body.fecha  || null,
-        body.hora   || null,
-        body.prioridad || "media",
+        body.fecha             || null,
+        body.fecha_vencimiento || null,
+        body.hora              || null,
+        body.prioridad         || "media",
         idUsuario,
-        body.categoria || "personal",
-        body.recordatorio_activo ?? false,
+        body.categoria         || "personal",
+        body.recordatorio_activo  ?? false,
         body.recordatorio_minutos ?? 60,
       ]
     );
@@ -110,7 +111,8 @@ export const GET: APIRoute = async ({ request }) => {
          id_tarea,
          titulo,
          descripcion,
-         TO_CHAR(fecha_inicio, 'YYYY-MM-DD') AS fecha_inicio,
+         TO_CHAR(fecha_inicio, 'YYYY-MM-DD')      AS fecha_inicio,
+         TO_CHAR(fecha_vencimiento, 'YYYY-MM-DD') AS fecha_vencimiento,
          hora_inicio,
          prioridad,
          estado,
@@ -146,7 +148,7 @@ export const PUT: APIRoute = async ({ request }) => {
   const client = await pool.connect();
   try {
     const body = await request.json();
-    const { id_tarea, estado, titulo, descripcion, fecha_inicio, hora_inicio, prioridad, categoria,
+    const { id_tarea, estado, titulo, descripcion, fecha_inicio, fecha_vencimiento, hora_inicio, prioridad, categoria,
             recordatorio_activo, recordatorio_minutos } = body;
 
     if (!id_tarea) {
@@ -177,6 +179,7 @@ export const PUT: APIRoute = async ({ request }) => {
          hora_inicio          = COALESCE($5::time, hora_inicio),
          prioridad            = COALESCE($6::prioridad_tarea, prioridad),
          categoria            = COALESCE($9, categoria),
+         fecha_vencimiento    = COALESCE($12::date, fecha_vencimiento),
          recordatorio_activo  = COALESCE($10::boolean, recordatorio_activo),
          recordatorio_minutos = COALESCE($11::integer, recordatorio_minutos),
          recordatorio_enviado = CASE WHEN $10::boolean IS NOT NULL THEN FALSE ELSE recordatorio_enviado END
@@ -186,14 +189,15 @@ export const PUT: APIRoute = async ({ request }) => {
         estado   || null,
         titulo   || null,
         descripcion !== undefined ? descripcion : null,
-        fecha_inicio || null,
-        hora_inicio  || null,
-        prioridad    || null,
+        fecha_inicio       || null,
+        hora_inicio        || null,
+        prioridad          || null,
         id_tarea,
         idUsuario,
         categoria             || null,
         recordatorio_activo   ?? null,
         recordatorio_minutos  ?? null,
+        fecha_vencimiento  || null,
       ]
     );
 

@@ -208,13 +208,20 @@ import '../styles/noteEditor.css';
 
           <div class="grid-2">
             <div class="db-field-group">
-              <label class="db-field-label" for="t-fecha">Fecha</label>
+              <label class="db-field-label" for="t-fecha">Fecha inicio</label>
               <input type="date" id="t-fecha" class="db-input">
             </div>
             <div class="db-field-group">
               <label class="db-field-label" for="t-hora-inicio">Hora</label>
               <input type="time" id="t-hora-inicio" class="db-input" style="text-align:center;">
             </div>
+          </div>
+          <div class="db-field-group">
+            <label class="db-field-label" for="t-fecha-vencimiento">
+              Fecha de vencimiento
+              <span style="font-weight:400;color:#94a3b8;font-size:11px;margin-left:4px;">(opcional)</span>
+            </label>
+            <input type="date" id="t-fecha-vencimiento" class="db-input">
           </div>
  
           <!-- RECORDATORIO -->
@@ -1501,10 +1508,11 @@ import '../styles/noteEditor.css';
       tareaEditandoId = tarea.id;
       tituloLabel.textContent  = 'Editar tarea';
       submitBtn.textContent    = 'Guardar cambios';
-      (document.getElementById('t-titulo')      as HTMLInputElement).value   = tarea.titulo;
-      (document.getElementById('t-desc')        as HTMLTextAreaElement).value = tarea.descripcion||'';
-      (document.getElementById('t-fecha')       as HTMLInputElement).value   = tarea.fecha;
-      (document.getElementById('t-hora-inicio') as HTMLInputElement).value   = tarea.hora||'';
+      (document.getElementById('t-titulo')           as HTMLInputElement).value   = tarea.titulo;
+      (document.getElementById('t-desc')             as HTMLTextAreaElement).value = tarea.descripcion||'';
+      (document.getElementById('t-fecha')            as HTMLInputElement).value   = tarea.fecha;
+      (document.getElementById('t-hora-inicio')      as HTMLInputElement).value   = tarea.hora||'';
+      (document.getElementById('t-fecha-vencimiento') as HTMLInputElement).value  = tarea.fecha_vencimiento||'';
       (document.getElementById('t-prioridad')   as HTMLSelectElement).value  = tarea.prioridad;
       actualizarSelectCategoria();
       // categoria guardada en DB es el nombre del filtro
@@ -1728,6 +1736,7 @@ import '../styles/noteEditor.css';
       titulo:      (document.getElementById('t-titulo')    as HTMLInputElement).value,
       descripcion: (document.getElementById('t-desc')      as HTMLTextAreaElement).value,
       fecha:fechaInput, hora:horaInput,
+      fecha_vencimiento: (document.getElementById('t-fecha-vencimiento') as HTMLInputElement).value || null,
       prioridad:   (document.getElementById('t-prioridad') as HTMLSelectElement).value,
       categoria:   (document.getElementById('t-cat')       as HTMLSelectElement).value,
       recordatorio_activo:  usaRecordatorio,
