@@ -13,7 +13,7 @@ const SECRET = process.env.SESSION_SECRET ?? 'myagenda-dev-secret-2026';
 // No necesita tabla en BD — el OTP viaja dentro del token cifrado.
 function crearOtpToken(idUsuario: string, otp: string): string {
   const payload = Buffer.from(
-    JSON.stringify({ id_usuario: idUsuario, otp, exp: Date.now() + 10 * 60 * 1000 })
+    JSON.stringify({ id_usuario: idUsuario, otp, exp: Date.now() + 3 * 60 * 1000 })
   ).toString('base64url');
   const sig = createHmac('sha256', SECRET).update(payload).digest('base64url');
   return `${payload}.${sig}`;

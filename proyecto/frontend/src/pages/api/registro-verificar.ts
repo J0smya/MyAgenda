@@ -75,7 +75,7 @@ export const POST: APIRoute = async ({ request }) => {
       contrasena: hash,
       telefono: telefono?.trim() || '',
       otp,
-      exp: Date.now() + 10 * 60 * 1000,
+      exp: Date.now() + 3 * 60 * 1000,
     });
 
     try { await enviarOtpEmail(email.trim(), otp); }

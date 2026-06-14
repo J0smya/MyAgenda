@@ -60,33 +60,11 @@ import '../styles/recuperarcontrasena.css';
 
       <!-- PANEL 1: Elegir método -->
       <div class="panel activo" id="panel-1">
-        <div class="campo">
-          <label>¿Cómo quieres recuperarla?</label>
-          <div class="selector">
-            <button class="btn-metodo seleccionado" id="btn-correo" type="button">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              Correo
-            </button>
-            <button class="btn-metodo" id="btn-sms" type="button">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-              SMS
-            </button>
-          </div>
-        </div>
-
         <div class="campo" id="campo-correo">
           <label for="input-correo">Correo electrónico</label>
           <div class="wrap-input">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             <input type="email" id="input-correo" placeholder="tu@correo.com" autocomplete="email" />
-          </div>
-        </div>
-
-        <div class="campo oculto" id="campo-tel">
-          <label for="input-tel">Número de teléfono</label>
-          <div class="wrap-input">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-            <input type="tel" id="input-tel" placeholder="+57 300 123 4567" autocomplete="tel" />
           </div>
         </div>
 
@@ -123,7 +101,7 @@ import '../styles/recuperarcontrasena.css';
 
           <div class="timer-row">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Expira en <strong id="timer">10:00</strong>
+            Expira en <strong id="timer">3:00</strong>
           </div>
         </div>
 
@@ -242,53 +220,27 @@ import '../styles/recuperarcontrasena.css';
       }
     }
 
-    // ── Seleccionar método ────────────────────────────────────────
-    document.getElementById('btn-correo').addEventListener('click', () => seleccionarMetodo('email'));
-    document.getElementById('btn-sms').addEventListener('click',    () => seleccionarMetodo('sms'));
-
-    function seleccionarMetodo(metodo) {
-      metodoActual = metodo;
-      document.getElementById('btn-correo').classList.toggle('seleccionado', metodo === 'email');
-      document.getElementById('btn-sms').classList.toggle('seleccionado',    metodo === 'sms');
-      document.getElementById('campo-correo').classList.toggle('oculto', metodo !== 'email');
-      document.getElementById('campo-tel').classList.toggle('oculto',    metodo !== 'sms');
-      // Enfocar el campo activo
-      setTimeout(() => {
-        const id = metodo === 'email' ? 'input-correo' : 'input-tel';
-        document.getElementById(id)?.focus();
-      }, 50);
-    }
-
     // ── PASO 1: Enviar código ─────────────────────────────────────
     document.getElementById('btn-enviar').addEventListener('click', enviarCodigo);
     document.getElementById('input-correo').addEventListener('keydown', e => { if (e.key === 'Enter') enviarCodigo(); });
-    document.getElementById('input-tel').addEventListener('keydown',    e => { if (e.key === 'Enter') enviarCodigo(); });
 
     async function enviarCodigo() {
       const emailVal = document.getElementById('input-correo').value.trim();
-      const telVal   = document.getElementById('input-tel').value.trim();
 
-      if (metodoActual === 'email' && !emailVal) {
+      if (!emailVal) {
         mostrarToast('Campo requerido', 'Ingresa tu correo electrónico.', 'error');
         document.getElementById('input-correo').focus();
         return;
       }
-      if (metodoActual === 'sms' && !telVal) {
-        mostrarToast('Campo requerido', 'Ingresa tu número de teléfono.', 'error');
-        document.getElementById('input-tel').focus();
-        return;
-      }
 
-      contactoActual = metodoActual === 'email' ? emailVal : telVal;
+      contactoActual = emailVal;
 
       const btn = document.getElementById('btn-enviar');
       btn.innerHTML = '<span class="btn-spinner"></span> Enviando…';
       btn.disabled = true;
 
       try {
-        const body = { accion: 'enviar_codigo', metodo: metodoActual };
-        if (metodoActual === 'email') body.email    = emailVal;
-        else                          body.telefono = telVal;
+        const body = { accion: 'enviar_codigo', metodo: 'email', email: emailVal };
 
         const res  = await fetch('/api/recuperarcontrasena', {
           method: 'POST',
@@ -306,10 +258,10 @@ import '../styles/recuperarcontrasena.css';
         document.getElementById('texto-mascara').textContent =
           `Código enviado a ${data.destino}`;
         irAPaso(2);
-        iniciarTemporizador(600);
-        iniciarReenviar(60);
+        iniciarTemporizador(180);
+        iniciarReenviar(50);
 
-        mostrarToast('Código enviado', `Revisa ${metodoActual === 'email' ? 'tu bandeja de entrada' : 'tus mensajes SMS'}.`, 'info');
+        mostrarToast('Código enviado', 'Revisa tu bandeja de entrada.', 'info');
 
       } catch {
         mostrarToast('Error de conexión', 'Verifica tu red e intenta de nuevo.', 'error');
@@ -392,9 +344,7 @@ import '../styles/recuperarcontrasena.css';
       const btn = document.getElementById('btn-reenviar');
       btn.disabled = true;
       try {
-        const body = { accion: 'enviar_codigo', metodo: metodoActual };
-        if (metodoActual === 'email') body.email    = contactoActual;
-        else                          body.telefono = contactoActual;
+        const body = { accion: 'enviar_codigo', metodo: 'email', email: contactoActual };
         const res  = await fetch('/api/recuperarcontrasena', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
@@ -403,8 +353,8 @@ import '../styles/recuperarcontrasena.css';
         if (res.ok) {
           otpToken = data.otpToken;
           otpInputs.forEach(i => i.value = '');
-          iniciarTemporizador(600);
-          iniciarReenviar(60);
+          iniciarTemporizador(180);
+          iniciarReenviar(50);
           otpInputs[0].focus();
           mostrarToast('Código reenviado', 'Se envió un nuevo código.', 'info');
         } else {
