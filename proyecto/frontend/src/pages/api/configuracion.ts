@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
       a.href     = url;
-      a.download = `Mis_Datos_MyAgenda_${new Date().toISOString().slice(0,10)}.json`;
+      a.download = `Misdatos_MyAgenda_${new Date().toISOString().slice(0,10)}.html`;
       document.body.appendChild(a);
       a.click();
       a.remove();
